@@ -4,126 +4,146 @@
 
     use Kentron\Facade\Twig;
 
-    class Page
+    final class Page
     {
-        public  $properties = [
-                    "meta" => [
-                        "title" => "",
-                    ],
-                    "script" => [
-                        "js" => [ "main.js" ],
-                        "css" => []
-                    ],
-                    "frame_view" => "index.twig",
-                    "template" => "/Shared/default.twig",
-                    "data" => []
-                ];
+        private $baseDirectory;
+        private $data;
+        private $frame;
+        private $meta;
+        private $scripts;
+        private $styles;
+        private $template;
 
-        private $twig = null;
-
-        public function __construct (array $pageSettings = [])
+        public function __construct (?string $directory = null)
         {
-            $twigDir = APP_DIR . "View/";
+            $this->scripts = new \stdClass();
+            $this->styles  = new \stdClass();
+            $this->meta    = new \stdClass();
 
-            $this->twig = new Twig($twigDir);
+            // Set any defaults
+            $this->setFrame("index.twig");
+            $this->setTitle("");
 
-            // Set the default values from the config
-            if (count($pageSettings) > 0) {
-                $this->setDefaults($pageSettings);
+            if (is_string($directory)) {
+                $this->setDirectory($directory);
             }
         }
 
         /**
-         *
          * Setters
-         *
          */
 
-        final public function setScripts (array $scripts): void
+        /**
+         * Set the base directory for Twig
+         * @param  string $directory The path of the directory to be used
+         * @throws InvalidArgumentException
+         */
+        public function setDirectory (string $directory): void
         {
-            $this->properties["script"]["js"] = $scripts;
+            if (file_exists($directory) !== false && is_dir($directory) !== false) {
+                throw new \InvalidArgumentException("$directory is not a valid directory");
+            }
+
+            $this->baseDirectory = $directory;
         }
 
-        final public function setStyles (array $styles): void
+        public function addJs ($js): void
+        {
+            if (is_null($this->scripts->js)) {
+                $this->scripts->js = [];
+            }
+
+            if (is_array($js)) {
+                $this->scripts->js = array_merge($this->scripts->js, $js);
+            }
+            else if (is_string($js) && file_exists($js)) {
+                $this->scripts->js[] = $js;
+            }
+        }
+
+        public function addCss ($styles): void
         {
             $this->properties["script"]["css"] = $styles;
         }
 
-        final public function setTemplate (string $templatePath): void
+        public function setTemplate (string $templatePath): void
         {
-            $this->properties["template"] = $templatePath;
+            $this->template = $templatePath;
         }
 
-        final public function setTitle (string $title): void
+        public function setTitle (string $title): void
         {
-            $this->properties["meta"]["title"] = $title;
+            $this->meta->title = $title;
         }
 
-        final public function setFrameView (string $framePath): void
+        public function setFrame (string $framePath): void
         {
-            $this->properties["frame_view"] = $framePath;
+            $this->frame = $framePath;
         }
 
         /**
-         *
-         * Helper functions
-         *
+         * Helper methods
          */
 
-        final public function removeScripts (): void
+        public function removeScripts (): void
         {
-            $this->setScripts([]);
-            $this->setStyles([]);
+            $this->scripts = [];
         }
 
-        final public function addScript (string $scriptPath): void
+        public function removeStyles (): void
         {
-            $this->properties["script"]["js"][] = $scriptPath;
+            $this->styles = [];
         }
 
-        final public function addScripts (array $scripts): void
+        public function addScript (string $scriptPath): void
+        {
+            $this->scripts += $scriptPath;
+        }
+
+        public function addScripts (array $scripts): void
         {
             foreach ($scripts as $script) {
                 $this->addScript($script);
             }
         }
 
-        final public function addStyle (string $stylePath): void
+        public function addStyle (string $stylePath): void
         {
-            $this->properties["script"]["css"][] = $stylePath;
+            $this->styles += $stylePath;
         }
 
-        final public function addStyles (array $styles): void
+        public function addStyles (array $styles): void
         {
             foreach ($styles as $style) {
                 $this->addStyle($style);
             }
         }
 
-        final public function render (): void
+        public function render (): void
         {
-            $this->twig->renderView($this->properties["frame_view"], $this->properties);
+            $twig = new Twig($this->baseDirectory);
+            $twig->renderView($this->frame, $this->getProperties());
         }
 
-        final public function capture (): string
+        public function capture (): string
         {
-            return $this->twig->captureView($this->properties["frame_view"], $this->properties["data"]);
+            $twig = new Twig($this->baseDirectory);
+            return $twig->captureView($this->properties["frame_view"], $this->properties["data"]);
         }
 
-        /**
-         *
-         * Private functions
-         *
-         */
-
-        private function setDefaults (array $pageSettings): void
+        private function getProperties (): array
         {
-            $title          = $pageSettings["title"] ?? "";
-            $defaultScripts = $pageSettings["scripts"] ?? [];
-            $defaultStyles  = $pageSettings["styles"] ?? [];
-
-            $this->setTitle($title);
-            $this->addScripts($defaultScripts);
-            $this->addStyles($defaultStyles);
+            return [
+                "meta" => [
+                    "title" => $this->title,
+                ],
+                "script" => [
+                    "js" => $this->scripts,
+                    "css" => $this->styles
+                ],
+                "frame_view" => $this->frame,
+                "template" => $this->template,
+                "data" => $this->data
+            ];
         }
     }

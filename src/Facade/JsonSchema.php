@@ -17,26 +17,26 @@
          * @var array
          */
         public $errors = [];
-        
+
         /**
          * Extract a JSON string
-         * @param  string     $json The json data to be extracted
+         * @param  string     $json The JSON data to be extracted
          * @return object
-         * @throws \Exception If the string cannot be successfully decoded
+         * @throws \Exception       If the string cannot be successfully decoded
          */
         public function extract (string $json): object
         {
             $extracted = json_decode($json, false);
-            
-            if (is_null()) {
-                throw new \Excpetion("JSON string is invalid");
+
+            if (is_null($extracted)) {
+                throw new \Exception("JSON string is invalid");
             }
         }
 
         /**
          * The validation function.
-         * @param  string $jsonData   JSON encoded data to be validated.
-         * @param  string $jsonSchema JSON encoded schema.
+         * @param  object $jsonData   JSON data to be validated.
+         * @param  object $jsonSchema JSON schema.
          * @return bool               The success of the validation.
          */
         public function isValid (object $jsonData, object $jsonSchema): bool

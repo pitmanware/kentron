@@ -2,22 +2,52 @@
 
     namespace Kentron\Proxy;
 
-    class Code
+    use Kentron\Exception\InvalidRegexException;
+
+    final class Code
     {
-        private $count      = 1,
-                $exclude    = [],
-                $length     = 4,
-                $regex      = "/[\+\/\=]/",
-                $safeMode   = true;
+        /**
+         * The amount of codes to be returned
+         * @var int $count
+         */
+        private $count = 1;
 
         /**
-         *
-         * Getters
-         *
+         * An exclusion list of codes to not produce
+         * @var array $exclude
          */
-        final public function get (): array
+        private $exclude = [];
+
+        /**
+         * The length of the codes to be returned
+         * @var int $length
+         */
+        private $length = 4;
+
+        /**
+         * Regex to match ignored characters
+         * @var string $regex Defaults to special characters produced by base64
+         */
+        private $regex = "/[\+\/\=]/";
+
+        /**
+         * Decides whether to include vowels and vowel-like numbers
+         * @var bool $safeMode
+         */
+        private $safeMode = true;
+
+        /**
+         * Getters
+         */
+
+        /**
+         * Creates an array of unique codes based off the given parameters
+         * @return array
+         */
+        public function get (): array
         {
             $codes = [];
+
             for ($i = 0; $i < $this->count; $i++) {
                 do {
                     $code = $this->generate();
@@ -30,81 +60,120 @@
             return $codes;
         }
 
-        final public function getAlpha (): array
+        /**
+         * Get codes containing only alpha characters
+         * @return array
+         */
+        public function getAlpha (): array
         {
             if ($this->safeMode) {
-                $this->setRegex("/[^BCDFGHJKLMNPQRSTVWXYZ]/");
+                $this->setNegativeRegex("/[^BCDFGHJKLMNPQRSTVWXYZ]/");
             }
             else {
-                $this->setRegex("/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/");
-            }
-
-            return $this->get();
-        }
-
-        final public function getDigit (): array
-        {
-            if ($this->safeMode) {
-                $this->setRegex("/[^23456789]/");
-            }
-            else {
-                $this->setRegex("/[^0123456789]/");
-            }
-
-            return $this->get();
-        }
-
-        final public function getAlphaNumeric (): array
-        {
-            if ($this->safeMode) {
-                $this->setRegex("/[^BCDFGHJKLMNPQRSTVWXYZ23456789]/");
-            }
-            else {
-                $this->setRegex("/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]/");
+                $this->setNegativeRegex("/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/");
             }
 
             return $this->get();
         }
 
         /**
-         *
-         * Setters
-         *
+         * Get codes containing only digits
+         * @return array
          */
-        final public function setLength (int $length): void
+        public function getDigit (): array
+        {
+            if ($this->safeMode) {
+                $this->setNegativeRegex("/[^23456789]/");
+            }
+            else {
+                $this->setNegativeRegex("/[^0123456789]/");
+            }
+
+            return $this->get();
+        }
+
+        /**
+         * Get codes containing only alphanumeric characters
+         * @return array
+         */
+        public function getAlphaNumeric (): array
+        {
+            if ($this->safeMode) {
+                $this->setNegativeRegex("/[^BCDFGHJKLMNPQRSTVWXYZ23456789]/");
+            }
+            else {
+                $this->setNegativeRegex("/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]/");
+            }
+
+            return $this->get();
+        }
+
+        /**
+         * Setters
+         */
+
+        /**
+         * Set the length of the expected code to be returned
+         * @param int $length
+         * @return void
+         */
+        public function setLength (int $length): void
         {
             if (count($length) > 0) {
                 $this->length = $length;
             }
         }
 
-        final public function setCount (int $count): void
+        /**
+         * Set the amount of generated codes to be returned
+         * @param int $count
+         * @return void
+         */
+        public function setCount (int $count): void
         {
             if (count($count) > 0) {
                 $this->count = $count;
             }
         }
 
-        final public function setRegex (string $regex): void
+        /**
+         * Set the regex to be used in generating the codes
+         * @param string $regex This is an exclusive regex. Anything matched will be removed
+         * @return void
+         * @throws InvalidRegexException
+         */
+        public function setNegativeRegex (string $regex): void
         {
+            if (@preg_match($regex, null) === false) {
+                throw new \InvalidRegexException("Supplied regex is invalid");
+            }
+
             $this->regex = $regex;
         }
 
-        final public function setExclude (array $exclude): void
+        /**
+         * Set an exclusion list
+         * @param array $exclude Any code generated in this list will be ignored
+         * @return void
+         */
+        public function setExclude (array $exclude): void
         {
             $this->exclude = $exclude;
         }
 
-        final public function setSafeMode (bool $safeMode): void
+        /**
+         * Set the safe mode. If active, all vowels will be removed to prevent against expletives
+         * @param bool $safeMode
+         * @return void
+         */
+        public function setSafeMode (bool $safeMode): void
         {
-            // Safe mode removed vowels and vowel-like digits from codes to prevent against expletives
             $this->safeMode = $safeMode;
         }
 
         /**
-         *
-         * Private function to generate a code based off the regex
-         *
+         * Generates one code based off the regex
+         * @return string
          */
         private function generate (): string
         {

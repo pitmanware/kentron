@@ -2,124 +2,146 @@
 
     namespace Kentron\Proxy;
 
-    use Kentron\Template\IError;
+    use Kentron\Template\AError;
 
-    class Response implements IError
+    final class Response extends AError
     {
-        public $body = [
-            "success"   => false,
-            "data"      => null,
-            "errors"    => []
-        ];
+        /**
+         * The success of the response, used primarilty with api/ajax routes
+         * @var bool
+         */
+        private $success = false;
 
+        /**
+         * The response data, JSON encoded on dispatch
+         * @var mixed
+         */
+        private $data;
+
+        /**
+         * The response code, defaults to 200
+         * @var int
+         */
         private $statusCode = 200;
 
         /**
-         *
          * Getters
-         *
          */
 
-        final public function getBody (): array
+        /**
+         * Get the body of the response data
+         * @return array
+         */
+        public function getBody (): array
         {
-            return $this->body;
+            return [
+                "success" => $this->success,
+                "data"    => $this->data,
+                "errors"  => $this->getErrors()
+            ];
         }
 
-        final public function getErrors (): array
+        public function getData       ()       { return $this->data;       }
+        public function getStatusCode (): int  { return $this->statusCode; }
+        public function getSuccess    (): bool { return $this->success;    }
+
+        /**
+         * Setters
+         */
+
+        public function setSuccess (bool $success = true): void
         {
-            return $this->body["errors"];
+            $this->success = $success;
         }
 
         /**
-         *
-         * Setters
-         *
+         * Set the response data
+         * @param mixed $data This will get JSON encoded so type doesn't matter
          */
-
-        final public function setErrors (array $errors): void
+        public function setData ($data): void
         {
-            $this->body["errors"] = $errors;
+            $this->data = $data;
         }
 
-        final public function setSuccess (bool $success = true): void
-        {
-            $this->body["success"] = $success;
-        }
-
-        final public function setData (array $data): void
-        {
-            $this->body["data"] = $data;
-        }
-
-        final public function setStatusCode (int $statusCode): void
+        /**
+         * Set the status code of the response
+         * @param int $statusCode
+         */
+        public function setStatusCode (int $statusCode): void
         {
             $this->statusCode = $statusCode;
         }
 
-        final public function setLocation (string $url): void
+        /**
+         * Set the location header
+         * @param string $url
+         */
+        public function setLocation (string $url): void
         {
             $this->setHeader("Location", $url);
         }
 
-        final public function setContentType (string $contentType): void
+        /**
+         * Set the content type header
+         * @param string $contentType
+         */
+        public function setContentType (string $contentType): void
         {
             $this->setHeader("Content-Type", $contentType);
         }
 
         /**
-         *
-         * Helper functions
-         *
+         * Helper methods
          */
 
-        final public function addError ($errors): void
+        /**
+         * Dispatch the response and kill the script
+         * @return void
+         */
+        public function dispatch (): void
         {
-            if (is_array($errors)) {
-                $errors = array_merge($this->getErrors(), $errors);
-                $this->setErrors($errors);
-            }
-            else {
-                $this->body["errors"][] = $errors;
-            }
-        }
-
-        final public function hasErrors (): bool
-        {
-            return count($this->getErrors()) > 0;
-        }
-
-        final public function dispatch (): void
-        {
+            $this->setResponseCode();
             $this->setContentType("application/json");
 
             if (!$this->hasErrors()) {
-                $this->setSuccess(true);
+                $this->setSuccess();
             }
 
             echo json_encode($this->getBody());
             die;
         }
 
-        final public function redirect (string $url): void
+        /**
+         * Set the location header and kill the script
+         * @param string $url
+         */
+        public function redirect (string $url): void
         {
+            $this->setResponseCode();
             $this->setLocation($url);
             die;
         }
 
         /**
-         *
-         * Wrapper functions
-         *
+         * Wrapper methods
          */
 
-        final public function setResponseCode (): void
+        /**
+         * Set the http response code
+         * @return void
+         */
+        private function setResponseCode (): void
         {
             http_response_code($this->statusCode);
         }
 
-        final public function setHeader (string $header, string $value): void
+        /**
+         * Dynamically set any http header
+         * @param string $header
+         * @param string $value
+         */
+        private function setHeader (string $header, string $value): void
         {
             header("$header: $value");
         }
-
     }
