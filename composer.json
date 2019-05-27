@@ -1,0 +1,30 @@
+{
+    "name": "utils/core",
+    "description": "Core classes",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Ben Pitman"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "twig/twig": "^2.6",
+        "illuminate/database": "~5.5.4",
+        "illuminate/pagination": "~5.5.4",
+        "justinrainbow/json-schema": "^5.2",
+        "swiftmailer/swiftmailer": "^6.0",
+        "brick/postcode": "0.2.*",
+        "giggsey/libphonenumber-for-php": "^8.9"
+    },
+    "require-dev": {
+        "theseer/phpdox": "^0.12",
+        "phploc/phploc": "^4.0"
+    },
+    "autoload": {
+        "psr-4" : {
+            "Utils\\Core\\" : "src"
+        }
+    }
+}

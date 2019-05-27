@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<phpdox xmlns="http://xml.phpdox.net/config" silent="false">
+
+    <project name="phpDox" source="${basedir}/src" workdir="${basedir}/build/phpdox/xml">
+
+        <collector publiconly="false" backend="parser" />
+
+        <generator output="${basedir}/docs">
+
+            <enrich base="${basedir}/build">
+                <source type="build" />
+                <source type="git">
+                    <history enabled="true" limit="15" />
+                </source>
+                <!-- <source type="checkstyle" /> -->
+                <!-- alternative checkstyler to support phpcs xml output -->
+                <!-- <source type="phpcs" /> -->
+                <!-- <source type="pmd" /> -->
+                <source type="phploc">
+                    <file name="phploc.xml" />
+                </source>
+                <!-- <source type="phpunit">
+                    <coverage path="coverage/xml" />
+                </source> -->
+            </enrich>
+
+            <build engine="html" enabled="true" output="html">
+                <template dir="${phpDox.home}/templates/html" />
+                <file extension="xhtml" />
+            </build>
+
+            <build engine="xml" enabled="false" output="xml" />
+
+        </generator>
+    </project>
+
+</phpdox>
