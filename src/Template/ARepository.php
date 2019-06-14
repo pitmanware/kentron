@@ -2,45 +2,19 @@
 
     namespace Kentron\Template;
 
-    use Kentron\Template\Model as AppModel;
-
-    use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-    use Illuminate\Database\Eloquent\Collection;
-    use Illuminate\Database\Eloquent\Model as EloquentModel;
-    use Illuminate\Database\Eloquent\SoftDeletes;
-    use Illuminate\Database\Query\Builder as QueryBuilder;
-    use Illuminate\Validation\Validator;
+    use Kentron\Template\AModel as AppModel;
 
     use \DateTime;
 
-    /**
-     * would contain all "used" model methods
-     * Models should NEVER be returned by any functions in the repository
-     * Repositories work on persistence, a model can be updated via the repository
-     * in a number of requests, there is no need for a single function in the
-     * repository to do ALL of the work you expect it to do and its information can
-     * be returned at any time using the get(), first() and toArray() functions.
-     *
-     * @info
-     */
     abstract class ARepository
     {
         /**
-         * Not best practice
-         * @todo seperate into different properties. eg: model, builder, collection.
-         * @todo As it stands, model property takes the form of over 7 different
-         * @todo objects over the course of getting data from eloquent and the call
-         * @todo order of these methods is too "Eloquent Informed" to be worth the
-         * @todo abstraction
-         *
-         * @var AppModel | EloquentModel | EloquentBuilder | QueryBuilder | Collection | Validator | SoftDeletes */
+         * The model
+         * @var AppModel
+         */
         protected $model;
 
-        protected $ormModel = AppModel::class;
-        protected $entity = AbstractEntity::class;
-
-        /** @var EloquentBuilder */
-        protected $queryBuilder;
+        protected $ormModel;
 
         protected $pagniator;
 
@@ -58,8 +32,6 @@
             'not similar to'
         ];
 
-        public const STOP = true;
-
         /**
          * AbstractRepository constructor.
          * @param null $model
@@ -74,40 +46,6 @@
         }
 
         /**
-         * Query
-         *
-         * @param null $query
-         */
-        public function query($query = null)
-        {
-            if ($query instanceof QueryBuilder) {
-                $this->model = $query;
-            }
-            else {
-                $this->model = $this->model->query();
-            }
-        }
-
-        /**
-         * All
-         *
-         * @param array $columns
-         *
-         * @return mixed
-         */
-        public function all($columns = ['*'])
-        {
-            /** @var AbstractRepository $instance */
-            $instance = new static;
-            return $instance->model->newQuery()->get($columns);
-        }
-
-        public function getFirstArray($model)
-        {
-            return $this->model->getFirstArray($model);
-        }
-
-        /**
          * Delete
          *
          * @return bool|int|mixed|null
@@ -118,22 +56,7 @@
         }
 
         /**
-         * Force Delete
-         * forceDelete() has multiple Eloquent declarations
-         * @todo If it actually matters, wrap inside conditional, maybe instanceof
-         * @todo If you know that it doesn't matter, delete these comments :p
-         *
-         * @author ?
-         * @return mixed
-         */
-        public function forceDelete()
-        {
-            return $this->model->forceDelete();
-        }
-
-        /**
          * Update
-         * Translated from French
          *
          * @param array $array
          */
@@ -167,34 +90,6 @@
             return $repo->model->toArray();
         }
 
-
-        /**
-         * Set Query Builder
-         * Contained errors in code, rewritten to do what I assume it was intended
-         * for (currently at time of writing, no usages for method anyway)
-         *
-         * @param $id
-         * @param array $columns
-         *
-         * @author MS
-         * @return AbstractRepository
-         */
-        public function setQueryBuilder($id, $columns = ['*'])
-        {
-            $this->find($id, $columns);
-            $this->queryBuilder = $this->model->select($columns)->where('id', $id);
-            return $this;
-        }
-
-        /**
-         * Execute Query Builder
-         *
-         */
-        public function executeQueryBuilder()
-        {
-            $this->model = $this->queryBuilder->get();
-        }
-
         /**
          * Get
          *
@@ -206,37 +101,12 @@
         }
 
         /**
-         * Key By
-         *
-         * @param callable|string $key
-         *
-         * @return Collection
-         */
-        public function keyBy($key)
-        {
-            return $this->model->keyBy($key);
-        }
-
-        /**
-         * Get Array By Key
-         *
-         * @param callable|string $key
-         *
-         * @return array
-         */
-        public function getArrayByKey($key)
-        {
-            return $this->model->get()->keyBy($key)->toArray();
-        }
-
-        /**
          * To Array
          *
          * @return array
          */
         public function toArray()
         {
-
             if (empty($this->model)) {
                 return [];
             }
@@ -244,81 +114,6 @@
                 return $this->model->toArray();
             }
         }
-
-        /**
-         * To Entity
-         *
-         *
-         * @return mixed
-         */
-        public function toEntity()
-        {
-            return new $this->entity($this->toArray());
-        }
-
-        /**
-         * To Collective Entity
-         *
-         * @return array
-         */
-        public function toEntityCollection()
-        {
-            $return = array();
-            foreach ($this->toArray() as $array) {
-                $return[] = new $this->entity($array);
-            }
-            return $return;
-        }
-
-
-
-        /**
-         * Update With Entity
-         *
-         * @param $entity
-         * @param $pk
-         *
-         */
-        public function updateWithEntity($entity, $pk = null)
-        {
-            $this->resetOrmModel();
-
-            if ($entity instanceof AbstractEntity) {
-                $array = $entity->get();
-
-                if (property_exists($entity, 'id')) {
-                    $this->where('id', '=', $entity->id);
-                }
-                else {
-                    $this->where($pk, '=', $entity->{$pk});
-                }
-
-                $this->update($array);
-            }
-        }
-
-
-        /**
-         * Create With Entity
-         *
-         * @param $entity
-         *
-         * @return bool
-         */
-        public function createWithEntity($entity)
-        {
-            $this->resetOrmModel();
-
-            if ($entity instanceof AbstractEntity) {
-                foreach ($entity->get() as $key => $value) {
-                    $this->set($key, $value);
-                }
-
-                return $this->model->save();
-            }
-        }
-
-
 
         /**
          * Select
@@ -334,8 +129,6 @@
          * Select Raw
          *
          * @param string $string
-         *
-         * @return Collection
          */
         public function selectRaw($string)
         {
@@ -494,53 +287,6 @@
         }
 
         /**
-         *
-         * Mass insert with the models timestamps
-         *
-         */
-        public function insertWithTimestamps($insertData)
-        {
-            foreach ($insertData as $key => &$rowData) {
-                $rowData[$this->model::CREATED_AT] = new \DateTime();
-
-                if ($this->model::UPDATED_AT) {
-                    $rowData[$this->model::UPDATED_AT] = new \DateTime();
-                }
-            }
-
-            return $this->model->insert($insertData);
-        }
-
-        /**
-         * eloquent eager load (table joins)
-         * @param  string $table
-         */
-        public function with($table)
-        {
-            $this->model->with($table);
-        }
-
-        /**
-         * create "where" from array key value of column = value
-         * @param  array  $filters
-         */
-        public function findWhere(array $filters = [])
-        {
-            // get list of feilds
-            foreach ($filters as $index => $value) {
-
-                if ($value instanceof DateTime || $value instanceof DateTimeUk || $value instanceof DateTimeDB)
-                {
-                    $value = $value->format('Y-m-d');
-                    $this->model = $this->model->whereDate($index, '=', $value);
-                }
-                else {
-                    $this->model = $this->model->where($index, $value);
-                }
-            }
-        }
-
-        /**
          * Create model by array
          * @param array $model
          */
@@ -567,7 +313,7 @@
          * @param  string       $type     join type
          * @param  boolean      $where    join where clause
          */
-        public function join($table, $one, $operator = null, $two = null, $type = 'inner', $where = false)
+        public function join(string $table, string $one, ?string $operator = null, ?string $two = null, string $type = 'inner', bool $where = false)
         {
             $this->model = $this->model
                 ->join($table, $one, $operator, $two, $type, $where);
@@ -578,115 +324,16 @@
          * @param  string $column
          * @param  string $direction
          */
-        public function orderBy($column, $direction = 'asc')
+        public function orderBy(string $column, string $direction = 'asc'): void
         {
             $this->model = $this->model->orderBy($column, $direction);
         }
 
         /**
-         * group by sql
-         * @param  mixed $groupBy
-         */
-        public function groupBy($groupBy)
-        {
-            $this->model = $this->model->groupBy($groupBy);
-        }
-
-        /**
-         * @todo rewrite this, don't like this level of exposure on capsule
-         *
-         * @param  [type] $string [description]
-         * @return [type]         [description]
-         */
-        public function raw($string)
-        {
-            global $capsule;
-            return $capsule::raw($string);
-
-            //Encapsulate the response in the $model property of the repo
-            //Raw should never really be used in a service context anyway,
-            // so this could be private
-            //$this->model = $capsule::raw($string);
-        }
-
-        /**
-         * paginate with PaginationProxy
-         * @param  int $itemsPerPage
-         * @param  int $pageNum
-         * @return array
-         */
-        public function paginate($itemsPerPage = 10, $pageNum = 1)
-        {
-            $pagination = new PaginationProxy($this->model, $itemsPerPage, $pageNum);
-            return [
-                'results' => $pagination->getItems(),
-                'pag_links' => $pagination->getLinks()
-            ];
-        }
-        /**
-         * paginate with PaginationProxy Ready for Ajax Requests.
-         * @param  int $itemsPerPage
-         * @param  int $pageNum
-         * @param  string $ajaxClass
-         * @return array
-         *
-         */
-        public function ajaxPaginate($itemsPerPage = 10, $pageNum = 1, $ajaxClass)
-        {
-            $pagination = new PaginationProxy($this->model, $itemsPerPage, $pageNum);
-            return [
-                'results' => $pagination->getItems(),
-                'pag_links' => $pagination->getAjaxLinks($ajaxClass)
-            ];
-        }
-
-        /**
-         * update a single table field
-         *
-         * @param  null|int $id
-         * @param  null|string $field
-         * @param  null|mixed $value
-         *
-         * @return bool
-         * @throws Exception | InvalidArgumentException
-         */
-        public function updateField($id = null, $field = null, $value = null)
-        {
-            if (is_null($id) || is_null($field)) {
-                throw new Exception("updateField args cannot be null.");
-            }
-
-            // if value a date, convert UK date object
-            $date = \DateTime::createFromFormat('d/m/Y', $value);
-            if ($date == true) {
-                $value = $date->format('Y-m-d');
-            }
-
-            $this->resetOrmModel();
-            $row = $this->model->find($id);
-
-            if (is_null($row)) {
-                throw new Exception("Record not found.");
-            }
-
-            $isValid = $this->model->validate([$field => $value]);
-
-            if (!$isValid) {
-                $message = $this->model->errors()->first();
-                throw new InvalidArgumentException("Validation error. $message");
-            }
-
-            $row->{$field} = $value;
-
-            return $row->update();
-        }
-
-        /**
          * Is Empty
-         *
          * @return bool
          */
-        public function isEmpty()
+        public function isEmpty(): bool
         {
             return $this->model->isEmpty();
         }
@@ -698,20 +345,7 @@
          */
         public function toSql()
         {
-            return $this->model->toSql();
-        }
-        /**
-         * Determine if the given operator and value combination is legal.
-         *
-         * @param  string  $operator
-         * @param  mixed  $value
-         * @return bool
-         */
-        private function invalidOperatorAndValue($operator, $value)
-        {
-            $isOperator = in_array($operator, $this->operators);
-
-            return $isOperator && $operator != '=' && is_null($value);
+            return $this->model->getStatement();
         }
 
         /**
@@ -802,92 +436,9 @@
             return $this->model->validate($array);
         }
 
-        /**
-         * Get Last Error
-         *
-         * @return mixed
-         */
-        public function getLastError()
-        {
-            return $this->model->errors()->first();
-        }
-
-        /**
-         * Get Errors
-         *
-         * @return mixed
-         */
-        public function getErrors()
-        {
-            return $this->model->errors()->all();
-        }
-
-        /**
-         * Manual Key By
-         *
-         * @param array $array
-         * @param string $key
-         * @return array
-         */
-        public function manualKeyBy(array $array, $key = "id")
-        {
-            $data = [];
-            foreach ($array as $item) {
-                $data[$item[$key]] = $item;
-            }
-            return $data;
-        }
-
         public function withTrashed()
         {
             $this->model = $this->model->withTrashed();
-        }
-
-
-        /**
-         * never modify this function!
-         *
-         * @param  string $name class name
-         * @param  mixed $key  storage key id
-         * @return object
-         */
-        protected final function dataFactory($name = '', $key = null)
-        {
-            return $this->factory('Data\\' . $name, $key);
-        }
-
-        /**
-         * never modify this function!
-         *
-         * @param  string $name class name
-         * @param  mixed $key  storage key id
-         * @return object
-         */
-        protected final function entityFactory($name = '', $key = null)
-        {
-            return $this->factory('Entity\\' . $name, $key);
-        }
-
-        /**
-         * never modify this function!
-         *
-         * @param  string $class class name
-         * @param  mixed $key  storage key id
-         * @return object
-         */
-        protected function factory($class, $key)
-        {
-            $factory = new DataFactory();
-            $namespace = $factory->getNamespace();
-
-            // instance manager
-            $registryManager = Registry::getInstance();
-            $instance = $registryManager->find($namespace . $class, $key);
-
-            if (is_null($instance)) {
-                $instance = $factory->make($class);
-            }
-            return $registryManager->add($namespace . $class, $key, $instance);
         }
 
         public function replicate()
@@ -920,6 +471,7 @@
             $model = $repo->getModel();
             $this->model = $this->model->union($model->getQuery());
         }
+
         public function getTableName()
         {
             return $this->model->getTableName();
@@ -946,32 +498,5 @@
         {
             return $this->model->paginate($recAmount, $columns, '', $page)->toArray();
         }
-
-        public function insertGetId ($insertArray)
-        {
-            return $this->model->insertGetId($insertArray);
-        }
-
-        public function setFilters ($filter)
-        {
-            foreach ($filter as $key => $value) {
-                if($value) {
-                    $this->where($key, '=', $value);
-                }
-            }
-        }
-
-        /**
-     	 * Iterate over results one query at a time
-     	 *
-     	 * @return tuple
-    	 */
-        public function iterator ()
-        {
-            foreach ($this->model->cursor() as $key => $value) {
-                if ((yield $key => $value->toArray()) === self::STOP) {
-                    break;
-                }
-            }
-        }
     }
+
