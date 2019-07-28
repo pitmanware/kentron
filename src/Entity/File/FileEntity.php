@@ -6,19 +6,19 @@
 
     class FileEntity extends Entity
     {
-        private $name       = "",
-                $extension  = "",
-                $type       = "",
-                $path       = "",
-                $size       = null;
+        private $name       = "";
+        private $extension  = "";
+        private $type       = "";
+        private $path       = "";
+        private $size       = null;
 
         public function __construct (string $name, string $type, string $path, string $size)
         {
-            $this->name         = $name;
-            $this->type         = $type;
-            $this->path         = $path;
-            $this->size         = $size;
-            $this->extension    = pathinfo($name, PATHINFO_EXTENSION);
+            $this->name       = $name;
+            $this->type       = $type;
+            $this->path       = $path;
+            $this->size       = $size;
+            $this->extension  = pathinfo($name, PATHINFO_EXTENSION) ?? "";
         }
 
         public function rename (string $newName): void

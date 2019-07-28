@@ -41,9 +41,20 @@
             ];
         }
 
-        public function getData       ()       { return $this->data;       }
-        public function getStatusCode (): int  { return $this->statusCode; }
-        public function getSuccess    (): bool { return $this->success;    }
+        public function getData ()
+        {
+            return $this->data;
+        }
+
+        public function getStatusCode (): int
+        {
+            return $this->statusCode;
+        }
+
+        public function getSuccess (): bool
+        {
+            return $this->success;
+        }
 
         /**
          * Setters

@@ -2,6 +2,9 @@
 
     namespace Kentron\Facade;
 
+    /**
+     * A wrapper for the OPP CURL PHP system
+     */
     final class Curl
     {
         /**
@@ -37,9 +40,7 @@
         }
 
         /**
-         *
          * Getters
-         *
          */
 
         /**
@@ -70,9 +71,7 @@
         }
 
         /**
-         *
          * Setters
-         *
          */
 
         /**
@@ -87,8 +86,8 @@
 
         /**
          * Set the request headers
-         * @param   array $headers
-         * @return  self
+         * @param  array $headers
+         * @return self
          */
         public function setHeaders (array $headers = []): self
         {
@@ -98,9 +97,9 @@
 
         /**
          * Dynamic allocation of curl options
-         * @param   int     $optName
-         * @param   mixed   $value
-         * @return  self
+         * @param  int     $optName
+         * @param  mixed   $value
+         * @return self
          */
         public function setOpt (int $optName, $value): self
         {
@@ -110,8 +109,8 @@
 
         /**
          * Dynamic allocation of curl options with an array
-         * @param   array $optArray Associative array of all options and their value
-         * @return  self
+         * @param  array $optArray Associative array of all options and their value
+         * @return self
          */
         public function setOptArray (array $optArray): self
         {
@@ -121,8 +120,8 @@
 
         /**
          * Set the port
-         * @param   int $portNumber
-         * @return  self
+         * @param  int $portNumber
+         * @return self
          */
         public function setPort (int $portNumber): self
         {
@@ -130,10 +129,21 @@
             return $this;
         }
 
+        public function setPost ($postData): self
+        {
+            if (is_array($postData)) {
+                $this->setPostArray($postData);
+            }
+            else if (is_string($postData)) {
+                $this->setPostField($postData);
+            }
+            return $this;
+        }
+
         /**
          * Set post data as array
-         * @param   array $postData Post data associative array
-         * @return  self
+         * @param  array $postData Post data associative array
+         * @return self
          */
         public function setPostArray (array $postData): self
         {
@@ -144,8 +154,8 @@
 
         /**
          * Set post data as string
-         * @param   string $postData Raw post string
-         * @return  self
+         * @param  string $postData Raw post string
+         * @return self
          */
         public function setPostField (string $postData): self
         {
@@ -156,9 +166,9 @@
 
         /**
          * Set SSL keys
-         * @param   string $sslPath Path to the SSL file
-         * @param   string $sslPass Password
-         * @return  self
+         * @param  string $sslPath Path to the SSL file
+         * @param  string $sslPass Password
+         * @return self
          */
         public function setSSL (string $sslPath = "/", string $sslPass = ""): self
         {
@@ -169,8 +179,8 @@
 
         /**
          * Set a timeout on the request
-         * @param   int     $seconds
-         * @return  self
+         * @param  int     $seconds
+         * @return self
          */
         public function setTimeOut (int $seconds): self
         {
@@ -180,8 +190,8 @@
 
         /**
          * Set the target URL
-         * @param   string $url
-         * @return  self
+         * @param  string $url
+         * @return self
          */
         public function setUrl (string $url): self
         {

@@ -8,36 +8,67 @@
 
     final class Soap extends \SoapClient
     {
-        public $errors = [];
+        /**
+         * Target action method
+         * @var string $action
+         */
+        private $action;
 
-        public $extractedXml = null;
+        /**
+         * Any errors returned from the Soap client
+         * @var array $errors
+         */
+        private $errors = [];
 
-        public $rawXml = "";
+        /**
+         * The extracted XML response
+         * @var null|object
+         */
+        private $extractedXml = null;
 
-        private $targetUrl;
+        /**
+         * The raw XML response
+         * @var string
+         */
+        private $rawXml = "";
 
+        /**
+         * The WSDL URL
+         * @var string
+         */
+        private $wsdl;
+
+        /**
+         * The SOAP version, default 1.2
+         * @var int
+         */
         private $version = SOAP_1_2;
 
-        public function __construct (string $targetUrl, ?int $version = null)
+        public function __construct (string $wsdl, ?int $version = null)
         {
-            $this->targetUrl = $targetUrl;
+            $this->wsdl = $wsdl;
 
             if (is_int($version)) {
                 $this->version = $version;
             }
 
             parent::__construct(
-                $this->targetUrl,
+                $this->wsdl,
                 ["soap_version" => $this->version]
             );
         }
 
-        public function request (string $xml, string $action, int $one_way = 0): bool
+        public function setAction (string $action): void
+        {
+            $this->action = $action;
+        }
+
+        public function requestRaw (string $xml, string $action, int $one_way = 0): bool
         {
             try {
                 $this->rawXml = parent::__doRequest(
                     $xml,
-                    $this->targetUrl,
+                    $this->wsdl,
                     $action,
                     $this->version,
                     $one_way
@@ -60,6 +91,11 @@
             }
 
             return true;
+        }
+
+        public function request (): bool
+        {
+            //TODO use SoapClient call method
         }
 
         public function extract (): ?object
