@@ -9,12 +9,8 @@
     {
         private $twig;
 
-        public function __construct (?string $twigDir = null)
+        public function __construct (string $twigDir)
         {
-            if (is_null($twigDir)) {
-                $twigDir = APP_DIR . "View/";
-            }
-
             $twigLoader = new FilesystemLoader($twigDir);
             $this->twig = new Environment($twigLoader, []);
         }

@@ -4,7 +4,7 @@
 
     use Kentron\Template\IValidation;
 
-    class Email implements IValidation
+    final class Email implements IValidation
     {
         private $email = "";
 

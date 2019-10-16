@@ -1,6 +1,6 @@
 <?php
 
-    namespace Kentron\Facade;
+    namespace Kentron\Proxy;
 
     /**
      * A wrapper for the OPP CURL PHP system

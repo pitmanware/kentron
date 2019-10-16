@@ -3,7 +3,7 @@
     namespace Kentron\Proxy\System;
 
     use Kentron\Template\IRequest;
-    use Utils\Proxy\Cast;
+    use Kentron\Proxy\Cast;
 
     /**
      * Wrapper for the _Get constant array
@@ -12,15 +12,17 @@
     {
         /**
          * Get one item from the _GET array
-         * @param  string       $key    The post index to retrieve
-         * @param  string|null  $type   The type to cast to if necessary
-         * @return mixed                Can return any type
+         *
+         * @param string      $key  The post index to retrieve
+         * @param string|null $type The type to cast to if necessary
+         *
+         * @return mixed Can return any type
          */
         public static function getOne (string $key, ?string $type = null)
         {
-            $value = $_GET[$key];
+            $value = $_GET[$key] ?? null;
 
-            if (empty($value)) {
+            if (is_null($value)) {
                 return null;
             }
 
@@ -34,6 +36,7 @@
 
         /**
          * Get all items from the _GET array
+         * 
          * @return array
          */
         public static function getAll (): array

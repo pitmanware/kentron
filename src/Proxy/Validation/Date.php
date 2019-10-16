@@ -4,28 +4,32 @@
 
     use Kentron\Template\IValidation;
 
-    class Date implements IValidation
+    final class Date implements IValidation
     {
-        private $date   = null,
-                $format = null;
+        private $date;
+        private $format;
 
         public function __construct (string $date, ?string $format = null)
         {
-            $this->date     = $date;
-            $this->format   = $format;
+            $this->date = $date;
+            $this->format = $format;
         }
 
         public function isValid (): bool
         {
-            try {
-                if (!is_null($this->format)) {
+            try
+            {
+                if (isset($this->format))
+                {
                     \DateTime::createFromFormat($this->date, $this->format);
                 }
-                else {
+                else
+                {
                     new \DateTime($this->date);
                 }
             }
-            catch (\Exception $ex) {
+            catch (\Exception $ex)
+            {
                 return false;
             }
 

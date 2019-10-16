@@ -6,19 +6,17 @@
 
     use Kentron\Template\IValidation;
 
-    class PhoneNumber implements IValidation
+    final class PhoneNumber implements IValidation
     {
-        public  $country        = "",
-                $number         = "",
-                $validValue     = true;
+        private $country = "GB";
+        private $number;
+        private $validValue = true;
+        private $phoneUtil;
+        private $phoneObject;
 
-        private $phoneUtil      = null,
-                $phoneObject    = null;
-
-        public function __construct (string $phoneNumber, string $country = "GB")
+        public function __construct (string $phoneNumber)
         {
-            $this->number   = str_replace(" ", "", $phoneNumber);
-            $this->country  = $country;
+            $this->number = str_replace(" ", "", $phoneNumber);
 
             try {
                 $this->phoneUtil = PhoneNumberUtil::getInstance();
@@ -39,12 +37,7 @@
             return $this->phoneUtil->isValidNumber($this->phoneObject);
         }
 
-        /**
-         *
-         *  Default to National
-         *
-         */
-        public function getFormat (): string
+        public function getDefaultFormat (): string
         {
             return $this->getNationalFormat();
         }

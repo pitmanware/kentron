@@ -6,7 +6,7 @@
 
     use Kentron\Template\IValidation;
 
-    class Postcode implements IValidation
+    final class Postcode implements IValidation
     {
         private $countryCode    = "",
                 $formatter      = null,

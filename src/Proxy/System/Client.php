@@ -4,11 +4,20 @@
 
     final class Client
     {
+        /**
+         * Gets the user agent
+         * 
+         * @return string
+         */
         public static function getUserAgent (): string
         {
             return $_SERVER["HTTP_USER_AGENT"] ?? "";
         }
 
+        /**
+         * Gets the IP address of the client
+         * @return string
+         */
         public static function getIP (): string
         {
             return  $_SERVER["HTTP_CLIENT_IP"] ??
@@ -20,18 +29,12 @@
                     "";
         }
 
+        /**
+         * Gets the domain name of the server
+         * @return string
+         */
         public static function getDomain (): string
         {
             return $_SERVER["HTTP_HOST"] ?? $_SERVER["SERVER_NAME"] ?? "";
-        }
-
-        public static function getProtocol (): string
-        {
-            if ((isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") || $_SERVER["SERVER_PORT"] == 443) {
-                return "https://";
-            }
-            else {
-                return "http://";
-            }
         }
     }

@@ -2,24 +2,39 @@
 
     namespace Kentron\Proxy;
 
-    use Utils\Exception\XmlFormatException;
+    use Kentron\Exception\XmlFormatException;
 
     final class Xml
     {
-        public static function extract (string $xml): object
+        /**
+         * Extract the raw XML
+         *
+         * @param string $xml The XML string to extract
+         *
+         * @return array The formatted extracted array
+         *
+         * @throws XmlFormatException If the XML could not be decoded
+         */
+        public static function extract (string $xml): array
         {
             libxml_use_internal_errors(true);
             $loadedXml = simplexml_load_string($xml);
 
-            if (empty($loadedXml)) {
+            if (is_null($loadedXml) || $loadedXml === false) {
                 throw self::buildException();
             }
 
-            // Format the encoded XML response to an object
-            return json_decode(json_encode($loadedXml));
+            return self::format($loadedXml);
         }
 
-        public static function extractSoap (string $soap): object
+        /**
+         * Calls self::extract after removing soap attributes
+         *
+         * @param string $soap The raw XML string
+         *
+         * @return array
+         */
+        public static function extractSoap (string $soap): array
         {
             $xml = preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $soap);
 
@@ -27,7 +42,45 @@
         }
 
         /**
-         * Create a nested XmlFormatException
+         * Format the extracted XML to a more useable array
+         *
+         * @param SimpleXMLElement $xml The extracted XML to format
+         *
+         * @return array The formatted extracted XML array
+         */
+        public static function format (\SimpleXMLElement $xml): array
+        {
+            $collection = [];
+            $nodes = $xml->children();
+            $attributes = $xml->attributes();
+
+            if (count($attributes) > 0) {
+                foreach ($attributes as $attrName => $attrValue) {
+                    $collection["@attributes"][$attrName] = (string) $attrValue;
+                }
+            }
+
+            if ($nodes->count() === 0) {
+                $collection["value"] = (string) $xml;
+                return $collection;
+            }
+
+            foreach ($nodes as $nodeName => $nodeValue) {
+                if (count($nodeValue->xpath('../' . $nodeName)) < 2) {
+                    $collection[$nodeName] = self::format($nodeValue);
+                    continue;
+                }
+
+                $collection[$nodeName][] = self::format($nodeValue);
+            }
+
+            return $collection;
+        }
+
+        /**
+         * Create a nested exception
+         *
+         * @return XmlFormatException
          */
         private static function buildException (): XmlFormatException
         {
@@ -49,7 +102,7 @@
 
                 $errorMessage .= "$error->message at $error->line:$error->column";
 
-                if (!empty($error->file)) {
+                if (isset($error->file)) {
                     $errorMessage .= " in file $error->file";
                 }
 
