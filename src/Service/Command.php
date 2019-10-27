@@ -1,6 +1,6 @@
 <?php
 
-    namespace Kentron\Proxy;
+    namespace Kentron\Service;
 
     /**
      * A wrapper class for proc_open

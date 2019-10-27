@@ -1,11 +1,13 @@
 <?php
 
-    namespace Kentron\Proxy;
+    namespace Kentron\Service;
+
+    use Kentron\Template\AError;
 
     /**
      * A wrapper for the OPP CURL PHP system
      */
-    final class Curl
+    final class Curl extends AError
     {
         /**
          * Curl instance
@@ -18,12 +20,6 @@
          * @var array
          */
         private $curlInfo = [];
-
-        /**
-         * The curl error if applicable
-         * @var string|null
-         */
-        private $error = null;
 
         /**
          * Response of the curl request
@@ -42,15 +38,6 @@
         /**
          * Getters
          */
-
-        /**
-        * Get curl error
-        * @return string|null
-        */
-        public function getError (): ?string
-        {
-            return $this->error;
-        }
 
         /**
          * Get info from the curl response
@@ -80,8 +67,7 @@
          */
         public function setGet(): self
         {
-            curl_setopt($this->curl, CURLOPT_POST, 0);
-            return $this;
+            return $this->setOpt(CURLOPT_POST, 0);
         }
 
         /**
@@ -91,8 +77,12 @@
          */
         public function setHeaders (array $headers = []): self
         {
-            curl_setopt($this->curl, CURLOPT_HTTPHEADER, $headers);
-            return $this;
+            return $this->setOpt(CURLOPT_HTTPHEADER, $headers);
+        }
+
+        public function setMethod (string $method): self
+        {
+            return $this->setOpt(CURLOPT_CUSTOMREQUEST, $method);
         }
 
         /**
@@ -125,8 +115,7 @@
          */
         public function setPort (int $portNumber): self
         {
-            curl_setopt($this->curl, CURLOPT_PORT, $portNumber);
-            return $this;
+            return $this->setOpt(CURLOPT_PORT, $portNumber);
         }
 
         public function setPost ($postData): self
@@ -147,9 +136,8 @@
          */
         public function setPostArray (array $postData): self
         {
-            curl_setopt($this->curl, CURLOPT_POST, true);
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $postData);
-            return $this;
+            return $this->setOpt(CURLOPT_POST, true);
+                ->setOpt(CURLOPT_POSTFIELDS, $postData);
         }
 
         /**
@@ -159,9 +147,8 @@
          */
         public function setPostField (string $postData): self
         {
-            curl_setopt($this->curl, CURLOPT_POST, true);
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $postData);
-            return $this;
+            return $this->setOpt(CURLOPT_POST, true)
+                ->setOpt(CURLOPT_POSTFIELDS, $postData);
         }
 
         /**
@@ -172,9 +159,8 @@
          */
         public function setSSL (string $sslPath = "/", string $sslPass = ""): self
         {
-            curl_setopt($this->curl, CURLOPT_SSLCERT, $sslPath);
-            curl_setopt($this->curl, CURLOPT_SSLCERTPASSWD, $sslPass);
-            return $this;
+            return $this->setOpt(CURLOPT_SSLCERT, $sslPath)
+                ->setOpt(CURLOPT_SSLCERTPASSWD, $sslPass);
         }
 
         /**
@@ -184,8 +170,7 @@
          */
         public function setTimeOut (int $seconds): self
         {
-            curl_setopt($this->curl, CURLOPT_TIMEOUT, $seconds);
-            return $this;
+            return $this->setOpt(CURLOPT_TIMEOUT, $seconds);
         }
 
         /**
@@ -195,8 +180,7 @@
          */
         public function setUrl (string $url): self
         {
-            curl_setopt($this->curl, CURLOPT_URL, $url);
-            return $this;
+            return $this->setOpt(CURLOPT_URL, $url);
         }
 
         /**
@@ -214,8 +198,9 @@
             $response       = curl_exec($this->curl);
             $errorNumber    = curl_errno($this->curl);
             $errorMessage   = curl_error($this->curl);
-            $this->error    = "Curl error ($errorNumber): $errorMessage";
             $this->curlInfo = curl_getinfo($this->curl);
+
+            $this->addError("Curl error ($errorNumber): $errorMessage");
 
             curl_close($this->curl);
 

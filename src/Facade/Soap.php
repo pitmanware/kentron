@@ -2,7 +2,7 @@
 
     namespace Kentron\Facade;
 
-    use Kentron\Proxy\Xml as XmlProxy;
+    use Kentron\Service\Xml as Xml\Service;
 
     use Kentron\Exception\XmlFormatException;
 
@@ -101,7 +101,7 @@
         public function extract (): ?object
         {
             try {
-                $this->extractedXml = XmlProxy::extractSoap($this->rawXml);
+                $this->extractedXml = Xml\Service::extractSoap($this->rawXml);
             }
             catch (\XmlFormatException $ex) {
                 $this->errors[] = $ex->getMessage();

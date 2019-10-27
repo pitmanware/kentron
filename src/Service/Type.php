@@ -1,9 +1,54 @@
 <?php
 
-    namespace Kentron\Proxy;
+    namespace Kentron\Service;
 
-    final class Cast
+    final class Type
     {
+        /**
+         * Checks if an array is associative or numeric indexed
+         *
+         * @param array $array The array to check
+         *
+         * @return bool True is the array is associative
+         */
+        public static function isAssoc (array $array): bool
+        {
+            return !!array_filter(array_keys($array), 'is_string');
+        }
+
+        /**
+         * Checks if a variable can be used in a foreach
+         * Also works with callables
+         *
+         * @param mixed $data The variable to check
+         *
+         * @return bool True if the variable can be traversed
+         */
+        public static function isIterable ($data): bool
+        {
+            return is_array($data) || is_object($data);
+        }
+
+        /**
+         * Returns a property from an iterable scalar
+         *
+         * @param mixed  $data     The data to extract a value from
+         * @param string $property The key
+         *
+         * @return mixed Null if no key exists
+         */
+        public static function getProperty ($data, string $property)
+        {
+            if (is_object($data) && property_exists($data, $property)) {
+                return $data->{$property};
+            }
+            else if (is_array($data) && isset($data[$property])) {
+                return $data[$property];
+            }
+
+            return null;
+        }
+
         /**
          * Gets one of the casting methods
          *

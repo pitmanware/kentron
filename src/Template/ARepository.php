@@ -2,55 +2,166 @@
 
     namespace Kentron\Template;
 
-    use Kentron\Template\AModel as AppModel;
+    use Kentron\Template\AModel;
+
+    use Kentron\Template\Entity\{ADBEntity,ACoreCollectionEntity};
 
     use \DateTime;
 
     abstract class ARepository
     {
         /**
-         * The model
-         * @var AppModel
+         * The class name of the model
+         * Should be overriden
+         *
+         * @var string
          */
-        protected $model;
-
-        protected $ormModel;
-
-        protected $pagniator;
+        protected $modelClass;
 
         /**
-         * All of the available clause operators.
+         * The model
+         *
+         * @var AModel
+         */
+        private $model;
+
+        /**
+         * Any updates that need to be run
          *
          * @var array
          */
-        protected $operators = [
-            '=', '<', '>', '<=', '>=', '<>', '!=',
-            'like', 'like binary', 'not like', 'between', 'ilike',
-            '&', '|', '^', '<<', '>>',
-            'rlike', 'regexp', 'not regexp',
-            '~', '~*', '!~', '!~*', 'similar to',
-            'not similar to'
+        private $updates = [];
+
+        /**
+         * All of the available clause operators
+         *
+         * @var array
+         */
+        private $operators = [
+            "=", "<", ">", "<=", ">=", "<>", "!=",
+            "like", "like binary", "not like", "between", "ilike",
+            "&", "|", "^", "<<", ">>",
+            "rlike", "regexp", "not regexp",
+            "~", "~*", "!~", "!~*", "similar to",
+            "not similar to"
         ];
 
         /**
-         * AbstractRepository constructor.
-         * @param null $model
+         * All the methods of ordering the results
+         *
+         * @var array
          */
-        public function __construct($model = null)
+        private $orderDirections = ["asc", "desc"];
+
+        /**
+         * AbstractRepository constructor
+         *
+         * @throws \UnexpectedValueException If model is empty or not a child of AModel
+         */
+        public function __construct ()
         {
-            if (($model instanceof $this->ormModel)) {
-                $this->model = $model;
-            } else {
-                $this->model = new $this->ormModel();
+            if (is_null($this->modelClass) || !is_subclass_of($this->modelClass, AModel::class)) {
+                throw new \UnexpectedValueException("Model must be instance of " . AModel::class);
             }
+
+            $this->model = new $this->ormModel();
         }
+
+        /**
+         * Entity methods
+         */
+
+         /**
+          * Runs the update method using the $updates property
+          * @return void
+          */
+         public function runUpdate (): void
+         {
+             $this->update($this->updates);
+         }
+
+         /**
+          * Inserts a new entry into the database using an ADBEntity
+          *
+          * @param ADBEntity $entity [description]
+          */
+         public function insertNew (ADBEntity $entity): void
+         {
+             // Loop through the attributes and set based on the key
+             foreach ($entity->iterateAvailableProperties(true) as $property => $value) {
+                 if ($property === $entity->getDateCreatedColumn()) {
+                     continue;
+                 }
+
+                 $this->set($property, $value);
+             }
+             $this->save();
+
+             // Save the new values to the entity
+             $entity->build($this->toArray());
+         }
+
+         /**
+          * Gets the first result from the table and inserts it into the given ADBEntity
+          *
+          * @param ADBEntity $dbEntity The entity to be built from the results
+          *
+          * @return bool The success of the build
+          */
+         public function buildFirst (ADBEntity $dbEntity): bool
+         {
+             $result = $this->first();
+
+             if (is_null($result)) {
+                 return false;
+             }
+
+             $dbEntity->build($result);
+             return true;
+         }
+
+         /**
+          * Gets all results from the table and inserts them into a given ACoreCollectionEntity
+          *
+          * @param ACoreCollectionEntity $collectionEntity The collection entity to be build
+          *
+          * @return bool The success of the build
+          */
+         public function buildAll (ACoreCollectionEntity $collectionEntity): bool
+         {
+             $this->get();
+             $results = $this->toArray();
+
+             if (count($results) === 0) {
+                 return false;
+             }
+
+             $collectionEntity->build($results);
+             return true;
+         }
+
+         /**
+          * Adds an update array to the $updates property
+          *
+          * @param array $update A key value pair
+          *
+          * @return void
+          */
+         protected function addUpdate (array $update): void
+         {
+             $this->updates += $update;
+         }
+
+        /**
+         * Table methods
+         */
 
         /**
          * Delete
          *
-         * @return bool|int|mixed|null
+         * @return mixed|null
          */
-        public function delete()
+        public function delete ()
         {
             return $this->model->delete();
         }
@@ -59,35 +170,12 @@
          * Update
          *
          * @param array $array
+         *
+         * @return void
          */
-        public function update(array $array)
+        public function update (array $array): void
         {
             $this->model->update($array);
-        }
-
-        /**
-         * Find
-         *
-         * @param $id
-         * @param array $columns
-         */
-        public function find($id, $columns = ['*'])
-        {
-            $this->model = $this->model->find($id, $columns);
-        }
-
-        /**
-         * Find Array
-         *
-         * @param $id
-         * @param array $columns
-         *
-         * @return mixed
-         */
-        public function findArray($id, $columns = ['*'])
-        {
-            $repo = new $this($this->model->find($id, $columns));
-            return $repo->model->toArray();
         }
 
         /**
@@ -95,7 +183,7 @@
          *
          * @param array $columns
          */
-        public function get($columns = ['*'])
+        public function get ($columns = ["*"]): void
         {
             $this->model = $this->model->get($columns);
         }
@@ -105,43 +193,32 @@
          *
          * @return array
          */
-        public function toArray()
+        public function toArray (): arrry
         {
-            if (empty($this->model)) {
-                return [];
-            }
-            else {
-                return $this->model->toArray();
-            }
+            return $this->model->toArray() ?? [];
         }
 
         /**
          * Select
          *
          * @param array $columns
+         *
+         * @return void
          */
-        public function select($columns)
+        public function select ($columns = ["*"]): void
         {
             $this->model = $this->model->select($columns);
         }
 
         /**
-         * Select Raw
-         *
-         * @param string $string
-         */
-        public function selectRaw($string)
-        {
-            return $this->model->selectRaw($string);
-        }
-
-        /**
          * Set
          *
-         * @param $key
-         * @param $value
+         * @param string $key
+         * @param mixed $value
+         *
+         * @return void
          */
-        public function set($key, $value)
+        public function set (string $key, $value): void
         {
             $this->model->{$key} = $value;
         }
@@ -151,60 +228,38 @@
          *
          * @return bool
          */
-        public function save()
+        public function save (): bool
         {
             return $this->model->save();
-        }
-
-        /**
-         * Describe
-         *
-         * @return mixed
-         */
-        public function describe()
-        {
-            return $this->model->describe();
         }
 
         /**
          * Where
          *
          * @param string $column
-         * @param null|string $operator
-         * @param null|string $value
+         * @param mixed $value
+         * @param string $operator
          *
-         * @author MS
-         * @throws InvalidArgumentException
+         * @return void
          */
-        public function where($column, $operator = null, $value = null)
+        public function where (string $column, $value, string $operator = "="): void
         {
-            $this->model = $this->model->where($column, $operator, $value);
-        }
+            $this->validateOperator($operator);
 
-        /**
-         * Where Date
-         *
-         * @param $column
-         * @param $operator
-         * @param $value
-         */
-        public function whereDate($column, $operator, $value)
-        {
-            if ($value instanceOf \DateTime) {
-                $value = $value->format('Y-m-d');
-            }
-            $this->model = $this->model->whereDate($column, $operator, $value);
+            $this->model = $this->model->where($column, $operator, $value);
         }
 
         /**
          * Where Between
          *
-         * @param $column
+         * @param string $column
          * @param array $values
          * @param string $modifier
          * @param bool $not
+         *
+         * @return void
          */
-        public function whereBetween($column, array $values, $modifier = 'and', $not = false)
+        public function whereBetween(string $column, array $values, string $modifier = "and", bool $not = false): void
         {
             $this->model = $this->model->whereBetween($column, $values, $modifier, $not);
         }
@@ -212,10 +267,11 @@
         /**
          * Get Value
          *
-         * @param $key
+         * @param string $key
+         *
          * @return mixed
          */
-        public function getValue($key)
+        public function getValue (string $key)
         {
             return $this->model->{$key};
         }
@@ -225,7 +281,8 @@
          *
          * @return int
          */
-        public function count() {
+        public function count (): int
+        {
             return $this->model->count();
         }
 
@@ -234,269 +291,192 @@
          *
          * @return array|null
          */
-        public function first() {
+        public function first () : ?array
+        {
             $this->model = $this->model->first();
 
-            if ($this->model) {
-                return $this->model->toArray();
+            if (!$this->model) {
+                return null;
             }
 
-            return null;
-        }
-
-        /**
-         * Skip
-         *
-         * @param $skip
-         */
-        public function skip($skip) {
-            if ($skip) {
-                $this->model->skip($skip);
-            }
-        }
-
-        /**
-         * Pluck
-         *
-         * @param $key
-         * @return mixed
-         */
-        public function pluck($key)
-        {
-            return $this->model->pluck($key);
+            return $this->model->toArray();
         }
 
         /**
          * Reset Orm Model
          *
+         * @return void
          */
-        public function resetOrmModel()
+        public function resetOrmModel (): void
         {
             $this->model = new $this->ormModel();
         }
 
         /**
-         * Insert
-         *
-         * @param $insert
-         * @return bool
-         */
-        public function insert($insert)
-        {
-            return $this->model->insert($insert);
-        }
-
-        /**
-         * Create model by array
-         * @param array $model
-         */
-        public function create($model) {
-            $this->model = $this->model->create($model);
-        }
-
-        /**
          * OrWhere
-         * @param $column
-         * @param $operator
-         * @param $value
+         * @param string $column
+         * @param mixed $operator
+         * @param string $value
+         *
+         * @return void
          */
-        public function orWhere($column, $operator, $value) {
+        public function orWhere (string $column, $value, string $operator = "="): void
+        {
+            $this->validateOperator($operator);
+
             $this->model->orWhere($column, $operator, $value);
         }
 
         /**
-         * abstract table join method
-         * @param  string       $table    table to join
-         * @param  string       $one      column on table
-         * @param  null|string  $operator operator
-         * @param  null|string  $two      foreign key column
-         * @param  string       $type     join type
-         * @param  boolean      $where    join where clause
+         * Joins table
+         *
+         * @param string      $table    Table to join
+         * @param string      $left     Column on table
+         * @param string|null $right    Foreign key column
+         * @param string      $operator
+         * @param string      $type     Join type
+         * @param bool        $where    Join where clause
+         *
+         * @return void
          */
-        public function join(string $table, string $one, ?string $operator = null, ?string $two = null, string $type = 'inner', bool $where = false)
+        public function join (string $table, string $left, ?string $right = null, string $operator = "=", string $type = "inner", bool $where = false): void
         {
-            $this->model = $this->model
-                ->join($table, $one, $operator, $two, $type, $where);
+            $this->validateOperator($operator);
+
+            $this->model = $this->model->join($table, $left, $operator, $right, $type, $where);
         }
 
         /**
          * order by $column $direction
-         * @param  string $column
-         * @param  string $direction
+         * @param string $column
+         * @param string $direction
+         *
+         * @return void
+         *
+         * @throws InvalidArgumentException
          */
-        public function orderBy(string $column, string $direction = 'asc'): void
+        public function orderBy (string $column, string $direction = "asc"): void
         {
+            if (!is_array($direction, $this->orderDirections)) {
+                throw new \InvalidArgumentException("'$direction' is not a valid order direction");
+            }
+
             $this->model = $this->model->orderBy($column, $direction);
         }
 
         /**
          * Is Empty
+         *
          * @return bool
          */
-        public function isEmpty(): bool
+        public function isEmpty (): bool
         {
             return $this->model->isEmpty();
         }
 
         /**
-         * To Sql
+         * Get the prepared SQL
          *
          * @return string
          */
-        public function toSql()
+        public function getStatement (): string
         {
             return $this->model->getStatement();
         }
 
         /**
-         * Get Id
-         *
-         * @return mixed
-         */
-        public function getId()
-        {
-            return $this->model->id;
-        }
-
-        /**
          * Where In
          *
-         * @param $field
+         * @param string $column
          * @param array $values
-         */
-        public function whereIn($field, $values)
-        {
-            $this->model = $this->model->whereIn($field, $values);
-        }
-
-        /**
-         * Where Raw
          *
-         * @param $queryString
+         * @return void
          */
-        public function whereRaw($queryString)
+        public function whereIn (string $column, array $values): void
         {
-            $this->model = $this->model->whereRaw($queryString);
-        }
-
-        /**
-         * Orderby Raw
-         *
-         * @param $queryString
-         *
-         * @author MS
-         */
-        public function orderByRaw($queryString)
-        {
-            $this->model = $this->model->orderByRaw($queryString);
+            $this->model = $this->model->whereIn($column, $values);
         }
 
         /**
          * Limit
          *
-         * @param int $limitBy
+         * @param int $limit
          *
-         * @author MS
+         * @return void
          */
-        public function limit($limitBy)
+        public function limit (int $limit): void
         {
-            $this->model = $this->model->limit($limitBy);
+            $this->model = $this->model->limit($limit);
         }
 
         /**
-        * Offset
-        *
-        * @param $offset
-        *
-        * @author AC
-        */
-        public function offset($offset)
-        {
-            $this->model = $this->model->offset($offset);
-        }
-
-        /**
-         * @info set protected property $guarded on Model to empty array before using
+         * Gets with trashed
          *
-         * @param $values
+         * @return void
          */
-        public function firstOrCreate($values)
-        {
-            $this->model = $this->model->firstOrCreate($values);
-        }
-
-        /**
-         * Validate
-         *
-         * @param array $array
-         * @return mixed
-         */
-        public function validate(array $array = [])
-        {
-            return $this->model->validate($array);
-        }
-
-        public function withTrashed()
+        public function withTrashed (): void
         {
             $this->model = $this->model->withTrashed();
         }
 
-        public function replicate()
-        {
-            $this->model = $this->model->replicate();
-        }
-
-        public function whereNull($column)
+        /**
+         * Where column is null
+         *
+         * @param string $column
+         *
+         * @return void
+         */
+        public function whereNull (string $column): void
         {
             $this->model = $this->model->whereNull($column);
         }
 
-        public function leftJoin($table, $one, $operator = null, $two = null)
+        /**
+         * Left join table
+         *
+         * @param string $table
+         * @param string $left
+         * @param string|null $right
+         * @param string $operator
+         *
+         * @return void
+         */
+        public function leftJoin(string $table, string $left, ?string $right = null, string $operator = "="): void
         {
-            $this->model = $this->model->leftJoin($table, $one, $operator, $two);
+            $this->validateOperator($operator);
+
+            $this->model = $this->model->leftJoin($table, $left, $operator, $right);
         }
 
-        public function whereNotNull($column)
+        /**
+         * Where column is not null
+         *
+         * @param string $column
+         *
+         * @return void
+         */
+        public function whereNotNull (string $column): void
         {
             $this->model = $this->model->whereNotNull($column);
         }
 
-        public function getModel()
-        {
-            return $this->model;
-        }
-
-        public function union(AbstractRepository $repo)
-        {
-            $model = $repo->getModel();
-            $this->model = $this->model->union($model->getQuery());
-        }
-
-        public function getTableName()
-        {
-            return $this->model->getTableName();
-        }
+        /**
+         * Private methods
+         */
 
         /**
-         * Add a "where not in" clause to the query.
+         * Validates a given operator
          *
-         * @param  string  $column
-         * @param  mixed   $values
-         * @param  string  $boolean
+         * @param string $operator
+         *
+         * @return void
+         *
+         * @throws InvalidArgumentException
          */
-        public function whereNotIn($column, $values, $boolean = 'and')
+        private function validateOperator (string $operator): void
         {
-            $this->model = $this->model->whereIn($column, $values, $boolean, true);
-        }
-
-        public function simplePaginate ($rows)
-        {
-            return $this->model->simplePaginate($rows);
-        }
-
-        public function pagination ($recAmount, $columns = ['*'], $page)
-        {
-            return $this->model->paginate($recAmount, $columns, '', $page)->toArray();
+            if (!is_array($operator, $this->operators)) {
+                throw new \InvalidArgumentException("'$operator' is not a valid operator");
+            }
         }
     }
-

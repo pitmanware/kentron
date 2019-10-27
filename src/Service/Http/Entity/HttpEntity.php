@@ -1,16 +1,19 @@
 <?php
 
-    namespace Kentron\Request\Entity;
+    namespace Kentron\Service\Http\Entity;
 
-    use Kentron\Entity\Entity;
-    use Kentron\Facade\Xml as XmlFacade;
+    use Marsh\Core\Entity\Entity;
+    use Marsh\Core\Facade\XmlFacade;
 
     use \SimpleXMLElement;
 
-    use Kentron\Proxy\{Type,IGBinary};
+    use Kentron\Service\Http\Entity\TSoap;
+    use Kentron\Service\{Type,IGBinary,Xml};
 
-    final class RequestEntity extends Entity
+    class HttpEntity extends Entity
     {
+        use TSoap;
+
         public const ENCODE_NONE = 1;
         public const ENCODE_JSON = 2;
         public const ENCODE_BINARY = 3;
@@ -24,6 +27,12 @@
         public const DECODE_XML = 4;
         public const DECODE_SOAP = 5;
 
+        public const METHOD_GET = 1;
+        public const METHOD_POST = 2;
+        public const METHOD_PUT = 3;
+        public const METHOD_DELETE = 4;
+        public const METHOD_SOAP = 5;
+
         private $baseUrl;
         private $data;
         private $decodeAsArray = false;
@@ -32,6 +41,7 @@
         private $extracted;
         private $getString = "";
         private $headers = [];
+        private $httpMethod = self::METHOD_POST;
         private $postData;
         private $rawResponse;
         private $success = false;
@@ -53,7 +63,7 @@
 
         public function getUrl (): string
         {
-            return "{$this->baseUrl}/{$this->uri}{$this->getString}";
+            return rtrim("{$this->baseUrl}/{$this->uri}{$this->getString}", "/");
         }
 
         public function getPostData ()
@@ -74,6 +84,38 @@
         public function getSuccess (): bool
         {
             return $this->success;
+        }
+
+        /**
+         * Gets the CURL request method
+         * @return string
+         * @throws \UnexpectedValueException If the method is not allowed
+         */
+        public function getHttpMethod (): string
+        {
+            switch ($this->httpMethod) {
+                case self::METHOD_GET:
+                    $httpMethod = "GET";
+                    break;
+
+                case self::METHOD_POST:
+                    $httpMethod = "POST";
+                    break;
+
+                case self::METHOD_PUT:
+                    $httpMethod = "PUT";
+                    break;
+
+                case self::METHOD_DELETE;
+                    $httpMethod = "DELETE";
+                    break;
+
+                default:
+                    throw new \UnexpectedValueException("CURL method given is unknown");
+                    break;
+            }
+
+            return $httpMethod;
         }
 
         /**
@@ -109,17 +151,14 @@
          */
         public function setGetData ($getData, ?bool $usePrefix = true): void
         {
-            if (is_resource($getData))
-            {
-                throw new \InvalidArgumentException("CURL get data cannot be a resource");
+            if (is_resource($getData)) {
+                throw new \InvalidArgumentException("Get data cannot be a resource");
             }
 
-            if (is_array($getData) || is_object($getData))
-            {
+            if (is_array($getData) || is_object($getData)) {
                 $getData = http_build_query($getData);
             }
-            else
-            {
+            else {
                 $this->getString = (string) $getData;
             }
 
@@ -132,9 +171,14 @@
             $this->headers[] = "$headerKey: $headerValue";
         }
 
+        public function setHttpMethod (int $httpMethod): void
+        {
+            $this->httpMethod = $httpMethod;
+        }
+
         /**
          * Sets the post data for the curl request
-         * @param  mixed $postData The post data
+         * @param mixed $postData The post data
          *
          * @throws \InvalidArgumentException If the post data is a resource
          * @throws \InvalidArgumentException If the post data is an invalid type for the encoding method
@@ -144,13 +188,12 @@
         public function setPostData ($postData): void
         {
             if (is_resource($postData)) {
-                throw new \InvalidArgumentException("CURL post data cannot be a resource");
+                throw new \InvalidArgumentException("Post data cannot be a resource");
             }
 
             switch ($this->encoding) {
                 case self::ENCODE_NONE:
-                    if (!is_string($postData) && !(is_array($postData) && Type::isAssoc($postData)))
-                    {
+                    if (!is_string($postData) && !(is_array($postData) && Type::isAssoc($postData))) {
                         throw new \InvalidArgumentException("Invalid post data type");
                     }
                     break;
@@ -165,8 +208,7 @@
 
                 case self::ENCODE_FILE:
                     $filePath = realpath($postData);
-                    if (empty($filePath) || !@file_exists($filePath) || !@is_readable($filePath))
-                    {
+                    if (empty($filePath) || !@file_exists($filePath) || !@is_readable($filePath)) {
                         throw new \ErrorException("File '$filePath' does not exist or is not readable");
                     }
 
@@ -175,13 +217,11 @@
 
                 case self::ENCODE_XML:
                 case self::ENCODE_SOAP:
-                    try
-                    {
-                        XmlFacade::extract($postData);
+                    if (isset($this->viewPath) && isset($this->method)) {
+                        $postData = Xml::build($this->viewPath, $this->method, $postData);
                     }
-                    catch (\Exception $ex)
-                    {
-                        throw new \ErrorException("CURL post data is not valid XML", null, $ex);
+                    if (is_null($postData) || is_null(Xml::extract($postData))) {
+                        throw new \ErrorException("Post data is not valid XML");
                     }
                     break;
 
@@ -207,15 +247,25 @@
             return !is_null($this->postData);
         }
 
+        public function isCurl (): bool
+        {
+            return $this->httpMethod !== self::METHOD_SOAP;
+        }
+
         /**
          * Decode the response from CURL
-         * @param string $response [description]
+         * @param mixed $response [description]
          *
          * @throws \UnexpectedValueException If the decoding method provided is not available
          */
-        public function parseResponse (string $response): void
+        public function parseResponse ($response): void
         {
-            $this->rawResponse = $response;
+            if (is_string($response)) {
+                $this->rawResponse = $response;
+            }
+            else {
+                $this->rawResponse = json_encode($response);
+            }
 
             switch ($this->decoding) {
                 case self::DECODE_NONE:
@@ -225,8 +275,7 @@
                 case self::DECODE_JSON:
                     $extracted = json_decode($response, $this->decodeAsArray);
 
-                    if (is_null($extracted))
-                    {
+                    if (is_null($extracted)) {
                         $this->addError("Response from '{$this->getUrl()}' could not be JSON decoded");
                         return;
                     }
@@ -235,33 +284,32 @@
                 case self::DECODE_BINARY:
                     $extracted = IGBinary::unserialise($response);
 
-                    if (is_null($extracted))
-                    {
+                    if (is_null($extracted)) {
                         $this->addError("Response from '{$this->getUrl()}' could not be binary decoded");
                         return;
                     }
                     break;
 
                 case self::DECODE_XML:
-                    try
-                    {
-                        $extracted = XmlFacade::extract($response);
-                    }
-                    catch (\Exception $ex)
-                    {
+                    $extracted = Xml::extract($response);
+
+                    if (is_null($extracted)) {
                         $this->addError("Response from '{$this->getUrl()}' could not be XML decoded");
                         return;
                     }
                     break;
 
                 case self::DECODE_SOAP:
-                    try
-                    {
-                        $extracted = XmlFacade::extractSoap($response);
-                    }
-                    catch (\Extracted $ex)
-                    {
-                        $this->addError("Response from '{$this->getUrl()}' could not be SOAP decoded");
+                    $extracted = Xml::extract(
+                        preg_replace(
+                            ['/(<\/?)(\w+):([^>]*>)/', '/&lt;/', '/&gt;/'],
+                            ['$1$2$3', '<', '>'],
+                            $response
+                        )
+                    );
+
+                    if (is_null($extracted)) {
+                        $this->addError("Response from '{$this->getUrl()}::{$this->getMethod()}' could not be SOAP decoded");
                         return;
                     }
 

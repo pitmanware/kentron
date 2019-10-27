@@ -1,6 +1,6 @@
 <?php
 
-    namespace Kentron\Proxy\Validation;
+    namespace Kentron\Service\Validation;
 
     use Kentron\Template\IValidation;
 

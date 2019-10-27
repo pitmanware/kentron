@@ -1,17 +1,17 @@
 <?php
 
-    namespace Kentron\Proxy\System;
+    namespace Kentron\Service\System;
 
     use Kentron\Template\IRequest;
-    use Kentron\Proxy\Cast;
+    use Kentron\Service\Type;
 
     /**
-     * Wrapper for the _Get constant array
+     * Wrapper for the _POST constant array
      */
-    final class Get implements IRequest
+    final class Post implements IRequest
     {
         /**
-         * Get one item from the _GET array
+         * Get one item from the _POST array
          *
          * @param string      $key  The post index to retrieve
          * @param string|null $type The type to cast to if necessary
@@ -20,7 +20,7 @@
          */
         public static function getOne (string $key, ?string $type = null)
         {
-            $value = $_GET[$key] ?? null;
+            $value = $_POST[$key] ?? null;
 
             if (is_null($value)) {
                 return null;
@@ -30,17 +30,17 @@
                 return $value;
             }
 
-            $typeMethod = Cast::getTypeMethod($type);
-            return Cast::$typeMethod($value);
+            $typeMethod = Type::getTypeMethod($type);
+            return Type::$typeMethod($value);
         }
 
         /**
-         * Get all items from the _GET array
-         * 
+         * Get all items from the _POST array
+         *
          * @return array
          */
         public static function getAll (): array
         {
-            return $_GET ?? [];
+            return $_POST ?? [];
         }
     }

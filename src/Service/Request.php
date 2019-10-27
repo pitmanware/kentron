@@ -1,8 +1,8 @@
 <?php
 
-    namespace Kentron\Proxy;
+    namespace Kentron\Service;
 
-    use Kentron\Proxy\Curl;
+    use Kentron\Service\Curl;
 
     use Kentron\Entity\Request\RequestEntity;
 

@@ -1,26 +1,72 @@
 <?php
 
-    namespace Kentron\Proxy;
+    namespace Kentron\Service;
 
     use Kentron\Exception\XmlFormatException;
+
+    use Kentron\Facade\Twig;
 
     final class Xml
     {
         /**
+         * Builds the XML string
+         *
+         * @param  string       $viewPath The path to the twig file
+         * @param  string       $action   The name of the twig file to populate
+         * @param  object|array $data     The data to populate the twig file
+         *
+         * @return string|null            Null if the data is not in the correct format
+         */
+        public static function build (string $viewPath, string $action, $data): ?string
+        {
+            if (!is_array($data) && !is_object($data)) {
+                return null;
+            }
+
+            $render = new Twig($viewPath);
+
+            return $render->captureView(
+                'Wrapper.twig',
+                [
+                    'template' => $action,
+                    'data'     => $data
+                ]
+            );
+        }
+
+        public static function extract (string $xml): ?array
+        {
+            libxml_use_internal_errors(true);
+
+            $xml = simplexml_load_string($xml);
+
+            if (!($xml instanceof \SimpleXMLElement)) {
+                return null;
+            }
+
+            return XmlFacade::extract($xml);
+        }
+
+        /**
          * Extract the raw XML
          *
-         * @param string $xml The XML string to extract
+         * @param string $xml       The XML string to extract
+         * @param bool   $allowNull If false, throws exception instead
          *
          * @return array The formatted extracted array
          *
          * @throws XmlFormatException If the XML could not be decoded
          */
-        public static function extract (string $xml): array
+        public static function extract (string $xml, bool $allowNull = false): ?array
         {
             libxml_use_internal_errors(true);
             $loadedXml = simplexml_load_string($xml);
 
-            if (is_null($loadedXml) || $loadedXml === false) {
+            if (!($xml instanceof \SimpleXMLElement)) {
+                if ($allowNull) {
+                    return null;
+                }
+
                 throw self::buildException();
             }
 

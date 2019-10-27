@@ -1,12 +1,12 @@
 <?php
 
-    namespace Kentron\Proxy;
+    namespace Kentron\Service;
 
     use Kentron\Entity\File\{FileCollectionEntity, FileEntity};
 
     use Kentron\Exception\FilesFormatException;
 
-    use Kentron\Proxy\System\Files;
+    use Kentron\Service\System\Files;
 
     class FileCollection
     {

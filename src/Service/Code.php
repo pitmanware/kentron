@@ -1,6 +1,6 @@
 <?php
 
-    namespace Kentron\Proxy;
+    namespace Kentron\Service;
 
     use Kentron\Exception\InvalidRegexException;
 

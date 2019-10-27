@@ -1,6 +1,6 @@
 <?php
 
-    namespace Kentron\Proxy\System;
+    namespace Kentron\Service\System;
 
     final class Client
     {
