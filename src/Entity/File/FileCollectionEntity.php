@@ -1,22 +1,13 @@
 <?php
 
-    namespace Kentron\Entity\File;
+namespace Kentron\Entity\File;
 
-    use Kentron\Entity\Entity;
+use Kentron\Entity\Template\ACollectionEntity;
 
-    class FileCollectionEntity extends Entity
+final class FileCollectionEntity extends ACollectionEntity
+{
+    public function __construct ()
     {
-
-        protected $collection = [];
-
-        public function addFileEntity (FileEntity $fileEntity)
-        {
-            $this->collection[] = $fileEntity;
-        }
-
-        public function getCollection (): array
-        {
-            return $this->collection;
-        }
-
+        parent::__construct(FileEntity::class);
     }
+}

@@ -1,8 +1,8 @@
 <?php
 
-    namespace Kentron\Template;
+namespace Kentron\Template;
 
-    interface IValidation
-    {
-        public function isValid (): bool;
-    }
+interface IValidation
+{
+    public function isValid (): bool;
+}

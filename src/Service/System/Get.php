@@ -1,46 +1,47 @@
 <?php
 
-    namespace Kentron\Service\System;
+namespace Kentron\Service\System;
 
-    use Kentron\Template\IRequest;
-    use Kentron\Service\Type;
+use Kentron\Service\Type;
+
+/**
+ * Wrapper for the _Get constant array
+ */
+final class Get
+{
+    /**
+     * Get one item from the _GET array
+     *
+     * @param string      $key  The post index to retrieve
+     * @param string|null $type The type to cast to if necessary
+     *
+     * @return mixed Can return any type
+     */
+    public static function getOne (string $key, ?string $type = null)
+    {
+        $value = $_GET[$key] ?? null;
+
+        if (is_null($value))
+        {
+            return null;
+        }
+
+        if (is_null($type))
+        {
+            return $value;
+        }
+
+        $typeMethod = Type::getTypeMethod($type);
+        return Type::$typeMethod($value);
+    }
 
     /**
-     * Wrapper for the _Get constant array
+     * Get all items from the _GET array
+     *
+     * @return array
      */
-    final class Get implements IRequest
+    public static function getAll (): array
     {
-        /**
-         * Get one item from the _GET array
-         *
-         * @param string      $key  The post index to retrieve
-         * @param string|null $type The type to cast to if necessary
-         *
-         * @return mixed Can return any type
-         */
-        public static function getOne (string $key, ?string $type = null)
-        {
-            $value = $_GET[$key] ?? null;
-
-            if (is_null($value)) {
-                return null;
-            }
-
-            if (is_null($type)) {
-                return $value;
-            }
-
-            $typeMethod = Type::getTypeMethod($type);
-            return Type::$typeMethod($value);
-        }
-
-        /**
-         * Get all items from the _GET array
-         *
-         * @return array
-         */
-        public static function getAll (): array
-        {
-            return $_GET ?? [];
-        }
+        return $_GET ?? [];
     }
+}

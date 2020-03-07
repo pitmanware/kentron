@@ -1,8 +1,7 @@
 <?php
 
-    namespace Kentron\Exception;
+namespace Kentron\Exception;
 
-    class FilesFormatException extends \Exception
-    {
+use \Exception;
 
-    }
+final class FilesFormatException extends Exception {}

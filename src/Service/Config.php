@@ -1,11 +1,11 @@
 <?php
 
-    namespace Kentron\Service;
+namespace Kentron\Service;
 
-    final class Config
+final class Config
+{
+    public static function get (): string
     {
-        public static function get (): string
-        {
-            return file_get_contents(CONFIG_DIR . "Config/Config.json");
-        }
+        return file_get_contents(CONFIG_DIR . "Config/Config.json");
     }
+}

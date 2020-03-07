@@ -1,13 +1,13 @@
 <?php
 
-    namespace Kentron\Struct;
+namespace Kentron\Struct;
 
-    use Kentron\Template\AError;
+use Kentron\Template\AError;
 
-    /**
-     * Base class for data holding
-     */
-    class Struct extends AError
-    {
+/**
+ * Base class for data holding
+ */
+class Struct extends AError
+{
 
-    }
+}

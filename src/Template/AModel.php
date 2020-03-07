@@ -1,14 +1,14 @@
 <?php
 
-    namespace Kentron\Template;
+namespace Kentron\Template;
 
-    use Illuminate\Database\Eloquent\Model as IlluminateModel;
+use Illuminate\Database\Eloquent\Model;
 
-    abstract class AModel extends IlluminateModel
-    {
-        public $timestamps = false;
+abstract class AModel extends Model
+{
+    public $timestamps = false;
 
-        const CREATED_AT = null;
-        const UPDATED_AT = null;
-        const DELETED_AT = null;
-    }
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    const DELETED_AT = null;
+}

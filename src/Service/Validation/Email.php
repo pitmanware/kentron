@@ -1,20 +1,20 @@
 <?php
 
-    namespace Kentron\Service\Validation;
+namespace Kentron\Service\Validation;
 
-    use Kentron\Template\IValidation;
+use Kentron\Template\IValidation;
 
-    final class Email implements IValidation
+final class Email implements IValidation
+{
+    private $email = "";
+
+    public function __construct (string $email)
     {
-        private $email = "";
-
-        public function __construct (string $email)
-        {
-            $this->email = $email;
-        }
-
-        public function isValid (): bool
-        {
-            return filter_var($email, FILTER_VALIDATE_EMAIL) ? true : false;
-        }
+        $this->email = $email;
     }
+
+    public function isValid (): bool
+    {
+        return filter_var($this->email, FILTER_VALIDATE_EMAIL) ? true : false;
+    }
+}

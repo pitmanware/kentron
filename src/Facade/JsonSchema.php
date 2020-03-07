@@ -1,73 +1,78 @@
 <?php
 
-    namespace Kentron\Facade;
+namespace Kentron\Facade;
 
-    use JsonSchema\SchemaStorage;
-    use JsonSchema\Validator;
-    use JsonSchema\Constraints\Factory;
-    use JsonSchema\Constraints\Constraint;
+use JsonSchema\SchemaStorage;
+use JsonSchema\Validator;
+use JsonSchema\Constraints\Factory;
+use JsonSchema\Constraints\Constraint;
+
+/**
+ * Used to validate json against a schema.
+ */
+class JsonSchema
+{
+    /**
+     * Any errors from the validation.
+     * @var array
+     */
+    public $errors = [];
 
     /**
-     * Used to validate json against a schema.
+     * Extract a JSON string
+     * @param  string      $json The JSON data to be extracted
+     * @return object|null
      */
-    class JsonSchema
+    public function extract (string $json): ?object
     {
-        /**
-         * Any errors from the validation.
-         * @var array
-         */
-        public $errors = [];
+        return json_decode($json, false);
+    }
 
-        /**
-         * Extract a JSON string
-         * @param  string     $json The JSON data to be extracted
-         * @return object
-         * @throws \Exception       If the string cannot be successfully decoded
-         */
-        public function extract (string $json): object
-        {
-            $extracted = json_decode($json, false);
+    /**
+     * The validation function.
+     * @param  object $jsonData   JSON data to be validated.
+     * @param  object $jsonSchema JSON schema.
+     * @return bool               The success of the validation.
+     */
+    public function isValid (object $jsonData, object $jsonSchema): bool
+    {
+        $schemaStorage = new SchemaStorage();
 
-            if (is_null($extracted)) {
-                throw new \Exception("JSON string is invalid");
-            }
+        $schemaStorage->addSchema("file://mySchema", $jsonSchema);
+
+        $jsonValidator = new Validator( new Factory($schemaStorage) );
+
+        $jsonValidator->validate($jsonData, $jsonSchema, Constraint::CHECK_MODE_APPLY_DEFAULTS);
+
+        $jsonErrors = $jsonValidator->getErrors();
+
+        if (count($jsonErrors) > 0) {
+            $this->formatErrors($jsonErrors);
+            return false;
         }
 
-        /**
-         * The validation function.
-         * @param  object $jsonData   JSON data to be validated.
-         * @param  object $jsonSchema JSON schema.
-         * @return bool               The success of the validation.
-         */
-        public function isValid (object $jsonData, object $jsonSchema): bool
-        {
-            $schemaStorage = new SchemaStorage();
+        return true;
+    }
 
-            $schemaStorage->addSchema("file://mySchema", $jsonSchema);
+    /**
+     * Gets any errors
+     *
+     * @return array
+     */
+    public function getErrors (): array
+    {
+        return $this->errors;
+    }
 
-            $jsonValidator = new Validator( new Factory($schemaStorage) );
-
-            $jsonValidator->validate($jsonData, $jsonSchema, Constraint::CHECK_MODE_APPLY_DEFAULTS);
-
-            $jsonErrors = $jsonValidator->getErrors();
-
-            if (count($jsonErrors) > 0) {
-                $this->formatErrors($jsonErrors);
-                return false;
-            }
-
-            return true;
-        }
-
-        /**
-         * Formats all errors from the json validator.
-         * @param  array  $jsonErrors The error array from the json validator.
-         * @return void
-         */
-        private function formatErrors (array $jsonErrors): void
-        {
-            foreach ($jsonErrors as $jsonError) {
-                $this->errors[] = "{$jsonError["pointer"]} - {$jsonError["message"]}";
-            }
+    /**
+     * Formats all errors from the json validator.
+     * @param  array  $jsonErrors The error array from the json validator.
+     * @return void
+     */
+    private function formatErrors (array $jsonErrors): void
+    {
+        foreach ($jsonErrors as $jsonError) {
+            $this->errors[] = "{$jsonError["pointer"]} - {$jsonError["message"]}";
         }
     }
+}

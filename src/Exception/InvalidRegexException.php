@@ -1,8 +1,7 @@
 <?php
 
-    namespace Kentron\Exception;
+namespace Kentron\Exception;
 
-    class InvalidRegexException extends \InvalidArgumentException
-    {
+use \InvalidArgumentException;
 
-    }
+final class InvalidRegexException extends InvalidArgumentException {}
