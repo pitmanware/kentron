@@ -32,17 +32,19 @@ final class Type
     /**
      * Returns a property from an iterable scalar
      *
-     * @param mixed  $data     The data to extract a value from
-     * @param string $property The key
+     * @param array|object $data     The data to extract a value from
+     * @param string       $property The key
      *
      * @return mixed Null if no key exists
      */
     public static function getProperty ($data, string $property)
     {
-        if (is_object($data) && property_exists($data, $property)) {
+        if (is_object($data) && property_exists($data, $property))
+        {
             return $data->{$property};
         }
-        else if (is_array($data) && isset($data[$property])) {
+        else if (is_array($data) && isset($data[$property]))
+        {
             return $data[$property];
         }
 
@@ -65,24 +67,30 @@ final class Type
             case "array":
                 return "castToArray";
                 break;
+
             case "bool":
             case "boolean":
                 return "castToBool";
                 break;
+
             case "float":
             case "double":
                 return "castToFloat";
                 break;
+
             case "int":
             case "integer":
                 return "castToInt";
                 break;
+
             case "object":
                 return "castToObject";
                 break;
+
             case "string":
                 return "castToString";
                 break;
+
             default:
                 throw new \UnexpectedValueException("$type is not a valid type");
                 break;
@@ -124,7 +132,8 @@ final class Type
      */
     public static function castToFloat ($value): float
     {
-        if (is_object($value)) {
+        if (is_object($value))
+        {
             throw new \InvalidArgumentException("Non object expected");
         }
 
@@ -142,7 +151,8 @@ final class Type
      */
     public static function castToInt ($value): int
     {
-        if (is_object($value)) {
+        if (is_object($value))
+        {
             throw new \InvalidArgumentException("Non object expected");
         }
 
@@ -172,7 +182,8 @@ final class Type
      */
     public static function castToString ($value): string
     {
-        if (is_iterable($value) || is_object($value)) {
+        if (is_iterable($value) || is_object($value))
+        {
             throw new \InvalidArgumentException("Non iterable/object expected");
         }
 

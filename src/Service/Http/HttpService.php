@@ -2,15 +2,19 @@
 
 namespace Kentron\Service\Http;
 
-use Kentron\Service\{Curl, Type};
+use Kentron\Facade\Curl;
+
+use Kentron\Service\Type;
 use Kentron\Service\Http\Entity\HttpEntity;
 
 final class HttpService
 {
     /**
      * Make the HTTP request
-     * @param  HttpEntity $httpEntity The request entity
-     * @return bool                   The success of the request
+     *
+     * @param HttpEntity $httpEntity The request entity
+     *
+     * @return bool The success of the request
      */
     public static function run (HttpEntity $httpEntity): bool
     {
@@ -26,7 +30,9 @@ final class HttpService
 
     /**
      * Make the cURL request using the info provided by the entity
-     * @param  HttpEntity $httpEntity
+     *
+     * @param HttpEntity $httpEntity
+     *
      * @return bool
      */
     private static function runCurl (HttpEntity $httpEntity): bool
@@ -41,17 +47,15 @@ final class HttpService
             $curl->setPost($httpEntity->getPostData());
         }
 
-        $curl->setOpt(CURLOPT_CUSTOMREQUEST, $httpEntity->getHttpMethod());
+        $curl->setRequestMethod($httpEntity->getHttpMethod());
 
-        $curl->exec();
-
-        if ($curl->hasFailed())
+        if (!$curl->execute())
         {
             $httpEntity->addError($curl->getErrors());
             return false;
         }
 
-        $httpEntity->setStatusCode($curl->statusCode);
+        $httpEntity->setStatusCode($curl->getStatusCode());
         $httpEntity->parseResponse($curl->getResponse());
 
         if ($httpEntity->hasErrors())
@@ -64,7 +68,9 @@ final class HttpService
 
     /**
      * Make the SOAP request using the info provided by the entity
-     * @param  HttpEntity $httpEntity
+     *
+     * @param HttpEntity $httpEntity
+     *
      * @return bool
      */
     private static function runSoap (HttpEntity $httpEntity): bool

@@ -2,7 +2,7 @@
 
 namespace Kentron\Entity\Template;
 
-use Kentron\Service\DT;
+use Kentron\Facade\DT;
 
 abstract class AMapEntity extends AEntity
 {

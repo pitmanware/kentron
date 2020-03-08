@@ -2,12 +2,12 @@
 
 namespace Kentron\Struct;
 
-use Kentron\Template\AError;
+use Kentron\Template\TError;
 
 /**
  * Base class for data holding
  */
-class Struct extends AError
+class Struct
 {
-
+    use TError;
 }

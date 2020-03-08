@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Service\Soap\Entity;
+namespace Kentron\Service\Http\Entity;
 
 use \SoapVar;
 use \SoapHeader;
@@ -104,6 +104,7 @@ trait TSoap
 
     /**
      * Sets the SOAP WSSE header
+     *
      * @return void
      */
     public function setSecurityHeader (): void
@@ -147,14 +148,19 @@ trait TSoap
 
     /**
      * Sets the path to the twig directory
+     *
      * @param string $viewPath
+     *
+     * @return void
+     *
      * @throws \ErrorException If the path does not exist or is unreadable
      */
     public function setViewPath (string $viewPath): void
     {
         $realPath = realpath($viewPath);
 
-        if ($realPath === false || !is_readable($realPath)) {
+        if ($realPath === false || !is_readable($realPath))
+        {
             throw new \ErrorException("Directory '$viewPath' does not exist or is not readable");
         }
 
@@ -185,18 +191,25 @@ trait TSoap
         return count($this->parameters) > 0;
     }
 
+    /**
+     * Private methods
+     */
+
     private function newSoapVar ($data, ?string $tag = null, ?string $url = null): SoapVar
     {
         $url = $url ?? $this->wsseUrl;
 
-        if (is_string($data)) {
+        if (is_string($data))
+        {
             $type = XSD_STRING;
         }
-        else if (is_object($data) || is_array($data)) {
+        else if (is_object($data) || is_array($data))
+        {
             $data = (object)$data;
             $type = SOAP_ENC_OBJECT;
         }
-        else {
+        else
+        {
             throw new \ErrorException("Unexpected SoapVar type");
         }
 

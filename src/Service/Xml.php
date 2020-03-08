@@ -11,15 +11,16 @@ final class Xml
     /**
      * Builds the XML string
      *
-     * @param  string       $viewPath The path to the twig file
-     * @param  string       $action   The name of the twig file to populate
-     * @param  object|array $data     The data to populate the twig file
+     * @param string       $viewPath The path to the twig file
+     * @param string       $action   The name of the twig file to populate
+     * @param object|array $data     The data to populate the twig file
      *
-     * @return string|null            Null if the data is not in the correct format
+     * @return string|null Null if the data is not in the correct format
      */
     public static function build (string $viewPath, string $action, $data): ?string
     {
-        if (!is_array($data) && !is_object($data)) {
+        if (!is_array($data) && !is_object($data))
+        {
             return null;
         }
 
@@ -32,19 +33,6 @@ final class Xml
                 'data'     => $data
             ]
         );
-    }
-
-    public static function extract (string $xml): ?array
-    {
-        libxml_use_internal_errors(true);
-
-        $xml = simplexml_load_string($xml);
-
-        if (!($xml instanceof \SimpleXMLElement)) {
-            return null;
-        }
-
-        return XmlFacade::extract($xml);
     }
 
     /**
@@ -62,8 +50,10 @@ final class Xml
         libxml_use_internal_errors(true);
         $loadedXml = simplexml_load_string($xml);
 
-        if (!($xml instanceof \SimpleXMLElement)) {
-            if ($allowNull) {
+        if (!($xml instanceof \SimpleXMLElement))
+        {
+            if ($allowNull)
+            {
                 return null;
             }
 
@@ -100,19 +90,24 @@ final class Xml
         $nodes = $xml->children();
         $attributes = $xml->attributes();
 
-        if (count($attributes) > 0) {
-            foreach ($attributes as $attrName => $attrValue) {
+        if (count($attributes) > 0)
+        {
+            foreach ($attributes as $attrName => $attrValue)
+            {
                 $collection["@attributes"][$attrName] = (string) $attrValue;
             }
         }
 
-        if ($nodes->count() === 0) {
+        if ($nodes->count() === 0)
+        {
             $collection["value"] = (string) $xml;
             return $collection;
         }
 
-        foreach ($nodes as $nodeName => $nodeValue) {
-            if (count($nodeValue->xpath('../' . $nodeName)) < 2) {
+        foreach ($nodes as $nodeName => $nodeValue)
+        {
+            if (count($nodeValue->xpath('../' . $nodeName)) < 2)
+            {
                 $collection[$nodeName] = self::format($nodeValue);
                 continue;
             }
@@ -132,15 +127,18 @@ final class Xml
     {
         $errors = (array) libxml_get_errors();
 
-        foreach ($errors as $error) {
-
-            switch ($error->level) {
+        foreach ($errors as $error)
+        {
+            switch ($error->level)
+            {
                 case LIBXML_ERR_WARNING:
                     $errorMessage = "Warning: ";
                     break;
+
                 case LIBXML_ERR_ERROR:
                     $errorMessage = "Error: ";
                     break;
+
                 case LIBXML_ERR_FATAL:
                     $errorMessage = "Fatal Error: ";
                     break;
@@ -148,17 +146,19 @@ final class Xml
 
             $errorMessage .= "$error->message at $error->line:$error->column";
 
-            if (isset($error->file)) {
+            if (isset($error->file))
+            {
                 $errorMessage .= " in file $error->file";
             }
 
-            // Third parameter is the previous exception
-            if (isset($xmlFormatException)) {
-                $xmlFormatException = new XmlFormatException($errorMessage, $error->code, $xmlFormatException);
-            }
-            else {
+            if (!isset($xmlFormatException))
+            {
                 $xmlFormatException = new XmlFormatException($errorMessage, $error->code);
+                continue;
             }
+
+            // Third parameter is the previous exception
+            $xmlFormatException = new XmlFormatException($errorMessage, $error->code, $xmlFormatException);
 
         }
 

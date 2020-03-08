@@ -5,9 +5,9 @@ namespace Kentron\Service\Http\Entity;
 use Kentron\Entity\Entity;
 
 use Kentron\Service\Http\Entity\TSoap;
-use Kentron\Service\{Type,IGBinary,Xml};
+use Kentron\Service\{Type, IGBinary, Xml};
 
-class HttpEntity extends Entity
+final class HttpEntity extends Entity
 {
     use TSoap;
 
@@ -44,7 +44,7 @@ class HttpEntity extends Entity
     private $statusCode;
     private $success = false;
     private $uri;
-    private $urlEncode = false;
+    private $parameterise = false;
 
     /**
      * Getters
@@ -92,7 +92,9 @@ class HttpEntity extends Entity
 
     /**
      * Gets the CURL request method
+     *
      * @return string
+     *
      * @throws \UnexpectedValueException If the method is not allowed
      */
     public function getHttpMethod (): string
@@ -149,8 +151,11 @@ class HttpEntity extends Entity
 
     /**
      * Sets the get data for the curl request
+     *
      * @param mixed  $getData
      * @param string $usePrefix Put a ? at the start of the string
+     *
+     * @return void
      *
      * @throws \InvalidArgumentException If the get data is a resource
      */
@@ -174,11 +179,26 @@ class HttpEntity extends Entity
         $this->getString = $usePrefix ? "?" . $getData : $getData;
     }
 
+    /**
+     * Adds a header
+     *
+     * @param string $headerKey
+     * @param string $headerValue
+     *
+     * @return void
+     */
     public function addHeader (string $headerKey, string $headerValue): void
     {
         $this->headers[] = "$headerKey: $headerValue";
     }
 
+    /**
+     * Set using the constants
+     *
+     * @param integer $httpMethod Example: METHOD_GET
+     *
+     * @return void
+     */
     public function setHttpMethod (int $httpMethod): void
     {
         $this->httpMethod = $httpMethod;
@@ -186,7 +206,10 @@ class HttpEntity extends Entity
 
     /**
      * Sets the post data for the curl request
+     *
      * @param mixed $postData The post data
+     *
+     * @return void
      *
      * @throws \InvalidArgumentException If the post data is a resource
      * @throws \InvalidArgumentException If the post data is an invalid type for the encoding method
@@ -195,7 +218,8 @@ class HttpEntity extends Entity
      */
     public function setPostData ($postData): void
     {
-        if (is_resource($postData)) {
+        if (is_resource($postData))
+        {
             throw new \InvalidArgumentException("Post data cannot be a resource"); // TODO: Yet (7.4)
         }
 
@@ -214,7 +238,7 @@ class HttpEntity extends Entity
                 }
                 else if (is_array($postData))
                 {
-                    if ($this->urlEncode)
+                    if ($this->parameterise)
                     {
                         $postData = http_build_query($postData);
                         $this->setContentLength(strlen($postData));
@@ -275,29 +299,52 @@ class HttpEntity extends Entity
         $this->postData = $postData;
     }
 
+    /**
+     * Set the HTTP status code (200, 404, 501, ...)
+     *
+     * @param integer $statusCode
+     *
+     * @return void
+     */
     public function setStatusCode (int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
 
+    /**
+     * Set the URI succeeding the domain
+     *
+     * @param string $uri
+     *
+     * @return void
+     */
     public function setUri (string $uri): void
     {
         $this->uri = trim($uri, "/");
     }
 
-    public function setUrlEncode (bool $urlEncode = true): void
+    /**
+     * Set whether the post data should be parameterised
+     *
+     * @param boolean $parameterise
+     *
+     * @return void
+     */
+    public function setParameterisePostData (bool $parameterise = true): void
     {
-        $this->urlEncode = $urlEncode;
+        $this->parameterise = $parameterise;
     }
 
+    /**
+     * Set a bearer authorisation token
+     *
+     * @param string $token
+     *
+     * @return void
+     */
     public function setBearerToken (string $token): void
     {
         $this->setAuthorisation("Bearer $token");
-    }
-
-    public function setContentType (string $contentType): void
-    {
-        $this->addHeader("Content-Type", $contentType);
     }
 
     public function setContentLength (int $contentLength): void
@@ -321,20 +368,25 @@ class HttpEntity extends Entity
 
     /**
      * Decode the response from CURL
-     * @param mixed $response [description]
+     *
+     * @param mixed $response
+     *
+     * @return void
      *
      * @throws \UnexpectedValueException If the decoding method provided is not available
      */
     public function parseResponse ($response): void
     {
-        if (is_string($response)) {
+        if (is_string($response))
+        {
             $this->rawResponse = $response;
         }
         else {
             $this->rawResponse = json_encode($response);
         }
 
-        switch ($this->decoding) {
+        switch ($this->decoding)
+        {
             case self::DECODE_NONE:
                 $extracted = $response;
                 break;
@@ -342,7 +394,8 @@ class HttpEntity extends Entity
             case self::DECODE_JSON:
                 $extracted = json_decode($response, $this->decodeAsArray);
 
-                if (is_null($extracted)) {
+                if (is_null($extracted))
+                {
                     $this->addError("Response from '{$this->getUrl()}' could not be JSON decoded");
                     return;
                 }
@@ -354,7 +407,8 @@ class HttpEntity extends Entity
             case self::DECODE_BINARY:
                 $extracted = IGBinary::unserialise($response);
 
-                if (is_null($extracted)) {
+                if (is_null($extracted))
+                {
                     $this->addError("Response from '{$this->getUrl()}' could not be binary decoded");
                     return;
                 }
@@ -363,7 +417,8 @@ class HttpEntity extends Entity
             case self::DECODE_XML:
                 $extracted = Xml::extract($response);
 
-                if (is_null($extracted)) {
+                if (is_null($extracted))
+                {
                     $this->addError("Response from '{$this->getUrl()}' could not be XML decoded");
                     return;
                 }
@@ -378,7 +433,8 @@ class HttpEntity extends Entity
                     )
                 );
 
-                if (is_null($extracted)) {
+                if (is_null($extracted))
+                {
                     $this->addError("Response from '{$this->getUrl()}::{$this->getMethod()}' could not be SOAP decoded");
                     return;
                 }
@@ -391,11 +447,9 @@ class HttpEntity extends Entity
                 break;
         }
 
-        if (is_array($extracted)) {
-            $this->setExtractedArrayData($extracted);
-        }
-        else if (is_object($extracted)) {
-            $this->setExtractedObjectData($extracted);
+        if (is_array($extracted) || is_object($extracted))
+        {
+            $this->setExtractedData($extracted);
         }
 
         $this->extracted = $extracted;
@@ -405,18 +459,18 @@ class HttpEntity extends Entity
      * Private functions
      */
 
-    private function setExtractedArrayData (array $extracted): void
+    /**
+     * Set local specific response post data
+     *
+     * @param array|object $extracted
+     *
+     * @return void
+     */
+    private function setExtractedData ($extracted): void
     {
-        $this->setSuccess($extracted["success"] ?? true);
-        $this->setData($extracted["data"] ?? null);
-        $this->addError($extracted["errors"] ?? []);
-    }
-
-    private function setExtractedObjectData (object $extracted): void
-    {
-        $this->setSuccess($extracted->success ?? true);
-        $this->setData($extracted->data ?? null);
-        $this->addError($extracted->errors ?? []);
+        $this->setSuccess(Type::getProperty($extracted, "success") ?? true);
+        $this->setData(Type::getProperty($extracted, "data") ?? null);
+        $this->addError(Type::getProperty($extracted, "errors") ?? []);
     }
 
     private function setSuccess (bool $success): void
@@ -429,8 +483,27 @@ class HttpEntity extends Entity
         $this->data = $data;
     }
 
+    /**
+     * Set an authorisation header
+     *
+     * @param string $authorisation
+     *
+     * @return void
+     */
     private function setAuthorisation (string $authorisation): void
     {
         $this->addHeader("Authorization", $authorisation);
+    }
+
+    /**
+     * Set the request content type
+     *
+     * @param string $contentType
+     *
+     * @return void
+     */
+    private function setContentType (string $contentType): void
+    {
+        $this->addHeader("Content-Type", $contentType);
     }
 }

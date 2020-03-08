@@ -9,90 +9,105 @@ final class TransportEntity extends AEntity
 {
     /**
      * The arguments for the controller
+     *
      * @var array
      */
     private $args = [];
 
     /**
      * The body to be rendered on response
+     *
      * @var string
      */
     private $body;
 
     /**
      * The data to be put in the body
+     *
      * @var mixed
      */
     private $data;
 
     /**
      * The default content type for the response header
+     *
      * @var string
      */
     private $defaultContentType = "application/json";
 
     /**
      * The status of the response
+     *
      * @var bool
      */
     private $failed;
 
     /**
      * The headers of the response
+     *
      * @var array
      */
     private $headers = [];
 
     /**
      * Flag to determine if the response should be json encoded
+     *
      * @var bool
      */
     private $jsonEncode = true;
 
     /**
      * The next function to be called by middleware
+     *
      * @var object
      */
     private $next;
 
     /**
      * Any GET or POST parameters
+     *
      * @var array
      */
     private $queryParameters = [];
 
     /**
      * Whether the response should be sent or not
+     *
      * @var bool
      */
     private $quiet = false;
 
     /**
      * The Slim Request class
+     *
      * @var Request
      */
     private $request;
 
     /**
      * The body of the request
+     *
      * @var string|null
      */
     private $requestBody;
 
     /**
      * The URL of the request
+     *
      * @var string
      */
     private $requestUrl;
 
     /**
      * The Slim Response class
+     *
      * @var Response
      */
     private $response;
 
     /**
      * The HTTP status code of the response
+     *
      * @var int
      */
     private $statusCode = 200;
@@ -156,28 +171,35 @@ final class TransportEntity extends AEntity
 
     public function iterateHeaders (): iterable
     {
-        foreach ($this->headers as $header => $value) {
+        foreach ($this->headers as $header => $value)
+        {
             yield $header => $value;
         }
     }
 
     /**
      * Gets the body of the response, defaults to json encoded
+     *
      * @return string
      */
     public function getBody (): ?string
     {
-        if ($this->quiet) {
+        if ($this->quiet)
+        {
             return null;
         }
 
-        if (empty($this->body)) {
-            if ($this->jsonEncode) {
-                $this->body = json_encode([
-                    "failed" => $this->hasFailed(),
-                    "data" => $this->getData(),
-                    "errors" => $this->getErrors()
-                ]);
+        if (empty($this->body))
+        {
+            if ($this->jsonEncode)
+            {
+                $this->body = json_encode(
+                    [
+                        "failed" => $this->hasFailed(),
+                        "data" => $this->getData(),
+                        "errors" => $this->getErrors()
+                    ]
+                );
             }
         }
 
@@ -200,7 +222,8 @@ final class TransportEntity extends AEntity
 
     public function setContentType (string $contentType): void
     {
-        switch ($contentType) {
+        switch ($contentType)
+        {
             case $this->defaultContentType:
                 $this->jsonEncode = true;
                 break;
@@ -254,13 +277,15 @@ final class TransportEntity extends AEntity
 
     /**
      * Renders the body
+     *
      * @return void
      */
     final public function renderResponse (): void
     {
         $this->response = $this->response->withStatus($this->statusCode);
 
-        foreach ($this->iterateHeaders() as $header => $value) {
+        foreach ($this->iterateHeaders() as $header => $value)
+        {
             $this->response = $this->response->withHeader($header, $value);
         }
 
@@ -269,6 +294,7 @@ final class TransportEntity extends AEntity
 
     /**
      * Calls the next function in the middleware stack
+     *
      * @return void
      */
     final public function next (): void
@@ -279,7 +305,9 @@ final class TransportEntity extends AEntity
 
     /**
      * Disables JSON output, used for GET requests
-     * @param boolean $quiet
+     *
+     * @param bool $quiet
+     *
      * @return void
      */
     final public function disableOutput (bool $quiet = true): void
