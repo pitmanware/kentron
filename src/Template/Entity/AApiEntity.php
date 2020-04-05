@@ -1,8 +1,8 @@
 <?php
 
-namespace Kentron\Entity\Template;
+namespace Kentron\Template\Entity;
 
-use Kentron\Entity\Template\ACoreEntity;
+use Kentron\Template\Entity\ACoreEntity;
 
 use Kentron\Facade\JsonSchema;
 

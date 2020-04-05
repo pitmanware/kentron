@@ -2,7 +2,7 @@
 
 namespace Kentron\Entity;
 
-use Kentron\Entity\Template\AEntity;
+use Kentron\Template\Entity\AEntity;
 use Slim\Http\{Request, Response};
 
 final class TransportEntity extends AEntity

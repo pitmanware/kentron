@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Entity\Template;
+namespace Kentron\Template\Entity;
 
 use Kentron\Facade\DT;
 

@@ -2,7 +2,7 @@
 
 namespace Kentron\Store\Variable;
 
-use Kentron\Entity\Template\ACoreCollectionEntity;
+use Kentron\Template\Entity\ACoreCollectionEntity;
 
 abstract class AVariable
 {
@@ -12,7 +12,7 @@ abstract class AVariable
     * The encryption cipher
     * @var string
     */
-    private const ENCRYPTION = "AES-256-OFB";
+    private static $cipher = "AES-256-OFB";
 
     /**
      * The base64 decoded random byte string initialisation vector to be used on encryption/decryption
@@ -39,10 +39,20 @@ abstract class AVariable
     private static $decrypted = [];
 
     /**
-     * Init function
+     * Sets the cipher
+     *
+     * @param string $cipher
+     *
+     * @return void
      */
+    public static function setCipher (string $cipher): void
+    {
+        self::$cipher = $cipher;
+    }
 
     /**
+     * Init function
+     *
      * Builds the array of system variables
      * @param string $databaseKey The database key from the config
      */
@@ -60,6 +70,7 @@ abstract class AVariable
 
     /**
      * Set a store value. Should be used sparingly out of scope
+     *
      * @param int   $index The index of the store to change
      * @param mixed $value The value of that store item
      */
@@ -70,7 +81,9 @@ abstract class AVariable
 
     /**
      * Get a system variable
+     *
      * @return mixed
+     *
      * @throws \Exception
      */
     public static function get (int $variableID)
@@ -99,26 +112,31 @@ abstract class AVariable
 
     /**
      * Decrypts a value from the database
+     *
      * @param  string $toDecrypt The encrypted variable
+     *
      * @return string
      */
     public static function encrypt (string $toDecrypt): string
     {
-        return openssl_encrypt($toDecrypt, self::ENCRYPTION, self::$databaseKey, 0, self::$initialisationVector);
+        return openssl_encrypt($toDecrypt, self::$cipher, self::$databaseKey, 0, self::$initialisationVector);
     }
 
     /**
      * Decrypts a value from the database
+     *
      * @param  string $toDecrypt The encrypted variable
+     *
      * @return string
      */
     public static function decrypt (string $toDecrypt): string
     {
-        return openssl_decrypt($toDecrypt, self::ENCRYPTION, self::$databaseKey, 0, self::$initialisationVector);
+        return openssl_decrypt($toDecrypt, self::$cipher, self::$databaseKey, 0, self::$initialisationVector);
     }
 
     /**
      * Get the system variables from the database
+     *
      * @return void
      */
     private static function getVariables (ACoreCollectionEntity $variableDBCollectionEntity): void

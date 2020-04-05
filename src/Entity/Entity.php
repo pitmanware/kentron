@@ -2,7 +2,7 @@
 
 namespace Kentron\Entity;
 
-use Kentron\Entity\Template\AEntity;
+use Kentron\Template\Entity\AEntity;
 
 /**
  * Base class for storing data, error handling and logic

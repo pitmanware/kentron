@@ -4,7 +4,7 @@ namespace Kentron\Template;
 
 use Kentron\Template\AModel;
 
-use Kentron\Entity\Template\{ADBEntity, ACoreCollectionEntity};
+use Kentron\Template\Entity\{ADBEntity, ACoreCollectionEntity};
 
 abstract class ARepository
 {

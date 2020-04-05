@@ -2,7 +2,7 @@
 
 namespace Kentron\Entity\File;
 
-use Kentron\Entity\Template\AEntity;
+use Kentron\Template\Entity\AEntity;
 use Kentron\Facade\File;
 
 final class FileEntity extends AEntity

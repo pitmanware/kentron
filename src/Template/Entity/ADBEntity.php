@@ -1,8 +1,8 @@
 <?php
 
-namespace Kentron\Entity\Template;
+namespace Kentron\Template\Entity;
 
-use Kentron\Entity\Template\{ACoreEntity, AMapEntity};
+use Kentron\Template\Entity\{ACoreEntity, AMapEntity};
 
 abstract class ADBEntity extends ACoreEntity
 {

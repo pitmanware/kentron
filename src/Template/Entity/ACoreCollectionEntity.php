@@ -1,8 +1,8 @@
 <?php
 
-namespace Kentron\Entity\Template;
+namespace Kentron\Template\Entity;
 
-use Kentron\Entity\Template\{ACollectionEntity, ACoreEntity};
+use Kentron\Template\Entity\{ACollectionEntity, ACoreEntity};
 
 use Kentron\Service\{Type, Assert};
 
