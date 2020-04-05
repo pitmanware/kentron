@@ -9,17 +9,13 @@ final class Page
     private $baseDirectory;
     private $data;
     private $frame;
-    private $meta;
-    private $scripts;
-    private $styles;
+    private $title;
+    private $scripts = [];
+    private $styles = [];
     private $template;
 
     public function __construct (?string $directory = null)
     {
-        $this->scripts = new \stdClass();
-        $this->styles  = new \stdClass();
-        $this->meta    = new \stdClass();
-
         // Set any defaults
         $this->setFrame("index.twig");
         $this->setTitle("");
@@ -40,7 +36,7 @@ final class Page
      */
     public function setDirectory (string $directory): void
     {
-        if (file_exists($directory) !== false && is_dir($directory) !== false) {
+        if (file_exists($directory) === false || is_dir($directory) === false) {
             throw new \InvalidArgumentException("$directory is not a valid directory");
         }
 
@@ -73,7 +69,7 @@ final class Page
 
     public function setTitle (string $title): void
     {
-        $this->meta->title = $title;
+        $this->title = $title;
     }
 
     public function setFrame (string $framePath): void
@@ -128,7 +124,7 @@ final class Page
     public function capture (): string
     {
         $twig = new Twig($this->baseDirectory);
-        return $twig->captureView($this->properties["frame_view"], $this->properties["data"]);
+        return $twig->captureView($this->frame, $this->getProperties());
     }
 
     private function getProperties (): array

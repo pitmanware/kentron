@@ -60,7 +60,7 @@ abstract class AVariable
     {
         self::$databaseKey = $databaseKey;
 
-        if ($variableDBCollectionEntity->countEntities())
+        if ($variableDBCollectionEntity->countEntities() === 0)
         {
             throw new \InvalidArgumentException("Variable collection entity is empty");
         }

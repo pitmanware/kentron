@@ -33,7 +33,7 @@ abstract class ARepository
     /**
      * All of the available clause operators
      *
-     * @var array
+     * @var string[]
      */
     private $operators = [
         "=", "<", ">", "<=", ">=", "<>", "!=",
@@ -43,13 +43,6 @@ abstract class ARepository
         "~", "~*", "!~", "!~*", "similar to",
         "not similar to"
     ];
-
-    /**
-     * All the methods of ordering the results
-     *
-     * @var array
-     */
-    private $orderDirections = ["asc", "desc"];
 
     /**
      * AbstractRepository constructor
@@ -63,97 +56,98 @@ abstract class ARepository
             throw new \UnexpectedValueException("Model must be instance of " . AModel::class);
         }
 
-        $this->model = new $this->ormModel();
+        $this->resetOrmModel();
     }
 
     /**
      * Entity methods
      */
 
-     /**
-      * Runs the update method using the $updates property
-      * @return void
-      */
-     public function runUpdate (): void
-     {
-         $this->update($this->updates);
-     }
+    /**
+     * Runs the update method using the $updates property
+    * @return void
+    */
+    public function runUpdate (): void
+    {
+        $this->update($this->updates);
+    }
 
-     /**
-      * Inserts a new entry into the database using an ADBEntity
-      *
-      * @param ADBEntity $entity [description]
-      */
-     public function insertNew (ADBEntity $entity): void
-     {
-         // Loop through the attributes and set based on the key
-         foreach ($entity->iterateAvailableProperties(true) as $property => $value)
-         {
-             if ($property === $entity->getDateCreatedColumn())
-             {
-                 continue;
-             }
+    /**
+     * Inserts a new entry into the database using an ADBEntity
+    *
+    * @param ADBEntity $entity [description]
+    */
+    public function insertNew (ADBEntity $entity): void
+    {
+        // Loop through the attributes and set based on the key
+        foreach ($entity->iterateAvailableProperties(true) as $property => $value)
+        {
+            if ($property === $entity->getDateCreatedColumn())
+            {
+                continue;
+            }
 
-             $this->set($property, $value);
-         }
-         $this->save();
+            $this->set($property, $value);
+        }
+        $this->save();
 
-         // Save the new values to the entity
-         $entity->build($this->toArray());
-     }
+        // Save the new values to the entity
+        $entity->build($this->toArray());
+    }
 
-     /**
-      * Gets the first result from the table and inserts it into the given ADBEntity
-      *
-      * @param ADBEntity $dbEntity The entity to be built from the results
-      *
-      * @return bool The success of the build
-      */
-     public function buildFirst (ADBEntity $dbEntity): bool
-     {
-         $result = $this->first();
+    /**
+     * Gets the first result from the table and inserts it into the given ADBEntity
+    *
+    * @param ADBEntity $dbEntity The entity to be built from the results
+    *
+    * @return bool The success of the build
+    */
+    public function buildFirst (ADBEntity $dbEntity): bool
+    {
+        $result = $this->first();
 
-         if (is_null($result))
-         {
-             return false;
-         }
+        if (is_null($result))
+        {
+            return false;
+        }
 
-         $dbEntity->build($result);
-         return true;
-     }
+        $dbEntity->build($result);
+        return true;
+    }
 
-     /**
-      * Gets all results from the table and inserts them into a given ACoreCollectionEntity
-      *
-      * @param ACoreCollectionEntity $collectionEntity The collection entity to be build
-      *
-      * @return bool The success of the build
-      */
-     public function buildAll (ACoreCollectionEntity $collectionEntity): bool
-     {
-         $this->get();
-         $results = $this->toArray();
+    /**
+     * Gets all results from the table and inserts them into a given ACoreCollectionEntity
+    *
+    * @param ACoreCollectionEntity $collectionEntity The collection entity to be build
+    *
+    * @return bool The success of the build
+    */
+    public function buildAll (ACoreCollectionEntity $collectionEntity): bool
+    {
+        $this->get();
+        $results = $this->toArray();
 
-         if (count($results) === 0)
-         {
-             return false;
-         }
+        if (count($results) === 0)
+        {
+            return false;
+        }
 
-         $collectionEntity->build($results);
-         return true;
-     }
+        $collectionEntity->buildCollection($results);
+        return true;
+    }
 
-     /**
-      * Adds an update array to the $updates property
-      *
-      * @param array $update A key value pair
-      *
-      * @return void
-      */
-     protected function addUpdate (array $update): void
-     {
-         $this->updates += $update;
-     }
+    /**
+     * Adds an update array to the $updates property
+     *
+     * @param string $column The column to update
+     * @param mixed  $value  The new value of that column
+     *
+     * @return void
+     */
+    protected function addUpdate (string $column, $value): void
+    {
+        $this->updates[$column] = $value;
+    }
 
     /**
      * Table methods
@@ -313,7 +307,7 @@ abstract class ARepository
      */
     public function resetOrmModel (): void
     {
-        $this->model = new $this->ormModel();
+        $this->model = new $this->modelClass;
     }
 
     /**
@@ -351,22 +345,16 @@ abstract class ARepository
     }
 
     /**
-     * order by $column $direction
+     * Order a column, default descending
+     *
      * @param string $column
-     * @param string $direction
+     * @param boolean $desc
      *
      * @return void
-     *
-     * @throws InvalidArgumentException
      */
-    public function orderBy (string $column, string $direction = "asc"): void
+    public function orderBy (string $column, bool $desc = true): void
     {
-        if (!is_array($direction, $this->orderDirections))
-        {
-            throw new \InvalidArgumentException("'$direction' is not a valid order direction");
-        }
-
-        $this->model = $this->model->orderBy($column, $direction);
+        $this->model = $this->model->orderBy($column, ["asc", "desc"][$desc]);
     }
 
     /**
@@ -480,7 +468,7 @@ abstract class ARepository
      */
     private function validateOperator (string $operator): void
     {
-        if (!is_array($operator, $this->operators))
+        if (!in_array($operator, $this->operators))
         {
             throw new \InvalidArgumentException("'$operator' is not a valid operator");
         }
