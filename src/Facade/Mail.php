@@ -2,6 +2,7 @@
 
 namespace Kentron\Facade;
 
+use Swift_Image;
 use Swift_SmtpTransport;
 use Swift_Message;
 use Swift_Mailer;
@@ -10,9 +11,9 @@ final class Mail
 {
     /**
      * If Swiftmailer produces an error, it goes here
-     * @var string
+     * @var string[]
      */
-    public $error = "";
+    public $errors = [];
 
     /**
      * Count of all emails successfully delivered
@@ -36,19 +37,19 @@ final class Mail
      * SMTP domain
      * @var string
      */
-    private $smtp = "smtp.office365.com";
+    private $smtp = "smtp.gmail.com";
 
     /**
      * Port number
      * @var int
      */
-    private $port = 587;
+    private $port = 465;
 
     /**
      * Mail protocol
      * @var string
      */
-    private $method = "tls";
+    private $method = "ssl";
 
     /**
      * Origin email address
@@ -74,27 +75,30 @@ final class Mail
      */
     private $transport;
 
+    public function __construct ()
+    {
+        $this->message = new Swift_Message();
+    }
+
     public function send (string $to, string $subject, string $body = "")
     {
         if (is_null($this->transport)) {
             $this->buildTransport();
         }
 
-        $message = new Swift_Message();
-
-        $message->setFrom([$this->fromEmail => $this->fromName]);
-        $message->setTo($to);
-        $message->setSubject($subject);
-
-        $message->setBody($body);
-        $message->setContentType($this->contentType);
-
         try {
+            $this->message->setFrom([$this->fromEmail => $this->fromName]);
+            $this->message->setTo($to);
+            $this->message->setSubject($subject);
+
+            $this->message->setBody($body);
+            $this->message->setContentType($this->contentType);
+
             $mailer = new Swift_Mailer($this->transport);
-            $this->mailSentCount = $mailer->send($message);
+            $this->mailSentCount = $mailer->send($this->message);
         }
         catch (\Exception $ex) {
-            $this->error = $ex->getMessage();
+            $this->errors[] = $ex->getMessage();
             return false;
         }
 
@@ -152,6 +156,11 @@ final class Mail
     public function setContentType (string $contentType): void
     {
         $this->contentType = $contentType;
+    }
+
+    public function addImage (string $imagePath): string
+    {
+        return $this->message->embed(Swift_Image::fromPath($imagePath));
     }
 
 }

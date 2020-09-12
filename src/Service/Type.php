@@ -4,6 +4,15 @@ namespace Kentron\Service;
 
 final class Type
 {
+    public const TYPE_ARRAY = "array";
+    public const TYPE_BOOLEAN = "boolean";
+    public const TYPE_DOUBLE = "double";
+    public const TYPE_FLOAT = "double";
+    public const TYPE_INTEGER = "integer";
+    public const TYPE_OBJECT = "object";
+    public const TYPE_RESOURCE = "resource";
+    public const TYPE_STRING = "string";
+
     /**
      * Checks if an array is associative or numeric indexed
      *
@@ -60,35 +69,33 @@ final class Type
      *
      * @throws \UnexpectedValueException If the given type is unknown
      */
-    public static function getTypeMethod (string $type): string
+    public static function castTo (string $type): string
     {
         switch (strtolower($type))
         {
-            case "array":
-                return "castToArray";
+            case static::TYPE_ARRAY:
+                return "toArray";
                 break;
 
-            case "bool":
-            case "boolean":
-                return "castToBool";
+            case static::TYPE_BOOLEAN:
+                return "toBool";
                 break;
 
-            case "float":
-            case "double":
-                return "castToFloat";
+            case static::TYPE_FLOAT:
+            case static::TYPE_DOUBLE:
+                return "toFloat";
                 break;
 
-            case "int":
-            case "integer":
-                return "castToInt";
+            case static::TYPE_INTEGER:
+                return "toInt";
                 break;
 
-            case "object":
-                return "castToObject";
+            case static::TYPE_OBJECT:
+                return "toObject";
                 break;
 
-            case "string":
-                return "castToString";
+            case static::TYPE_STRING:
+                return "toString";
                 break;
 
             default:
@@ -104,7 +111,7 @@ final class Type
      *
      * @return array
      */
-    public static function castToArray ($value): array
+    public static function toArray ($value): array
     {
         return (array) $value;
     }
@@ -116,7 +123,7 @@ final class Type
      *
      * @return bool
      */
-    public static function castToBool ($value): bool
+    public static function toBool ($value): bool
     {
         return (bool) $value;
     }
@@ -130,7 +137,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function castToFloat ($value): float
+    public static function toFloat ($value): float
     {
         if (is_object($value))
         {
@@ -149,7 +156,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function castToInt ($value): int
+    public static function toInt ($value): int
     {
         if (is_object($value))
         {
@@ -166,7 +173,7 @@ final class Type
      *
      * @return object
      */
-    public static function castToObject ($value): object
+    public static function toObject ($value): object
     {
         return (object) $value;
     }
@@ -180,7 +187,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function castToString ($value): string
+    public static function toString ($value): string
     {
         if (is_iterable($value) || is_object($value))
         {

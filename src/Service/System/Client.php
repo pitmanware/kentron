@@ -6,7 +6,7 @@ final class Client
 {
     /**
      * Gets the user agent
-     * 
+     *
      * @return string
      */
     public static function getUserAgent (): string
@@ -20,13 +20,13 @@ final class Client
      */
     public static function getIP (): string
     {
-        return  $_SERVER["HTTP_CLIENT_IP"] ??
-                $_SERVER["HTTP_X_FORWARDED_FOR"] ??
-                $_SERVER["HTTP_X_FORWARDED"] ??
-                $_SERVER["HTTP_FORWARDED_FOR"] ??
-                $_SERVER["HTTP_FORWARDED"] ??
-                $_SERVER["REMOTE_ADDR"] ??
-                "";
+        return  (((((($_SERVER["HTTP_CLIENT_IP"]       ?? "")  ?:
+                     ($_SERVER["HTTP_X_FORWARDED_FOR"] ?? "")) ?:
+                     ($_SERVER["HTTP_X_FORWARDED"]     ?? "")) ?:
+                     ($_SERVER["HTTP_FORWARDED_FOR"]   ?? "")) ?:
+                     ($_SERVER["HTTP_FORWARDED"]       ?? "")) ?:
+                     ($_SERVER["REMOTE_ADDR"]          ?? "")) ?:
+                     "";
     }
 
     /**
@@ -35,6 +35,12 @@ final class Client
      */
     public static function getDomain (): string
     {
-        return $_SERVER["HTTP_HOST"] ?? $_SERVER["SERVER_NAME"] ?? "";
+        return (($_SERVER["SERVER_NAME"] ?? "") ?: ($_SERVER["HTTP_HOST"] ?? "")) ?: "";
+    }
+
+    public static function isPrivate (): bool
+    {
+        $ip = self::getIP();
+        return !$ip || !!preg_match("/^(10|172\.(1[6-9]|2[0-9]|3[01])|192\.168).+/", $ip);
     }
 }

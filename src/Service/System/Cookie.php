@@ -2,7 +2,10 @@
 
 namespace Kentron\Service\System;
 
-final class Cookie
+use Kentron\Facade\DT;
+use Kentron\Store\Variable\AVariable;
+
+class Cookie
 {
     /**
      * Gets a stored cookie by name
@@ -19,15 +22,36 @@ final class Cookie
     /**
      * Add a new cookie
      *
-     * @param string $name     The name of the cookie to store
-     * @param mixed  $value    The content of the cookie
-     * @param int    $lifeTime The valid period of the cookie in UNIX seconds
+     * @param string $name        The name of the cookie to store
+     * @param mixed  $value       The content of the cookie
+     * @param DT     $dateExpires The expiry date
      *
      * @return void
      */
-    public static function create (string $name, $value, int $lifeTime): void
+    public static function set (string $name, $value, DT $dateExpires): void
     {
-        setcookie($name, $value, $lifeTime);
+        setcookie(
+            $name,
+            $value,
+            [
+                "expires" => $dateExpires->format("U"),
+                "path" => "/",
+                "domain" => Client::getDomain(),
+                "secure" => !AVariable::onDev(),
+                "httpOnly" => true,
+                "samesite" => "Strict"
+            ]
+        );
         $_COOKIE[$name] = $value;
+    }
+
+    public static function unset (string $name): void
+    {
+        self::set($name, null, DT::now());
+    }
+
+    public static function logout (): void
+    {
+        self::unset(session_name());
     }
 }

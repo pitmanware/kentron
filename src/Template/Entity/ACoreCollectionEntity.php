@@ -85,7 +85,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
     final public function addEntity (ACoreEntity $coreEntity): void
     {
         $this->coreCollection[] = $coreEntity;
-        $this->rootEntity->addEntity($coreEntity->getRootEntity());
+        $this->getRootEntity()->addEntity($coreEntity->getRootEntity());
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      */
     final public function iterateEntities (): iterable
     {
-        yield from $this->rootEntity->iterateEntities();
+        yield from $this->getRootEntity()->iterateEntities();
     }
 
     /**
@@ -110,6 +110,10 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     public function normalise (): array
     {
+        if ($this->getRootEntity()->isValidMethod(__FUNCTION__)) {
+            return $this->getRootEntity()->{__FUNCTION__}();
+        }
+
         $normalised = [];
 
         foreach ($this->iterateCoreEntities() as $coreEntity) {
@@ -128,45 +132,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      */
     final public function map (array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
     {
-        $map = [];
-        $index = 0;
-
-        foreach ($this->iterateCoreEntities() as $coreEntity) {
-
-            foreach ($methods as $key => $method) {
-
-                if (!$this->isValidMethod($coreEntity->getRootEntity(), $method)) {
-                    continue;
-                }
-                $mappedData = $coreEntity->getRootEntity()->{$method}();
-
-                if (is_array($conditions)) {
-
-                    foreach ($conditions as [$operand, $assertion, $result]) {
-
-                        if (!$this->isValidMethod($coreEntity->getRootEntity(), $operand)) {
-                            continue;
-                        }
-                        $value = $coreEntity->getRootEntity()->{$operand}();
-
-                        if (!Assert::$assertion($value, $result)) {
-                            continue 3;
-                        }
-                    }
-                }
-
-                if ($namedIndexes) {
-                    $map[$index][$method] = $mappedData;
-                }
-                else {
-                    $map[$index][$key] = $mappedData;
-                }
-            }
-
-            $index++;
-        }
-
-        return (!!$map && $flatten) ? array_merge_recursive(...$map) : $map;
+        return $this->getRootEntity()->{__FUNCTION__}($methods, $flatten, $conditions, $namedIndexes);
     }
 
     /**
@@ -176,26 +142,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      */
     final public function filter (array $conditions): iterable
     {
-        foreach ($this->iterateCoreEntities() as $coreEntity) {
-
-            if (!is_array($conditions[0])) {
-                $conditions = [$conditions];
-            }
-
-            foreach ($conditions as [$method, $assertion, $result]) {
-
-                if (!$this->isValidMethod($coreEntity->getRootEntity(), $method)) {
-                    continue 2;
-                }
-                $value = $coreEntity->getRootEntity()->{$method}();
-
-                if (!Assert::$assertion($value, $result)) {
-                    continue 2;
-                }
-            }
-
-            yield $coreEntity;
-        }
+        yield from $this->getRootEntity()->{__FUNCTION__}($conditions);
     }
 
     /**
@@ -204,7 +151,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      */
     final public function shiftCoreEntity (): ?ACoreEntity
     {
-        $this->rootEntity->shiftEntity();
+        $this->getRootEntity()->shiftEntity();
         return array_shift($this->coreCollection);
     }
 
@@ -214,7 +161,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      */
     final public function popCoreEntity (): ?ACoreEntity
     {
-        $this->rootEntity->popEntity();
+        $this->getRootEntity()->popEntity();
         return array_pop($this->coreCollection);
     }
 }

@@ -3,7 +3,8 @@
 namespace Kentron\Entity;
 
 use Kentron\Template\Entity\AEntity;
-use Slim\Http\{Request, Response};
+
+use Slim\Http\{Request,Response};
 
 final class TransportEntity extends AEntity
 {
@@ -78,6 +79,13 @@ final class TransportEntity extends AEntity
     private $quiet = false;
 
     /**
+     * Used for front end routing
+     *
+     * @var string|null
+     */
+    private $redirect = null;
+
+    /**
      * The Slim Request class
      *
      * @var Request
@@ -106,6 +114,13 @@ final class TransportEntity extends AEntity
     private $response;
 
     /**
+     * The name of the Slim route
+     *
+     * @var string|null
+     */
+    private $routeName;
+
+    /**
      * The HTTP status code of the response
      *
      * @var int
@@ -118,6 +133,7 @@ final class TransportEntity extends AEntity
     public function __construct ()
     {
         $this->headers["content-type"] = $this->defaultContentType;
+        $this->headers["cache-control"] = "max-age=300, must-revalidate";
     }
 
     /**
@@ -164,6 +180,11 @@ final class TransportEntity extends AEntity
         return $this->response;
     }
 
+    public function getRouteName (): ?string
+    {
+        return $this->routeName;
+    }
+
     public function hasFailed (): bool
     {
         return $this->failed ?? count($this->getErrors()) > 0;
@@ -171,8 +192,7 @@ final class TransportEntity extends AEntity
 
     public function iterateHeaders (): iterable
     {
-        foreach ($this->headers as $header => $value)
-        {
+        foreach ($this->headers as $header => $value) {
             yield $header => $value;
         }
     }
@@ -184,22 +204,18 @@ final class TransportEntity extends AEntity
      */
     public function getBody (): ?string
     {
-        if ($this->quiet)
-        {
+        if ($this->quiet) {
             return null;
         }
 
-        if (empty($this->body))
-        {
-            if ($this->jsonEncode)
-            {
-                $this->body = json_encode(
-                    [
-                        "failed" => $this->hasFailed(),
-                        "data" => $this->getData(),
-                        "errors" => $this->getErrors()
-                    ]
-                );
+        if (empty($this->body)) {
+            if ($this->jsonEncode) {
+                $this->body = json_encode([
+                    "failed" => $this->hasFailed(),
+                    "data" => $this->getData(),
+                    "alerts" => $this->normaliseAlerts(),
+                    "redirect" => $this->redirect
+                ]);
             }
         }
 
@@ -222,14 +238,18 @@ final class TransportEntity extends AEntity
 
     public function setContentType (string $contentType): void
     {
-        switch ($contentType)
-        {
+        switch ($contentType) {
             case $this->defaultContentType:
                 $this->jsonEncode = true;
                 break;
         }
 
         $this->headers["content-type"] = $contentType;
+    }
+
+    public function setHtml (): void
+    {
+        $this->setContentType("text/html");
     }
 
     public function setData ($data): void
@@ -252,12 +272,18 @@ final class TransportEntity extends AEntity
         $this->statusCode = $statusCode;
     }
 
+    public function setRedirect (string $redirect): void
+    {
+        $this->redirect = $redirect;
+    }
+
     public function setRequest (Request &$request): void
     {
         $this->request = $request;
         $this->requestUrl = $this->request->getUri()->getPath();
         $this->requestBody = $this->request->getBody()->getContents() ?: null;
         $this->queryParameters = $this->request->getQueryParams();
+        $this->routeName = $this->request->getAttribute("route")->getName() ?? null;
         $this->request->getBody()->rewind();
     }
 
@@ -284,8 +310,7 @@ final class TransportEntity extends AEntity
     {
         $this->response = $this->response->withStatus($this->statusCode);
 
-        foreach ($this->iterateHeaders() as $header => $value)
-        {
+        foreach ($this->iterateHeaders() as $header => $value) {
             $this->response = $this->response->withHeader($header, $value);
         }
 
@@ -306,7 +331,7 @@ final class TransportEntity extends AEntity
     /**
      * Disables JSON output, used for GET requests
      *
-     * @param bool $quiet
+     * @param boolean $quiet
      *
      * @return void
      */
@@ -319,5 +344,10 @@ final class TransportEntity extends AEntity
     {
         $this->statusCode = 302;
         $this->headers["Location"] = $url;
+    }
+
+    final public function hasParameters (): bool
+    {
+        return !empty($this->queryParameters);
     }
 }

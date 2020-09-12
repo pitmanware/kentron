@@ -31,10 +31,10 @@ abstract class ACoreEntity extends AEntity
 
     /**
      * Constructor can only be called by child
-     * Should be overridden
-     * @param AEntity $entity Supplies the core entity
+     * May be overridden
+     * @param null|AEntity $entity Supplies the core entity or self
      */
-    protected function __construct (AEntity $entity)
+    public function __construct (?AEntity $entity = null)
     {
         $this->rootEntity = $entity;
     }
@@ -56,6 +56,9 @@ abstract class ACoreEntity extends AEntity
      */
     final public function __call (string $callable, array $args = [])
     {
+        if (is_null($this->rootEntity)) {
+            throw new \Error("Call to undefined method " . get_class($this) . "::{$callable}");
+        }
         return $this->rootEntity->{$callable}(...$args);
     }
 
@@ -65,7 +68,7 @@ abstract class ACoreEntity extends AEntity
      */
     final public function getRootEntity (): AEntity
     {
-        return $this->rootEntity;
+        return $this->rootEntity ?? $this;
     }
 
     /**
@@ -101,7 +104,7 @@ abstract class ACoreEntity extends AEntity
             // Look for a nested class
             $adder = $binding["add"] ?? null;
 
-            if ($this->isValidMethod($this->rootEntity, $adder)) {
+            if ($this->getRootEntity()->isValidMethod($adder)) {
 
                 if (is_array($dataProperty) && !Type::isAssoc($dataProperty)) {
                     // If the property is an indexed array and the class is a collection
@@ -133,12 +136,12 @@ abstract class ACoreEntity extends AEntity
         foreach ($this->propertyMap as $key => $binding) {
             $getter = $binding["get"] ?? null;
 
-            if (!$this->isValidMethod($this->rootEntity, $getter)) {
+            if (!$this->getRootEntity()->isValidMethod($getter)) {
                 continue;
             }
 
             try {
-                $propertyValue = $this->rootEntity->{$getter}();
+                $propertyValue = $this->getRootEntity()->{$getter}();
             }
             catch (\TypeError $typeError) {
                 if (!$allowNullable) {
@@ -157,7 +160,8 @@ abstract class ACoreEntity extends AEntity
      */
     public function normalise (): array
     {
-        if ($this->isValidMethod($this->rootEntity, __FUNCTION__)) {
+        $entity = $this->getRootEntity();
+        if (!$this->entityIsRecursive($entity) && $entity->isValidMethod(__FUNCTION__)) {
             return $this->callRootEntityMethod(__FUNCTION__);
         }
 
@@ -168,24 +172,6 @@ abstract class ACoreEntity extends AEntity
         }
 
         return $normalised;
-    }
-
-    /**
-     * Validates a callable method on the core entity
-     * @param  string|null $method The method to check
-     * @return bool
-     */
-    final protected function isValidMethod (AEntity $entity, ?string $method = null): bool
-    {
-        if (
-            isset($method) &&
-            method_exists($entity, $method) &&
-            is_callable([$entity, $method])
-        ) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -200,7 +186,7 @@ abstract class ACoreEntity extends AEntity
         // check to see if there is a getter for the class
         $classGetter = $binding["get_class"] ?? null;
 
-        if ($this->isValidMethod($this, $classGetter)) {
+        if ($this->isValidMethod($classGetter)) {
             $entity = $this->{$classGetter}();
 
             // The subclass must be another instance of ACoreEntity
@@ -216,7 +202,7 @@ abstract class ACoreEntity extends AEntity
 
             $classSetter = $binding["set_class"] ?? null;
 
-            if ($this->isValidMethod($this, $classSetter)) {
+            if ($this->isValidMethod($classSetter)) {
                 $this->{$classSetter}($entity);
             }
 
@@ -234,8 +220,8 @@ abstract class ACoreEntity extends AEntity
      */
     final private function callRootEntityMethod (?string $method, ...$params)
     {
-        if ($this->isValidMethod($this->rootEntity, $method)) {
-            return $this->rootEntity->{$method}(...$params);
+        if ($this->getRootEntity()->isValidMethod($method)) {
+            return $this->getRootEntity()->{$method}(...$params);
         }
 
         return null;
@@ -248,11 +234,7 @@ abstract class ACoreEntity extends AEntity
      */
     final private function entityIsRecursive (AEntity $entity): bool
     {
-        if (is_subclass_of($entity, __CLASS__)) {
-            return true;
-        }
-
-        return false;
+        return is_subclass_of($entity, __CLASS__);
     }
 
     /**
@@ -262,10 +244,6 @@ abstract class ACoreEntity extends AEntity
      */
     final private function entityIsACollection (AEntity $entity): bool
     {
-        if (is_subclass_of($entity, ACoreCollectionEntity::class)) {
-            return true;
-        }
-
-        return false;
+        return is_subclass_of($entity, ACoreCollectionEntity::class);
     }
 }

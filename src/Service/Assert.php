@@ -13,4 +13,9 @@ final class Assert
     {
         return $operand === $comparand;
     }
+
+    public static function is ($operand, callable $func): bool
+    {
+        return $func($operand);
+    }
 }

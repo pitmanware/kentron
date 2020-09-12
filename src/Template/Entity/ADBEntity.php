@@ -88,8 +88,8 @@ abstract class ADBEntity extends ACoreEntity
     {
         if (
             isset($this->primaryIDColumn) &&
-            $this->isValidMethod($this->rootEntity, "getID") &&
-            $this->isValidMethod($this->rootEntity, "setID")
+            $this->getRootEntity()->isValidMethod("getID") &&
+            $this->getRootEntity()->isValidMethod("setID")
         ) {
             $this->propertyMap[$this->primaryIDColumn] = [
                 "get" => "getID",
@@ -99,8 +99,8 @@ abstract class ADBEntity extends ACoreEntity
 
         if (
             isset($this->dateCreatedColumn) &&
-            $this->isValidMethod($this->rootEntity, "getDateCreated") &&
-            $this->isValidMethod($this->rootEntity, "setDateCreated")
+            $this->getRootEntity()->isValidMethod("getDateCreated") &&
+            $this->getRootEntity()->isValidMethod("setDateCreated")
         ) {
             $this->propertyMap[$this->dateCreatedColumn] = [
                 "get" => "getDateCreated",
@@ -110,8 +110,8 @@ abstract class ADBEntity extends ACoreEntity
 
         if (
             isset($this->dateUpdateColumn) &&
-            $this->isValidMethod($this->rootEntity, "getDateUpdated") &&
-            $this->isValidMethod($this->rootEntity, "setDateUpdated")
+            $this->getRootEntity()->isValidMethod("getDateUpdated") &&
+            $this->getRootEntity()->isValidMethod("setDateUpdated")
         ) {
             $this->propertyMap[$this->dateUpdateColumn] = [
                 "get" => "getDateUpdated",
@@ -121,8 +121,8 @@ abstract class ADBEntity extends ACoreEntity
 
         if (
             isset($this->dateDeletedColumn) &&
-            $this->isValidMethod($this->rootEntity, "getDateDeleted") &&
-            $this->isValidMethod($this->rootEntity, "setDateDeleted")
+            $this->getRootEntity()->isValidMethod("getDateDeleted") &&
+            $this->getRootEntity()->isValidMethod("setDateDeleted")
         ) {
             $this->propertyMap[$this->dateDeletedColumn] = [
                 "get" => "getDateDeleted",

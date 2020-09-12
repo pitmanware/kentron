@@ -10,15 +10,17 @@ abstract class AApiEntity extends ACoreEntity
 {
     /**
      * The full content of the JSON schema
+     *
      * @var string|null
-     * @example /var/www/html/project/App/Schema/validation.schema.json
      */
     private $schema;
 
     /**
      * Validates the given JSON string against the schema for this entity
-     * @param  string      $json The request JSON
-     * @return object|null       The extracted JSON or null if failed
+     *
+     * @param string $json The request JSON
+     *
+     * @return object|null The extracted JSON or null if failed
      */
     public function validate (string $json): ?object
     {
@@ -41,6 +43,7 @@ abstract class AApiEntity extends ACoreEntity
 
     /**
      * Sets the JSON schema for validation
+     *
      * @param string $schema The content of the JSON schema
      */
     final public function setSchema (string $schema): void

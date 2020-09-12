@@ -2,6 +2,8 @@
 
 namespace Kentron\Template\Entity;
 
+use Kentron\Service\Assert;
+
 abstract class ACollectionEntity extends AEntity
 {
     /**
@@ -108,5 +110,84 @@ abstract class ACollectionEntity extends AEntity
     final public function popEntity (): ?AEntity
     {
         return array_pop($this->collection);
+    }
+
+    /**
+     * Run a function for every core entity in the collection
+     * @param  array $methods    The methods to call on all the entities
+     * @param  bool  $flatten    If the results should be reduced to a single dimension
+     * @param  array $conditions Comparisons to be made against the result
+     * @return array
+     */
+    final public function map (array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
+    {
+        $map = [];
+        $index = 0;
+
+        foreach ($this->iterateEntities() as $entity) {
+
+            foreach ($methods as $key => $method) {
+
+                if (!$entity->isValidMethod($method)) {
+                    continue;
+                }
+                $mappedData = $entity->{$method}();
+
+                if (is_array($conditions)) {
+
+                    foreach ($conditions as [$operand, $assertion, $result]) {
+
+                        if (!$entity->isValidMethod($operand)) {
+                            continue;
+                        }
+                        $value = $entity->{$operand}();
+
+                        if (!Assert::$assertion($value, $result)) {
+                            continue 3;
+                        }
+                    }
+                }
+
+                if ($namedIndexes) {
+                    $map[$index][$method] = $mappedData;
+                }
+                else {
+                    $map[$index][$key] = $mappedData;
+                }
+            }
+
+            $index++;
+        }
+
+        return (!!$map && $flatten) ? array_merge_recursive(...$map) : $map;
+    }
+
+    /**
+     * Similar to map, except it iterates through entities that pass all conditions
+     * @param  array    $conditions
+     * @return iterable
+     */
+    final public function filter (array $conditions): iterable
+    {
+        foreach ($this->iterateEntities() as $entity) {
+
+            if (!is_array($conditions[0])) {
+                $conditions = [$conditions];
+            }
+
+            foreach ($conditions as [$method, $assertion, $result]) {
+
+                if (!$entity->isValidMethod($method)) {
+                    continue 2;
+                }
+                $value = $entity->{$method}();
+
+                if (!Assert::$assertion($value, $result)) {
+                    continue 2;
+                }
+            }
+
+            yield $entity;
+        }
     }
 }

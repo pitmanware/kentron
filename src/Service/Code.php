@@ -47,8 +47,9 @@ final class Code
     public function get (): array
     {
         $codes = [];
+        $count = $this->count;
 
-        for ($i = 0; $i < $this->count; $i++)
+        while ($count--)
         {
             do
             {
@@ -68,14 +69,7 @@ final class Code
      */
     public function getAlpha (): array
     {
-        if ($this->safeMode)
-        {
-            $this->setNegativeRegex("/[^BCDFGHJKLMNPQRSTVWXYZ]/");
-        }
-        else
-        {
-            $this->setNegativeRegex("/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/");
-        }
+        $this->regex = $this->safeMode ? "/[^BCDFGHJKLMNPQRSTVWXYZ]/" : "/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/";
 
         return $this->get();
     }
@@ -86,13 +80,7 @@ final class Code
      */
     public function getDigit (): array
     {
-        if ($this->safeMode)
-        {
-            $this->setNegativeRegex("/[^23456789]/");
-        }
-        else {
-            $this->setNegativeRegex("/[^0123456789]/");
-        }
+        $this->regex = $this->safeMode ? "/[^23456789]/" : "/[^0123456789]/";
 
         return $this->get();
     }
@@ -103,14 +91,7 @@ final class Code
      */
     public function getAlphaNumeric (): array
     {
-        if ($this->safeMode)
-        {
-            $this->setNegativeRegex("/[^BCDFGHJKLMNPQRSTVWXYZ23456789]/");
-        }
-        else
-        {
-            $this->setNegativeRegex("/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]/");
-        }
+        $this->regex = $this->safeMode ? "/[^BCDFGHJKLMNPQRSTVWXYZ23456789]/" : "/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]/";
 
         return $this->get();
     }
@@ -126,7 +107,7 @@ final class Code
      */
     public function setLength (int $length): void
     {
-        if (count($length) > 0)
+        if ($length > 0)
         {
             $this->length = $length;
         }
@@ -139,7 +120,7 @@ final class Code
      */
     public function setCount (int $count): void
     {
-        if (count($count) > 0)
+        if ($count > 0)
         {
             $this->count = $count;
         }
@@ -151,7 +132,7 @@ final class Code
      * @return void
      * @throws InvalidRegexException
      */
-    public function setNegativeRegex (string $regex): void
+    public function setRegex (string $regex): void
     {
         if (@preg_match($regex, null) === false)
         {

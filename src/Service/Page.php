@@ -4,7 +4,7 @@ namespace Kentron\Service;
 
 use Kentron\Facade\Twig;
 
-final class Page
+class Page
 {
     private $baseDirectory;
     private $data;
@@ -43,25 +43,6 @@ final class Page
         $this->baseDirectory = $directory;
     }
 
-    public function addJs ($js): void
-    {
-        if (is_null($this->scripts->js)) {
-            $this->scripts->js = [];
-        }
-
-        if (is_array($js)) {
-            $this->scripts->js = array_merge($this->scripts->js, $js);
-        }
-        else if (is_string($js) && file_exists($js)) {
-            $this->scripts->js[] = $js;
-        }
-    }
-
-    public function addCss ($styles): void
-    {
-        $this->properties["script"]["css"] = $styles;
-    }
-
     public function setTemplate (string $templatePath): void
     {
         $this->template = $templatePath;
@@ -75,6 +56,11 @@ final class Page
     public function setFrame (string $framePath): void
     {
         $this->frame = $framePath;
+    }
+
+    public function setData ($data): void
+    {
+        $this->data = $data;
     }
 
     /**
@@ -93,7 +79,7 @@ final class Page
 
     public function addScript (string $scriptPath): void
     {
-        $this->scripts += $scriptPath;
+        $this->scripts[] = $scriptPath;
     }
 
     public function addScripts (array $scripts): void
@@ -105,7 +91,7 @@ final class Page
 
     public function addStyle (string $stylePath): void
     {
-        $this->styles += $stylePath;
+        $this->styles[] = $stylePath;
     }
 
     public function addStyles (array $styles): void
@@ -133,11 +119,8 @@ final class Page
             "meta" => [
                 "title" => $this->title,
             ],
-            "script" => [
-                "js" => $this->scripts,
-                "css" => $this->styles
-            ],
-            "frame_view" => $this->frame,
+            "scripts" => $this->scripts,
+            "styles" => $this->styles,
             "template" => $this->template,
             "data" => $this->data
         ];

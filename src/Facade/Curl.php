@@ -2,15 +2,13 @@
 
 namespace Kentron\Facade;
 
-use Kentron\Template\TError;
+use Kentron\Template\AAlert;
 
 /**
  * A wrapper for the OPP CURL PHP system
  */
-final class Curl
+final class Curl extends AAlert
 {
-    use TError;
-
     /**
      * Curl instance
      *

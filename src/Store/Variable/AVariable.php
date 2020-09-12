@@ -2,11 +2,22 @@
 
 namespace Kentron\Store\Variable;
 
+use Kentron\Service\Assert;
 use Kentron\Template\Entity\ACoreCollectionEntity;
 
 abstract class AVariable
 {
     use TLocalVariables;
+
+    public const ENV_DEV = 1;
+    public const ENV_UAT = 2;
+    public const ENV_LIVE = 3;
+
+    /**
+     * The environment
+     * @var null|int
+     */
+    private static $environment = null;
 
     /**
     * The encryption cipher
@@ -48,6 +59,18 @@ abstract class AVariable
     public static function setCipher (string $cipher): void
     {
         self::$cipher = $cipher;
+    }
+
+    /**
+     * Sets the environment to dev, uat or live
+     *
+     * @param integer $environment
+     *
+     * @return void
+     */
+    public static function setEnvironment (int $environment): void
+    {
+        self::$environment = $environment;
     }
 
     /**
@@ -132,6 +155,36 @@ abstract class AVariable
     public static function decrypt (string $toDecrypt): string
     {
         return openssl_decrypt($toDecrypt, self::$cipher, self::$databaseKey, 0, self::$initialisationVector);
+    }
+
+    /**
+     * Returns true if the environment is set to development
+     *
+     * @return boolean
+     */
+    public static function onDev (): bool
+    {
+        return Assert::same(self::$environment, self::ENV_DEV);
+    }
+
+    /**
+     * Returns true if the environment is set to UAT
+     *
+     * @return boolean
+     */
+    public static function onUAT (): bool
+    {
+        return Assert::same(self::$environment, self::ENV_UAT);
+    }
+
+    /**
+     * Returns true if the environment is set to live
+     *
+     * @return boolean
+     */
+    public static function onLive (): bool
+    {
+        return Assert::same(self::$environment, self::ENV_LIVE);
     }
 
     /**
