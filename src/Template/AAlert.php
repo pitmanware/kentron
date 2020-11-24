@@ -190,6 +190,23 @@ abstract class AAlert
         return $this->errorCodes & $errorCode;
     }
 
+    final public function hasErrorCodes (): bool
+    {
+        return $this->errorCodes !== 0;
+    }
+
+    final public function getErrorCodes (): int
+    {
+        return $this->errorCodes;
+    }
+
+    /**
+     * Merge the errors, notices and warnings with another entity
+     *
+     * @param AEntity $entity
+     *
+     * @return void
+     */
     final public function mergeAlerts (AEntity $entity): void
     {
         $this->addError($entity->getErrors());

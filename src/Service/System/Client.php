@@ -35,12 +35,16 @@ final class Client
      */
     public static function getDomain (): string
     {
-        return (($_SERVER["SERVER_NAME"] ?? "") ?: ($_SERVER["HTTP_HOST"] ?? "")) ?: "";
+        if (isset($_SERVER["HTTP_HOST"]) && !empty($_SERVER["HTTP_HOST"])) {
+            return preg_replace("/:\d+\$/", "", $_SERVER["HTTP_HOST"]);
+        }
+        else {
+            return $_SERVER["SERVER_NAME"] ?? "";
+        }
     }
 
     public static function isPrivate (): bool
     {
-        $ip = self::getIP();
-        return !$ip || !!preg_match("/^(10|172\.(1[6-9]|2[0-9]|3[01])|192\.168).+/", $ip);
+        return !filter_var(self::getIP(), FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     }
 }

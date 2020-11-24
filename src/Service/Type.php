@@ -74,28 +74,28 @@ final class Type
         switch (strtolower($type))
         {
             case static::TYPE_ARRAY:
-                return "toArray";
+                return "castToArray";
                 break;
 
             case static::TYPE_BOOLEAN:
-                return "toBool";
+                return "castToBool";
                 break;
 
             case static::TYPE_FLOAT:
             case static::TYPE_DOUBLE:
-                return "toFloat";
+                return "castToFloat";
                 break;
 
             case static::TYPE_INTEGER:
-                return "toInt";
+                return "castToInt";
                 break;
 
             case static::TYPE_OBJECT:
-                return "toObject";
+                return "castToObject";
                 break;
 
             case static::TYPE_STRING:
-                return "toString";
+                return "castToString";
                 break;
 
             default:
@@ -111,7 +111,7 @@ final class Type
      *
      * @return array
      */
-    public static function toArray ($value): array
+    public static function castToArray ($value): array
     {
         return (array) $value;
     }
@@ -123,7 +123,7 @@ final class Type
      *
      * @return bool
      */
-    public static function toBool ($value): bool
+    public static function castToBool ($value): bool
     {
         return (bool) $value;
     }
@@ -137,7 +137,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function toFloat ($value): float
+    public static function castToFloat ($value): float
     {
         if (is_object($value))
         {
@@ -156,7 +156,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function toInt ($value): int
+    public static function castToInt ($value): int
     {
         if (is_object($value))
         {
@@ -173,7 +173,7 @@ final class Type
      *
      * @return object
      */
-    public static function toObject ($value): object
+    public static function castToObject ($value): object
     {
         return (object) $value;
     }
@@ -187,7 +187,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function toString ($value): string
+    public static function castToString ($value): string
     {
         if (is_iterable($value) || is_object($value))
         {

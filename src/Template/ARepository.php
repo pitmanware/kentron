@@ -39,7 +39,7 @@ abstract class ARepository
         "=", "<", ">", "<=", ">=", "<>", "!=",
         "like", "like binary", "not like", "between", "ilike",
         "&", "|", "^", "<<", ">>",
-        "rlike", "regexp", "not regexp",
+        "rlike", "regexp", "regexp binary", "not regexp",
         "~", "~*", "!~", "!~*", "similar to",
         "not similar to"
     ];
@@ -244,6 +244,16 @@ abstract class ARepository
         $this->validateOperator($operator);
 
         $this->model = $this->model->where($column, $operator, $value);
+    }
+
+    public function whereRaw($queryString, array $bindings = [])
+    {
+        $this->model = $this->model->whereRaw($queryString, $bindings);
+    }
+
+    public function orWhereRaw($queryString, array $bindings = [])
+    {
+        $this->model = $this->model->orWhereRaw($queryString, $bindings);
     }
 
     /**
