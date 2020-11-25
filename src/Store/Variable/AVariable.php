@@ -8,6 +8,7 @@ use Kentron\Template\Entity\ACoreCollectionEntity;
 abstract class AVariable
 {
     use TLocalVariables;
+    use TProviderVariables;
 
     public const ENV_DEV = 1;
     public const ENV_UAT = 2;
