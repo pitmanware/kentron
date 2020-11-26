@@ -9,16 +9,14 @@
         }
     ],
     "require": {
-        "php": ">=7.2.0",
+        "php": ">=7.4.0",
         "slim/slim": "^3.0",
         "twig/twig": "^3.0",
         "justinrainbow/json-schema": "^5.2",
-        "swiftmailer/swiftmailer": "^6.2",
         "brick/postcode": "0.2.*",
         "giggsey/libphonenumber-for-php": "^8.11"
     },
     "require-dev": {
-        "theseer/phpdox": "^0.12"
     },
     "autoload": {
         "psr-4" : {

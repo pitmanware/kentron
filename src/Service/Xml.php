@@ -19,8 +19,7 @@ final class Xml
      */
     public static function build (string $viewPath, string $action, $data): ?string
     {
-        if (!is_array($data) && !is_object($data))
-        {
+        if (!is_array($data) && !is_object($data)) {
             return null;
         }
 
@@ -50,10 +49,8 @@ final class Xml
         libxml_use_internal_errors(true);
         $loadedXml = simplexml_load_string($xml);
 
-        if (!($xml instanceof \SimpleXMLElement))
-        {
-            if ($allowNull)
-            {
+        if (!($xml instanceof \SimpleXMLElement)) {
+            if ($allowNull) {
                 return null;
             }
 
@@ -90,24 +87,20 @@ final class Xml
         $nodes = $xml->children();
         $attributes = $xml->attributes();
 
-        if (count($attributes) > 0)
-        {
-            foreach ($attributes as $attrName => $attrValue)
-            {
+        if (count($attributes) > 0) {
+            foreach ($attributes as $attrName => $attrValue) {
                 $collection["@attributes"][$attrName] = (string) $attrValue;
             }
         }
 
-        if ($nodes->count() === 0)
-        {
+        if ($nodes->count() === 0) {
             $collection["value"] = (string) $xml;
             return $collection;
         }
 
-        foreach ($nodes as $nodeName => $nodeValue)
-        {
-            if (count($nodeValue->xpath('../' . $nodeName)) < 2)
-            {
+        /** @var \SimpleXMLElement $nodeValue */
+        foreach ($nodes as $nodeName => $nodeValue) {
+            if (count($nodeValue->xpath('../' . $nodeName)) < 2) {
                 $collection[$nodeName] = self::format($nodeValue);
                 continue;
             }
@@ -127,10 +120,8 @@ final class Xml
     {
         $errors = (array) libxml_get_errors();
 
-        foreach ($errors as $error)
-        {
-            switch ($error->level)
-            {
+        foreach ($errors as $error) {
+            switch ($error->level) {
                 case LIBXML_ERR_WARNING:
                     $errorMessage = "Warning: ";
                     break;
@@ -146,13 +137,11 @@ final class Xml
 
             $errorMessage .= "$error->message at $error->line:$error->column";
 
-            if (isset($error->file))
-            {
+            if (isset($error->file)) {
                 $errorMessage .= " in file $error->file";
             }
 
-            if (!isset($xmlFormatException))
-            {
+            if (!isset($xmlFormatException)) {
                 $xmlFormatException = new XmlFormatException($errorMessage, $error->code);
                 continue;
             }

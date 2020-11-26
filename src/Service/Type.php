@@ -48,12 +48,10 @@ final class Type
      */
     public static function getProperty ($data, string $property)
     {
-        if (is_object($data) && property_exists($data, $property))
-        {
+        if (is_object($data) && property_exists($data, $property)) {
             return $data->{$property};
         }
-        else if (is_array($data) && isset($data[$property]))
-        {
+        else if (is_array($data) && isset($data[$property])) {
             return $data[$property];
         }
 
@@ -71,8 +69,7 @@ final class Type
      */
     public static function castTo (string $type): string
     {
-        switch (strtolower($type))
-        {
+        switch (strtolower($type)) {
             case static::TYPE_ARRAY:
                 return "castToArray";
                 break;
@@ -139,8 +136,7 @@ final class Type
      */
     public static function castToFloat ($value): float
     {
-        if (is_object($value))
-        {
+        if (is_object($value)) {
             throw new \InvalidArgumentException("Non object expected");
         }
 
@@ -158,8 +154,7 @@ final class Type
      */
     public static function castToInt ($value): int
     {
-        if (is_object($value))
-        {
+        if (is_object($value)) {
             throw new \InvalidArgumentException("Non object expected");
         }
 
@@ -189,8 +184,7 @@ final class Type
      */
     public static function castToString ($value): string
     {
-        if (is_iterable($value) || is_object($value))
-        {
+        if (is_iterable($value) || is_object($value)) {
             throw new \InvalidArgumentException("Non iterable/object expected");
         }
 

@@ -2,9 +2,7 @@
 
 namespace Kentron\Facade;
 
-use Kentron\Service\Xml as Xml\Service;
-
-use Kentron\Exception\XmlFormatException;
+use Kentron\Service\Xml as XmlService;
 
 final class Soap extends \SoapClient
 {
@@ -101,7 +99,7 @@ final class Soap extends \SoapClient
     public function extract (): ?object
     {
         try {
-            $this->extractedXml = Xml\Service::extractSoap($this->rawXml);
+            $this->extractedXml = XmlService::extractSoap($this->rawXml);
         }
         catch (\XmlFormatException $ex) {
             $this->errors[] = $ex->getMessage();

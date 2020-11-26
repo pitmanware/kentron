@@ -8,20 +8,14 @@ use Kentron\Exception\FilesFormatException;
 
 use Kentron\Service\System\Files;
 
-class FileCollection
+final class FileCollection
 {
-    private $fileColletionEntity = null;
-
-    public function __construct ()
-    {
-        $this->fileColletionEntity = new FileCollectionEntity();
-    }
-
     /**
      * Build the array of File Entities
      */
     final public function build (): FileCollectionEntity
     {
+        $fileColletionEntity = new FileCollectionEntity();
         $files = Files::getAll();
 
         if (empty($files)) {
@@ -37,15 +31,15 @@ class FileCollection
         for ($key = 0; $key < $fileCount; $key++) {
 
             $fileEntity = new FileEntity(
-                $file["name"][$key],
-                $file["type"][$key],
-                $file["tmp_name"][$key],
-                $file["size"][$key]
+                $files["name"][$key],
+                $files["type"][$key],
+                $files["tmp_name"][$key],
+                $files["size"][$key]
             );
 
-            $this->fileColletionEntity->addFileEntity($fileEntity);
+            $fileColletionEntity->addEntity($fileEntity);
         }
 
-        return $this->fileColletionEntity;
+        return $fileColletionEntity;
     }
 }

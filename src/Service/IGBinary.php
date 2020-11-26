@@ -18,7 +18,7 @@ final class IGBinary
             return null;
         }
 
-        return @igbinary_serialize($decoded);
+        return @\igbinary_serialize($decoded);
     }
 
     /**
@@ -30,6 +30,6 @@ final class IGBinary
      */
     public static function unserialise (string $encoded)
     {
-        return @igbinary_unserialize($encoded);
+        return @\igbinary_unserialize($encoded);
     }
 }

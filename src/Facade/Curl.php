@@ -157,12 +157,10 @@ final class Curl extends AAlert
      */
     public function setPost ($postData): void
     {
-        if (is_array($postData))
-        {
+        if (is_array($postData)) {
             $this->setPostArray($postData);
         }
-        else if (is_string($postData))
-        {
+        else if (is_string($postData)) {
             $this->setPostField($postData);
         }
     }
@@ -260,8 +258,7 @@ final class Curl extends AAlert
         $this->curlInfo = curl_getinfo($this->curl);
         $this->statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
 
-        if ($response === false)
-        {
+        if ($response === false) {
             $errorNumber = curl_errno($this->curl);
             $errorMessage = curl_error($this->curl);
 
