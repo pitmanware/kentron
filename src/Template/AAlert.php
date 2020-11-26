@@ -2,7 +2,7 @@
 
 namespace Kentron\Template;
 
-use Kentron\Template\Entity\AEntity;
+use Kentron\Entity\Template\AEntity;
 
 /**
  * Error handling methods
@@ -76,12 +76,10 @@ abstract class AAlert
      */
     final public function addError ($errors): void
     {
-        if (is_string($errors))
-        {
+        if (is_string($errors)) {
             $this->errors[] = $errors;
         }
-        else if (is_array($errors))
-        {
+        else if (is_array($errors)) {
             $this->errors = array_merge($this->errors, $errors);
         }
     }
@@ -93,12 +91,10 @@ abstract class AAlert
      */
     final public function addNotice ($notices): void
     {
-        if (is_string($notices))
-        {
+        if (is_string($notices)) {
             $this->notices[] = $notices;
         }
-        else if (is_array($notices))
-        {
+        else if (is_array($notices)) {
             $this->notices = array_merge($this->notices, $notices);
         }
     }
@@ -110,12 +106,10 @@ abstract class AAlert
      */
     final public function addWarning ($warnings): void
     {
-        if (is_string($warnings))
-        {
+        if (is_string($warnings)) {
             $this->warnings[] = $warnings;
         }
-        else if (is_array($warnings))
-        {
+        else if (is_array($warnings)) {
             $this->warnings = array_merge($this->warnings, $warnings);
         }
     }

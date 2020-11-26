@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Template\Entity;
+namespace Kentron\Entity\Template;
 
 use Kentron\Service\Type;
 
@@ -8,6 +8,7 @@ abstract class ACoreEntity extends AEntity
 {
     /**
      * The core entity
+     *
      * @var AEntity
      */
     protected $rootEntity;
@@ -15,7 +16,9 @@ abstract class ACoreEntity extends AEntity
     /**
     * Relevant property map to build the entity dynamically
     * Should be overridden
+    *
     * @var array
+    *
     * @example [
     *     "property_key" => [
     *         "get" => "getClassProperty", // Get, set and add are on the core entity
@@ -32,6 +35,7 @@ abstract class ACoreEntity extends AEntity
     /**
      * Constructor can only be called by child
      * May be overridden
+     *
      * @param null|AEntity $entity Supplies the core entity or self
      */
     public function __construct (?AEntity $entity = null)
@@ -48,11 +52,24 @@ abstract class ACoreEntity extends AEntity
     }
 
     /**
+     * Alternatively the core entity can be returned
+     *
+     * @return AEntity
+     */
+    public function getRootEntity (): AEntity
+    {
+        return $this->rootEntity ?? $this;
+    }
+
+    /**
      * Dynamically call methods on the core entity
-     * @param  string $callable The method to call
-     * @param  array  $args     The arguments to pass into the method
+     *
+     * @param string $callable The method to call
+     * @param array  $args     The arguments to pass into the method
+     *
      * @return mixed
-     * @throws Error On invalid method call
+     *
+     * @throws \Error On invalid method call
      */
     final public function __call (string $callable, array $args = [])
     {
@@ -63,17 +80,10 @@ abstract class ACoreEntity extends AEntity
     }
 
     /**
-     * Alternatively the core entity can be returned
-     * @return AEntity
-     */
-    final public function getRootEntity (): AEntity
-    {
-        return $this->rootEntity ?? $this;
-    }
-
-    /**
      * Builds the entity from the database or API
-     * @param  array|object $data The input data
+     *
+     * @param array|object $data The input data
+     *
      * @return void
      */
     final public function build ($data): void
@@ -128,7 +138,9 @@ abstract class ACoreEntity extends AEntity
 
     /**
      * Generator for the properties
+     *
      * @return iterable
+     *
      * @throws \TypeError
      */
     final public function iterateProperties (bool $allowNullable = false): iterable
@@ -156,6 +168,7 @@ abstract class ACoreEntity extends AEntity
 
     /**
      * The reverse of the build function returning the property map with the entity values
+     *
      * @return array
      */
     public function normalise (): array
@@ -176,9 +189,11 @@ abstract class ACoreEntity extends AEntity
 
     /**
      * Gets a class using the getter and builds it is the propery is iterable
-     * @param  array  $binding      The binding from $propertyMap
-     * @param  mixed  $dataProperty The property to build with
-     * @return mixed                Either the built entity or the original property
+     *
+     * @param array $binding      The binding from $propertyMap
+     * @param mixed $dataProperty The property to build with
+     *
+     * @return mixed Either the built entity or the original property
      */
     final private function buildClass (array $binding, $dataProperty)
     {
@@ -186,7 +201,7 @@ abstract class ACoreEntity extends AEntity
         // check to see if there is a getter for the class
         $classGetter = $binding["get_class"] ?? null;
 
-        if ($this->isValidMethod($classGetter)) {
+        if (parent::isValidMethod($classGetter)) {
             $entity = $this->{$classGetter}();
 
             // The subclass must be another instance of ACoreEntity
@@ -202,7 +217,7 @@ abstract class ACoreEntity extends AEntity
 
             $classSetter = $binding["set_class"] ?? null;
 
-            if ($this->isValidMethod($classSetter)) {
+            if (parent::isValidMethod($classSetter)) {
                 $this->{$classSetter}($entity);
             }
 
@@ -214,8 +229,10 @@ abstract class ACoreEntity extends AEntity
 
     /**
      * Calls a valid method on the rootEntity
+     *
      * @param string $method The method
      * @param mixed  $params Any parameters to be passed to the method
+     *
      * @return mixed
      */
     final private function callRootEntityMethod (?string $method, ...$params)
@@ -229,7 +246,9 @@ abstract class ACoreEntity extends AEntity
 
     /**
      * Allows for recursive building if entity extends this
-     * @param  AEntity $entity The entity to check
+     *
+     * @param AEntity $entity The entity to check
+     *
      * @return bool
      */
     final private function entityIsRecursive (AEntity $entity): bool
@@ -239,7 +258,9 @@ abstract class ACoreEntity extends AEntity
 
     /**
      * Checks if the given entity extends from ACoreCollectionEntity
-     * @param  AEntity $entity The entity to check
+     *
+     * @param AEntity $entity The entity to check
+     *
      * @return bool
      */
     final private function entityIsACollection (AEntity $entity): bool

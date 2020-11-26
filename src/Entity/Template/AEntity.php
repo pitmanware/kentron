@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Template\Entity;
+namespace Kentron\Entity\Template;
 
 use Kentron\Template\AAlert;
 
@@ -8,7 +8,9 @@ abstract class AEntity extends AAlert
 {
     /**
      * Validates a callable method
-     * @param  string|null $method The method to check
+     *
+     * @param string|null $method The method to check
+     *
      * @return bool
      */
     final public function isValidMethod (?string $method = null): bool

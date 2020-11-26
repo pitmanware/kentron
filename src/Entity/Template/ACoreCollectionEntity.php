@@ -1,15 +1,16 @@
 <?php
 
-namespace Kentron\Template\Entity;
+namespace Kentron\Entity\Template;
 
-use Kentron\Template\Entity\{ACollectionEntity, ACoreEntity};
+use Kentron\Entity\Template\{ACollectionEntity, ACoreEntity};
 
-use Kentron\Service\{Type, Assert};
+use Kentron\Service\Type;
 
 abstract class ACoreCollectionEntity extends ACoreEntity
 {
     /**
      * The core entity collection
+     *
      * @var array
      */
     private $coreCollection = [];
@@ -18,8 +19,10 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     /**
      * Overridden to expect ACollectionEntity
+     *
      * @param ACollectionEntity $collectionEntity This becomes the core entity
      * @param string|null       $coreEntityClass  This is the relative path for the collected core entity
+     *
      * @throws \InvalidArgumentException If the core class path is invalid
      */
     protected function __construct (ACollectionEntity $collectionEntity, ?string $coreEntityClass = null)
@@ -34,8 +37,20 @@ abstract class ACoreCollectionEntity extends ACoreEntity
     }
 
     /**
+     * Overrides parent to return the collection
+     *
+     * @return ACollectionEntity
+     */
+    final public function getRootEntity (): ACollectionEntity
+    {
+        return parent::getRootEntity();
+    }
+
+    /**
      * Build the array of entities
+     *
      * @param object|array $entityData Array of arrays or objects only
+     *
      * @return void
      */
     final public function buildCollection ($entityData): void
@@ -68,6 +83,11 @@ abstract class ACoreCollectionEntity extends ACoreEntity
         }
     }
 
+    /**
+     * Return a new core entity if the class path is set
+     *
+     * @return ACoreEntity|null
+     */
     final public function getNewCoreEntity (): ?ACoreEntity
     {
         if (is_null($this->coreEntityClass)) {
@@ -79,7 +99,8 @@ abstract class ACoreCollectionEntity extends ACoreEntity
     }
 
     /**
-     * Append an ADBEntity or AAPIEntity to the core collection
+     * Append an ACoreEntity to the core collection
+     *
      * @param ACoreEntity $coreEntity
      */
     final public function addEntity (ACoreEntity $coreEntity): void
@@ -90,6 +111,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     /**
      * Generator for iterating through the root entities
+     *
      * @return iterable
      */
     final public function iterateEntities (): iterable
@@ -99,6 +121,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     /**
      * Generator for iterating through the core entities
+     *
      * @return iterable
      */
     final public function iterateCoreEntities (): iterable
@@ -125,9 +148,11 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     /**
      * Run a function for every core entity in the collection
-     * @param  array $methods    The methods to call on all the entities
-     * @param  bool  $flatten    If the results should be reduced to a single dimension
-     * @param  array $conditions Comparisons to be made against the result
+     *
+     * @param array $methods    The methods to call on all the entities
+     * @param bool  $flatten    If the results should be reduced to a single dimension
+     * @param array $conditions Comparisons to be made against the result
+     *
      * @return array
      */
     final public function map (array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
@@ -137,7 +162,9 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     /**
      * Similar to map, except it iterates through entities that pass all conditions
-     * @param  array    $conditions
+     *
+     * @param array $conditions
+     *
      * @return iterable
      */
     final public function filter (array $conditions): iterable
@@ -147,6 +174,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     /**
      * Get the first Entity in the collection and remove it
+     *
      * @return Entity|null
      */
     final public function shiftCoreEntity (): ?ACoreEntity
@@ -157,6 +185,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
 
     /**
      * Return the last Entity in the collection and remove it
+     *
      * @return Entity|null
      */
     final public function popCoreEntity (): ?ACoreEntity

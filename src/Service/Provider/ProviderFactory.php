@@ -6,7 +6,7 @@ use Kentron\Store\Variable\AVariable;
 use Kentron\Throwable\UnexpectedProviderException;
 
 // Services
-use App\Module\Core\Provider\Template\AProviderFactory;
+use Kentron\Service\Provider\Template\AProviderFactory;
 
 final class ProviderFactory
 {
@@ -15,15 +15,14 @@ final class ProviderFactory
      * @return AProviderFactory
      * @throws UnexpectedProviderException
      */
-    public static function getProvider (): string
+    public static function getProvider (): AProviderFactory
     {
-        $providerName = AVariable::getProviderName();
-        $methodName = "get{$providerName}Factory";
+        $providerClass = AVariable::getProviderClass();
 
-        if (method_exists(__CLASS__, $methodName) && is_callable([__CLASS__, $methodName])) {
-            return self::$methodName()::init();
+        if (!class_exists($providerClass)) {
+            throw new UnexpectedProviderException($providerClass);
         }
 
-        throw new UnexpectedProviderException($providerName);
+        return new $providerClass;
     }
 }

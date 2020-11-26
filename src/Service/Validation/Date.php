@@ -17,19 +17,15 @@ final class Date implements IValidation
 
     public function isValid (): bool
     {
-        try
-        {
-            if (isset($this->format))
-            {
+        try {
+            if (isset($this->format)) {
                 \DateTime::createFromFormat($this->date, $this->format);
             }
-            else
-            {
+            else {
                 new \DateTime($this->date);
             }
         }
-        catch (\Exception $ex)
-        {
+        catch (\Exception $ex) {
             return false;
         }
 

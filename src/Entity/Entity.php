@@ -2,9 +2,10 @@
 
 namespace Kentron\Entity;
 
-use Kentron\Template\Entity\AEntity;
+use Kentron\Entity\Template\AEntity;
 
 /**
- * Base class for storing data, error handling and logic
+ * An empty entity for storing data and error handling;
+ * use sparingly.
  */
-class Entity extends AEntity {}
+final class Entity extends AEntity {}

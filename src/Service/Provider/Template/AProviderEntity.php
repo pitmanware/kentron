@@ -2,7 +2,7 @@
 
 namespace Kentron\Service\Provider\Template;
 
-use Kentron\Template\Entity\AEntity;
+use Kentron\Entity\Template\AEntity;
 
 use Kentron\Service\Http\Entity\HttpEntity;
 use Kentron\Store\Variable\AVariable;

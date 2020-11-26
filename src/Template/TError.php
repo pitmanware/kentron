@@ -31,12 +31,10 @@ trait TError
      */
     final public function addError ($errors): void
     {
-        if (is_string($errors))
-        {
+        if (is_string($errors)){
             $this->errors[] = $errors;
         }
-        else if (is_array($errors))
-        {
+        else if (is_array($errors)){
             $this->errors = array_merge($this->errors, $errors);
         }
     }

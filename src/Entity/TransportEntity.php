@@ -2,7 +2,7 @@
 
 namespace Kentron\Entity;
 
-use Kentron\Template\Entity\AEntity;
+use Kentron\Entity\Template\AEntity;
 
 use Slim\Http\{Request,Response};
 

@@ -21,12 +21,10 @@ final class Postcode implements IValidation
     {
         $formatter = new PostcodeFormatter();
 
-        try
-        {
+        try {
             $formatter->format($this->countryCode, $this->postcode);
         }
-        catch (\Exception $ex)
-        {
+        catch (\Exception $ex) {
             return false;
         }
 

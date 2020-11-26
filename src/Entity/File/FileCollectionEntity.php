@@ -2,7 +2,7 @@
 
 namespace Kentron\Entity\File;
 
-use Kentron\Template\Entity\ACollectionEntity;
+use Kentron\Entity\Template\ACollectionEntity;
 
 final class FileCollectionEntity extends ACollectionEntity
 {

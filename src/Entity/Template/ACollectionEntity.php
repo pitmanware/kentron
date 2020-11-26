@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Template\Entity;
+namespace Kentron\Entity\Template;
 
 use Kentron\Service\Assert;
 
@@ -8,24 +8,32 @@ abstract class ACollectionEntity extends AEntity
 {
     /**
      * Class path to the collected entity
-     * @var string
+     *
+     * @var string|null
      */
     private $entityClass;
 
     /**
      * The collection of core entities
-     * @var array
+     *
+     * @var AEntity[]
      */
     private $collection = [];
 
     /**
      * Save the entity path
-     * @param string $entityClass Absolute path to extended AEntity
+     *
+     * @param string $entityClass FQDN to extended AEntity
      */
     public function __construct (?string $entityClass = null)
     {
-        if (!is_null($entityClass) && !is_subclass_of($entityClass, AEntity::class)) {
-            throw new \InvalidArgumentException("$entityClass must be an instance of " . AEntity::class);
+        if (!is_null($entityClass)) {
+            if (!class_exists($entityClass)) {
+                throw new \InvalidArgumentException("$entityClass does not exist");
+            }
+            else if (!is_subclass_of($entityClass, AEntity::class)) {
+                throw new \InvalidArgumentException("$entityClass must be an instance of " . AEntity::class);
+            }
         }
 
         $this->entityClass = $entityClass;
@@ -33,6 +41,7 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Gets a new instance of the core AEntity
+     *
      * @return AEntity|null
      */
     final public function getNewEntity (): ?AEntity
@@ -47,7 +56,9 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Get an AEntity by its index in the collection
-     * @param  int         $index
+     *
+     * @param  int $index
+     *
      * @return AEntity|null
      */
     final public function getEntity (int $index): ?AEntity
@@ -57,6 +68,7 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Return the collection
+     *
      * @return array
      */
     final public function getEntities (): array
@@ -66,7 +78,9 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Append an entity to the collection
-     * @param  AEntity $entity
+     *
+     * @param AEntity $entity
+     *
      * @return void
      */
     final public function addEntity (AEntity $entity): void
@@ -76,6 +90,7 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Returns the amound of entities saved in the collection
+     *
      * @return int
      */
     final public function countEntities (): int
@@ -85,7 +100,8 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Generator for iterating through the collection
-     * @return iterable
+     *
+     * @return AEntity[]
      */
     final public function iterateEntities (): iterable
     {
@@ -96,6 +112,7 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Get the first AEntity in the collection and remove it
+     *
      * @return AEntity|null
      */
     final public function shiftEntity (): ?AEntity
@@ -105,6 +122,7 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Return the last AEntity in the collection and remove it
+     *
      * @return AEntity|null
      */
     final public function popEntity (): ?AEntity
@@ -114,9 +132,11 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Run a function for every core entity in the collection
-     * @param  array $methods    The methods to call on all the entities
-     * @param  bool  $flatten    If the results should be reduced to a single dimension
-     * @param  array $conditions Comparisons to be made against the result
+     *
+     * @param array $methods    The methods to call on all the entities
+     * @param bool  $flatten    If the results should be reduced to a single dimension
+     * @param array $conditions Comparisons to be made against the result
+     *
      * @return array
      */
     final public function map (array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
@@ -164,8 +184,10 @@ abstract class ACollectionEntity extends AEntity
 
     /**
      * Similar to map, except it iterates through entities that pass all conditions
-     * @param  array    $conditions
-     * @return iterable
+     *
+     * @param array $conditions
+     *
+     * @return AEntity[]
      */
     final public function filter (array $conditions): iterable
     {

@@ -3,7 +3,7 @@
 namespace Kentron\Store\Variable;
 
 use Kentron\Service\Assert;
-use Kentron\Template\Entity\ACoreCollectionEntity;
+use Kentron\Entity\Template\ACoreCollectionEntity;
 
 abstract class AVariable
 {

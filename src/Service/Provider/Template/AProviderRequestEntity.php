@@ -2,7 +2,7 @@
 
 namespace Kentron\Service\Provider\Template;
 
-use Kentron\Template\Entity\AEntity;
+use Kentron\Entity\Template\AEntity;
 
 abstract class AProviderRequestEntity extends AEntity
 {

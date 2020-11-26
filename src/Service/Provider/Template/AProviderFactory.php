@@ -7,14 +7,17 @@ abstract class AProviderFactory
     /** @var AProviderService $service */
     protected static $service;
 
-    abstract public static function init (): string;
+    protected function __construct (AProviderService $providerService)
+    {
+        self::$service = $providerService;
+    }
 
-    final protected static function setProviderRequestService (IProviderRequest $requestClass): void
+    final protected function setProviderRequestService (IProviderRequest $requestClass): void
     {
         self::$service->setProviderRequestService($requestClass);
     }
 
-    final protected static function setProviderResponseService (IProviderResponse $responseClass): void
+    final protected function setProviderResponseService (IProviderResponse $responseClass): void
     {
         self::$service->setProviderResponseService($responseClass);
     }
