@@ -131,6 +131,16 @@ abstract class ACollectionEntity extends AEntity
     }
 
     /**
+     * Return the last AEntity in the collection
+     *
+     * @return AEntity|null
+     */
+    final public function getLastEntity (): ?AEntity
+    {
+        return $this->collection[count($this->collection) - 1] ?? null;
+    }
+
+    /**
      * Run a function for every core entity in the collection
      *
      * @param array $methods    The methods to call on all the entities

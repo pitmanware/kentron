@@ -57,6 +57,6 @@ final class Schema
      */
     private static function getFileContent (string $filePath): ?array
     {
-        return json_decode(@file_get_contents($filePath), true);
+        return json_decode(File::get($filePath), true);
     }
 }
