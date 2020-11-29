@@ -67,7 +67,7 @@ abstract class AMail
      *
      * @var string
      */
-    protected $toEmail;
+    protected $targetEmail;
 
     /**
      * Origin email address
@@ -118,9 +118,27 @@ abstract class AMail
      */
     protected $embedCollectionEntity;
 
-    abstract public function send (?string $to = null, ?string $subject = null, ?string $body = null): bool;
+    abstract public function send (): bool;
     abstract public function attach (MailAttachmentEntity $mailAttachmentEntity): bool;
     abstract public function embed (MailEmbedEntity $mailEmbedEntity): bool;
+
+    public function sendMail (?string $to = null, ?string $subject = null, ?string $body = null): bool
+    {
+        if (is_null($to) && is_null($this->targetEmail)) {
+            $this->addError("Target email is not set");
+            return false;
+        }
+        if (is_null($subject) && is_null($this->subject)) {
+            $this->addError("Email subject is not set");
+            return false;
+        }
+
+        $this->targetEmail = $this->targetEmail ?? $to;
+        $this->subject = $this->subject ?? $subject;
+        $this->body = $this->body ?? $body;
+
+        return $this->send();
+    }
 
     final public function attachFile (string $filePath, ?string $fileName = null): bool
     {
