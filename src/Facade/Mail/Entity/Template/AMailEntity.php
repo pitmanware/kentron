@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Facade\Mail\Entity;
+namespace Kentron\Facade\Mail\Entity\Template;
 
 use Kentron\Entity\Template\AEntity;
 

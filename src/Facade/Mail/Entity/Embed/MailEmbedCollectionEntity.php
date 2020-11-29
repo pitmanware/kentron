@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Facade\Mail\Entity;
+namespace Kentron\Facade\Mail\Entity\Embed;
 
 use Kentron\Entity\Template\ACollectionEntity;
 

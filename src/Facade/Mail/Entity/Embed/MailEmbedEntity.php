@@ -1,6 +1,8 @@
 <?php
 
-namespace Kentron\Facade\Mail\Entity;
+namespace Kentron\Facade\Mail\Entity\Embed;
+
+use Kentron\Facade\Mail\Entity\Template\AMailEntity;
 
 final class MailEmbedEntity extends AMailEntity
 {
