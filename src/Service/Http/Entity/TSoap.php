@@ -159,8 +159,7 @@ trait TSoap
     {
         $realPath = realpath($viewPath);
 
-        if ($realPath === false || !is_readable($realPath))
-        {
+        if ($realPath === false || !is_readable($realPath)) {
             throw new \ErrorException("Directory '$viewPath' does not exist or is not readable");
         }
 
@@ -199,17 +198,14 @@ trait TSoap
     {
         $url = $url ?? $this->wsseUrl;
 
-        if (is_string($data))
-        {
+        if (is_string($data)) {
             $type = XSD_STRING;
         }
-        else if (is_object($data) || is_array($data))
-        {
+        else if (is_object($data) || is_array($data)) {
             $data = (object)$data;
             $type = SOAP_ENC_OBJECT;
         }
-        else
-        {
+        else {
             throw new \ErrorException("Unexpected SoapVar type");
         }
 

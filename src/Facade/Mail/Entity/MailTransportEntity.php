@@ -133,6 +133,14 @@ final class MailTransportEntity extends AEntity
         $this->targetCollectionEntity = new MailTargetCollectionEntity();
     }
 
+    /**
+     * Add file as attachment
+     *
+     * @param string $filePath
+     * @param string|null $fileName
+     *
+     * @return boolean
+     */
     public function attachFile (string $filePath, ?string $fileName = null): bool
     {
         if (!$this->validateFile($filePath)) {
@@ -150,6 +158,15 @@ final class MailTransportEntity extends AEntity
         $this->attachmentCollectionEntity->addEntity($attachmentEntity);
     }
 
+    /**
+     * Add file into the body (usually an image)
+     *
+     * @param string $filePath
+     * @param string|null $fileName
+     * @param string|null $cid
+     *
+     * @return boolean
+     */
     public function embedFile (string $filePath, ?string $fileName = null, ?string $cid = null): bool
     {
         if (!$this->validateFile($filePath)) {
@@ -171,6 +188,14 @@ final class MailTransportEntity extends AEntity
         $this->embedCollectionEntity->addEntity($embedEntity);
     }
 
+    /**
+     * Add a recipient for the email (multiple allowed)
+     *
+     * @param string $email
+     * @param string|null $name
+     *
+     * @return void
+     */
     public function addRecipient (string $email, ?string $name = null): void
     {
         /** @var MailTargetEntity $targetEntity */

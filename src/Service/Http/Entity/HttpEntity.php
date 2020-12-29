@@ -99,8 +99,7 @@ final class HttpEntity extends Entity
      */
     public function getHttpMethod (): string
     {
-        switch ($this->httpMethod)
-        {
+        switch ($this->httpMethod) {
             case self::METHOD_GET:
                 $httpMethod = "GET";
                 break;
@@ -161,17 +160,14 @@ final class HttpEntity extends Entity
      */
     public function setGetData ($getData, ?bool $usePrefix = true): void
     {
-        if (is_resource($getData))
-        {
+        if (is_resource($getData)) {
             throw new \InvalidArgumentException("Get data cannot be a resource");
         }
 
-        if (is_array($getData) || is_object($getData))
-        {
+        if (is_array($getData) || is_object($getData)) {
             $getData = http_build_query($getData);
         }
-        else
-        {
+        else {
             $this->getString = (string) $getData;
         }
 
@@ -218,33 +214,26 @@ final class HttpEntity extends Entity
      */
     public function setPostData ($postData): void
     {
-        if (is_resource($postData))
-        {
+        if (is_resource($postData)) {
             throw new \InvalidArgumentException("Post data cannot be a resource"); // TODO: Yet (7.4)
         }
 
-        switch ($this->encoding)
-        {
+        switch ($this->encoding) {
             case self::ENCODE_NONE:
-                if (!is_string($postData) && !(is_array($postData) && Type::isAssoc($postData)))
-                {
+                if (!is_string($postData) && !(is_array($postData) && Type::isAssoc($postData))) {
                     throw new \InvalidArgumentException("Invalid post data type");
                 }
 
-                if (is_string($postData))
-                {
+                if (is_string($postData)) {
                     $this->setContentType("text/plain");
                     $this->setContentLength(strlen($postData));
                 }
-                else if (is_array($postData))
-                {
-                    if ($this->parameterise)
-                    {
+                else if (is_array($postData)) {
+                    if ($this->parameterise) {
                         $postData = http_build_query($postData);
                         $this->setContentLength(strlen($postData));
                     }
-                    else
-                    {
+                    else {
                         $this->setContentLength(strlen(json_encode($postData)));
                     }
                     $this->setContentType("application/x-www-form-urlencoded");
@@ -265,8 +254,7 @@ final class HttpEntity extends Entity
 
             case self::ENCODE_FILE:
                 $filePath = realpath($postData);
-                if (empty($filePath) || !@file_exists($filePath) || !@is_readable($filePath))
-                {
+                if (empty($filePath) || !@file_exists($filePath) || !@is_readable($filePath)) {
                     throw new \ErrorException("File '$filePath' does not exist or is not readable");
                 }
 
@@ -277,12 +265,10 @@ final class HttpEntity extends Entity
 
             case self::ENCODE_XML:
             case self::ENCODE_SOAP:
-                if (isset($this->viewPath) && isset($this->method))
-                {
+                if (isset($this->viewPath) && isset($this->method)) {
                     $postData = Xml::build($this->viewPath, $this->method, $postData);
                 }
-                if (is_null($postData) || is_null(Xml::extract($postData)))
-                {
+                if (is_null($postData) || is_null(Xml::extract($postData))) {
                     throw new \ErrorException("Post data is not valid XML");
                 }
 
@@ -377,16 +363,14 @@ final class HttpEntity extends Entity
      */
     public function parseResponse ($response): void
     {
-        if (is_string($response))
-        {
+        if (is_string($response)) {
             $this->rawResponse = $response;
         }
         else {
             $this->rawResponse = json_encode($response);
         }
 
-        switch ($this->decoding)
-        {
+        switch ($this->decoding) {
             case self::DECODE_NONE:
                 $extracted = $response;
                 break;
@@ -394,8 +378,7 @@ final class HttpEntity extends Entity
             case self::DECODE_JSON:
                 $extracted = json_decode($response, $this->decodeAsArray);
 
-                if (is_null($extracted))
-                {
+                if (is_null($extracted)) {
                     $this->addError("Response from '{$this->getUrl()}' could not be JSON decoded");
                     return;
                 }
@@ -407,8 +390,7 @@ final class HttpEntity extends Entity
             case self::DECODE_BINARY:
                 $extracted = IGBinary::unserialise($response);
 
-                if (is_null($extracted))
-                {
+                if (is_null($extracted)) {
                     $this->addError("Response from '{$this->getUrl()}' could not be binary decoded");
                     return;
                 }
@@ -417,8 +399,7 @@ final class HttpEntity extends Entity
             case self::DECODE_XML:
                 $extracted = Xml::extract($response);
 
-                if (is_null($extracted))
-                {
+                if (is_null($extracted)) {
                     $this->addError("Response from '{$this->getUrl()}' could not be XML decoded");
                     return;
                 }
@@ -433,8 +414,7 @@ final class HttpEntity extends Entity
                     )
                 );
 
-                if (is_null($extracted))
-                {
+                if (is_null($extracted)) {
                     $this->addError("Response from '{$this->getUrl()}::{$this->getMethod()}' could not be SOAP decoded");
                     return;
                 }
@@ -447,8 +427,7 @@ final class HttpEntity extends Entity
                 break;
         }
 
-        if (is_array($extracted) || is_object($extracted))
-        {
+        if (is_array($extracted) || is_object($extracted)) {
             $this->setExtractedData($extracted);
         }
 

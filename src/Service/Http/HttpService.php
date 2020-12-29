@@ -18,12 +18,10 @@ final class HttpService
      */
     public static function run (HttpEntity $httpEntity): bool
     {
-        if ($httpEntity->isCurl())
-        {
+        if ($httpEntity->isCurl()) {
             return self::runCurl($httpEntity);
         }
-        else
-        {
+        else {
             return self::runSoap($httpEntity);
         }
     }
@@ -42,15 +40,13 @@ final class HttpService
         $curl->setUrl($httpEntity->getUrl());
         $curl->setHeaders($httpEntity->getHeaders());
 
-        if ($httpEntity->isPost())
-        {
+        if ($httpEntity->isPost()) {
             $curl->setPost($httpEntity->getPostData());
         }
 
         $curl->setRequestMethod($httpEntity->getHttpMethod());
 
-        if (!$curl->execute())
-        {
+        if (!$curl->execute()) {
             $httpEntity->addError($curl->getErrors());
             return false;
         }
@@ -58,8 +54,7 @@ final class HttpService
         $httpEntity->setStatusCode($curl->getStatusCode());
         $httpEntity->parseResponse($curl->getResponse());
 
-        if ($httpEntity->hasErrors())
-        {
+        if ($httpEntity->hasErrors()) {
             return false;
         }
 
@@ -75,8 +70,7 @@ final class HttpService
      */
     private static function runSoap (HttpEntity $httpEntity): bool
     {
-        try
-        {
+        try {
             $soap = new \SoapClient(
                 $httpEntity->getWsdlUrl(),
                 $httpEntity->getConfig()
@@ -85,14 +79,12 @@ final class HttpService
             $method = $httpEntity->getMethod();
             $requestData = $httpEntity->getPostData();
 
-            if (is_array($requestData))
-            {
+            if (is_array($requestData)) {
                 $soap->__setSoapHeaders($httpEntity->getHeaders());
 
                 $response = $soap->$method($requestData);
             }
-            else if (is_string($requestData))
-            {
+            else if (is_string($requestData)) {
                 $response = $soap->__doRequest(
                     $requestData,
                     $httpEntity->getWsdlUrl(),
@@ -102,8 +94,7 @@ final class HttpService
                 );
             }
         }
-        catch (\Throwable $th)
-        {
+        catch (\Throwable $th) {
             $httpEntity->addError($th->getMessage());
             return false;
         }
@@ -111,8 +102,7 @@ final class HttpService
         $httpEntity->setRawRequest($soap->__getLastRequest());
         $httpEntity->parseResponse(Type::getProperty($response, "{$method}Result") ?? $response);
 
-        if ($httpEntity->hasErrors())
-        {
+        if ($httpEntity->hasErrors()) {
             return false;
         }
 
