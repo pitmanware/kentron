@@ -10,7 +10,6 @@
     ],
     "require": {
         "php": ">=7.4.0",
-        "twig/twig": "^3.0",
         "justinrainbow/json-schema": "^5.2",
         "brick/postcode": "0.2.*",
         "giggsey/libphonenumber-for-php": "^8.11"

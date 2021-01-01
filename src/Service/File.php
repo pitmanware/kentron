@@ -2,8 +2,6 @@
 
 namespace Kentron\Service;
 
-use UnexpectedValueException;
-
 final class File
 {
     private static $cacheDir;
@@ -70,6 +68,11 @@ final class File
     public static function exists (string $filePath): bool
     {
         return file_exists($filePath);
+    }
+
+    public static function isEmpty (string $filePath): bool
+    {
+        return !@filesize($filePath);
     }
 
     public static function isDir (string $filePath): bool
