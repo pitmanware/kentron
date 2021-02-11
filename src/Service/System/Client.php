@@ -29,18 +29,23 @@ final class Client
                      "";
     }
 
+    public static function getUrl (): string
+    {
+        return "//" . self::getDomain() . $_SERVER['REQUEST_URI'];
+    }
+
+    public static function getQueryString (): array
+    {
+        return parse_url(self::getUrl(), PHP_URL_QUERY);
+    }
+
     /**
      * Gets the domain name of the server
      * @return string
      */
     public static function getDomain (): string
     {
-        if (isset($_SERVER["HTTP_HOST"]) && !empty($_SERVER["HTTP_HOST"])) {
-            return preg_replace("/:\d+\$/", "", $_SERVER["HTTP_HOST"]);
-        }
-        else {
-            return $_SERVER["SERVER_NAME"] ?? "";
-        }
+        return ($_SERVER["HTTP_HOST"] ?? "") ?: $_SERVER["SERVER_NAME"] ?? "";
     }
 
     public static function isPrivate (): bool
