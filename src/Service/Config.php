@@ -11,7 +11,7 @@ final class Config
      */
     private static $configDir;
 
-    public static function setConfigDir (string $configDir): void
+    public static function setConfigDir(string $configDir): void
     {
         if (!File::isValidDir($configDir)) {
             throw new \UnexpectedValueException("'{$configDir}' is not a valid directory");
@@ -20,7 +20,7 @@ final class Config
         self::$configDir = File::getRealPath($configDir);
     }
 
-    public static function get (): string
+    public static function get(): string
     {
         return File::get(self::$configDir . "Config.json");
     }

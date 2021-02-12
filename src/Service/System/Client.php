@@ -9,7 +9,7 @@ final class Client
      *
      * @return string
      */
-    public static function getUserAgent (): string
+    public static function getUserAgent(): string
     {
         return $_SERVER["HTTP_USER_AGENT"] ?? "";
     }
@@ -18,7 +18,7 @@ final class Client
      * Gets the IP address of the client
      * @return string
      */
-    public static function getIP (): string
+    public static function getIP(): string
     {
         return  (((((($_SERVER["HTTP_CLIENT_IP"]       ?? "")  ?:
                      ($_SERVER["HTTP_X_FORWARDED_FOR"] ?? "")) ?:
@@ -29,12 +29,12 @@ final class Client
                      "";
     }
 
-    public static function getUrl (): string
+    public static function getUrl(): string
     {
         return "//" . self::getDomain() . $_SERVER['REQUEST_URI'];
     }
 
-    public static function getQueryString (): array
+    public static function getQueryString(): array
     {
         return parse_url(self::getUrl(), PHP_URL_QUERY);
     }
@@ -43,12 +43,12 @@ final class Client
      * Gets the domain name of the server
      * @return string
      */
-    public static function getDomain (): string
+    public static function getDomain(): string
     {
         return ($_SERVER["HTTP_HOST"] ?? "") ?: $_SERVER["SERVER_NAME"] ?? "";
     }
 
-    public static function isPrivate (): bool
+    public static function isPrivate(): bool
     {
         return !filter_var(self::getIP(), FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     }

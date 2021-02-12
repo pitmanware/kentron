@@ -13,12 +13,12 @@ final class ProviderTransportEntity extends AEntity
      * Getters
      */
 
-    public function getRequestData (): ?object
+    public function getRequestData(): ?object
     {
         return $this->requestData;
     }
 
-    public function getResponseData (): ?array
+    public function getResponseData(): ?array
     {
         return $this->responseData;
     }
@@ -27,12 +27,12 @@ final class ProviderTransportEntity extends AEntity
      * Setters
      */
 
-    public function setRequestData (?object $requestData = null): void
+    public function setRequestData(?object $requestData = null): void
     {
         $this->requestData = $requestData;
     }
 
-    public function setResponseData (?array $responseData = null): void
+    public function setResponseData(?array $responseData = null): void
     {
         $this->responseData = $responseData;
     }

@@ -19,7 +19,7 @@ abstract class AMiddleware
      * @param TransportEntity   $transportEntity The custom transport object
      * @return void
      */
-    final public function run (TransportEntity $transportEntity): void
+    final public function run(TransportEntity $transportEntity): void
     {
         $this->transportEntity = $transportEntity;
 
@@ -30,5 +30,5 @@ abstract class AMiddleware
      * Abstract run function for any sub classes to perform initialisation scripts
      * @return void
      */
-    abstract protected function customRun (): void;
+    abstract protected function customRun(): void;
 }

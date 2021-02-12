@@ -12,7 +12,7 @@ final class Geo
 
     private static $geo;
 
-    public static function init (): void
+    public static function init(): void
     {
         $httpEntity = new HttpEntity();
 
@@ -34,17 +34,17 @@ final class Geo
         self::$geo = $geo;
     }
 
-    public static function getRegionCode (): string
+    public static function getRegionCode(): string
     {
         return self::get("geoplugin_regionCode");
     }
 
-    public static function getRegionName (): string
+    public static function getRegionName(): string
     {
         return self::get("geoplugin_regionName");
     }
 
-    public static function getCountryCode (): string
+    public static function getCountryCode(): string
     {
         return self::get("geoplugin_countryCode");
     }
@@ -53,7 +53,7 @@ final class Geo
      * Private methods
      */
 
-    private static function get ($geoIndex): string
+    private static function get($geoIndex): string
     {
         if (is_null(self::$geo)) {
             self::init();

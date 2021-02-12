@@ -25,7 +25,7 @@ abstract class AController
      * Creates the Request and Response objects and runs access checks
      * @param TransportEntity $transportEntity The entity containing Slim objects
      */
-    public function __construct (TransportEntity $transportEntity)
+    public function __construct(TransportEntity $transportEntity)
     {
         $this->transportEntity = $transportEntity;
     }
@@ -33,7 +33,7 @@ abstract class AController
     /**
      * On controller destruct, render any response
      */
-    public function __destruct ()
+    public function __destruct()
     {
         $this->transportEntity->respond();
     }

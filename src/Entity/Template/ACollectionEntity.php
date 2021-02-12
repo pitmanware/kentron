@@ -25,7 +25,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @param string $entityClass FQDN to extended AEntity
      */
-    public function __construct (?string $entityClass = null)
+    public function __construct(?string $entityClass = null)
     {
         if (!is_null($entityClass)) {
             if (!class_exists($entityClass)) {
@@ -44,7 +44,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return AEntity|null
      */
-    final public function getNewEntity (): ?AEntity
+    final public function getNewEntity(): ?AEntity
     {
         if (is_null($this->entityClass)) {
             return null;
@@ -61,7 +61,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return AEntity|null
      */
-    final public function getEntity (int $index): ?AEntity
+    final public function getEntity(int $index): ?AEntity
     {
         return $this->collection[$index] ?? null;
     }
@@ -71,7 +71,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return array
      */
-    final public function getEntities (): array
+    final public function getEntities(): array
     {
         return $this->collection;
     }
@@ -83,7 +83,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return void
      */
-    final public function addEntity (AEntity $entity): void
+    final public function addEntity(AEntity $entity): void
     {
         $this->collection[] = $entity;
     }
@@ -93,7 +93,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return int
      */
-    final public function countEntities (): int
+    final public function countEntities(): int
     {
         return count($this->collection);
     }
@@ -103,7 +103,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return AEntity[]
      */
-    final public function iterateEntities (): iterable
+    final public function iterateEntities(): iterable
     {
         foreach ($this->collection as $entity) {
             yield $entity;
@@ -115,7 +115,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return AEntity|null
      */
-    final public function shiftEntity (): ?AEntity
+    final public function shiftEntity(): ?AEntity
     {
         return array_shift($this->collection);
     }
@@ -125,7 +125,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return AEntity|null
      */
-    final public function popEntity (): ?AEntity
+    final public function popEntity(): ?AEntity
     {
         return array_pop($this->collection);
     }
@@ -135,7 +135,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return AEntity|null
      */
-    final public function getLastEntity (): ?AEntity
+    final public function getLastEntity(): ?AEntity
     {
         return $this->collection[count($this->collection) - 1] ?? null;
     }
@@ -149,7 +149,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return array
      */
-    final public function map (array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
+    final public function map(array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
     {
         $map = [];
         $index = 0;
@@ -199,7 +199,7 @@ abstract class ACollectionEntity extends AEntity
      *
      * @return AEntity[]
      */
-    final public function filter (array $conditions): iterable
+    final public function filter(array $conditions): iterable
     {
         foreach ($this->iterateEntities() as $entity) {
 

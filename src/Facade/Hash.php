@@ -11,7 +11,7 @@ final class Hash
      * @return string             The hash
      * @throws InvalidArgumentException On invalid algorithm
      */
-    public static function generateRandom (int $length = 64, string $algorithm = "sha256"): string
+    public static function generateRandom(int $length = 64, string $algorithm = "sha256"): string
     {
         if (!in_array($algorithm, hash_algos())) {
             throw new \InvalidArgumentException("'$algorithm' is not a valid algorithm");

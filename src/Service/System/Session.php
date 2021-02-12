@@ -4,22 +4,22 @@ namespace Kentron\Service\System;
 
 class Session
 {
-    public static function get (string $key)
+    public static function get(string $key)
     {
         return $_SESSION[$key] ?? null;
     }
 
-    public static function getSession (): array
+    public static function getSession(): array
     {
         return $_SESSION;
     }
 
-    public static function set (string $key, $value): void
+    public static function set(string $key, $value): void
     {
         $_SESSION[$key] = $value;
     }
 
-    public static function unset (string $key): void
+    public static function unset(string $key): void
     {
         if (isset($_SESSION[$key]))
         {
@@ -27,7 +27,7 @@ class Session
         }
     }
 
-    public static function destroy (): void
+    public static function destroy(): void
     {
         session_destroy();
         $_SESSION = [];

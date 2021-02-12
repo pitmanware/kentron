@@ -9,13 +9,13 @@ final class Date implements IValidation
     private $date;
     private $format;
 
-    public function __construct (string $date, ?string $format = null)
+    public function __construct(string $date, ?string $format = null)
     {
         $this->date = $date;
         $this->format = $format;
     }
 
-    public function isValid (): bool
+    public function isValid(): bool
     {
         try {
             if (isset($this->format)) {

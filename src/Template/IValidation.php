@@ -4,5 +4,5 @@ namespace Kentron\Template;
 
 interface IValidation
 {
-    public function isValid (): bool;
+    public function isValid(): bool;
 }

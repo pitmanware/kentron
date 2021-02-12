@@ -38,7 +38,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @param null|AEntity $entity Supplies the core entity or self
      */
-    public function __construct (?AEntity $entity = null)
+    public function __construct(?AEntity $entity = null)
     {
         $this->rootEntity = $entity;
     }
@@ -46,7 +46,7 @@ abstract class ACoreEntity extends AEntity
     /**
      * Destroy the core entity on destruct
      */
-    public function __destruct ()
+    public function __destruct()
     {
         $this->rootEntity = null;
     }
@@ -56,7 +56,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @return AEntity
      */
-    public function getRootEntity (): AEntity
+    public function getRootEntity(): AEntity
     {
         return $this->rootEntity ?? $this;
     }
@@ -71,7 +71,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @throws \Error On invalid method call
      */
-    final public function __call (string $callable, array $args = [])
+    final public function __call(string $callable, array $args = [])
     {
         if (is_null($this->rootEntity)) {
             throw new \Error("Call to undefined method " . get_class($this) . "::{$callable}");
@@ -86,7 +86,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @return void
      */
-    final public function build ($data): void
+    final public function build($data): void
     {
         if (!Type::isIterable($data)) {
             return;
@@ -143,7 +143,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @throws \TypeError
      */
-    final public function iterateProperties (bool $allowNullable = false): iterable
+    final public function iterateProperties(bool $allowNullable = false): iterable
     {
         foreach ($this->propertyMap as $key => $binding) {
             $getter = $binding["get"] ?? null;
@@ -171,7 +171,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @return array
      */
-    public function normalise (): array
+    public function normalise(): array
     {
         $entity = $this->getRootEntity();
         if (!$this->entityIsRecursive($entity) && $entity->isValidMethod(__FUNCTION__)) {
@@ -195,7 +195,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @return mixed Either the built entity or the original property
      */
-    final private function buildClass (array $binding, $dataProperty)
+    private function buildClass(array $binding, $dataProperty)
     {
         // If the property is an object or array,
         // check to see if there is a getter for the class
@@ -235,7 +235,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @return mixed
      */
-    final private function callRootEntityMethod (?string $method, ...$params)
+    private function callRootEntityMethod(?string $method, ...$params)
     {
         if ($this->getRootEntity()->isValidMethod($method)) {
             return $this->getRootEntity()->{$method}(...$params);
@@ -251,7 +251,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @return bool
      */
-    final private function entityIsRecursive (AEntity $entity): bool
+    private function entityIsRecursive(AEntity $entity): bool
     {
         return is_subclass_of($entity, __CLASS__);
     }
@@ -263,7 +263,7 @@ abstract class ACoreEntity extends AEntity
      *
      * @return bool
      */
-    final private function entityIsACollection (AEntity $entity): bool
+    private function entityIsACollection(AEntity $entity): bool
     {
         return is_subclass_of($entity, ACoreCollectionEntity::class);
     }

@@ -6,11 +6,12 @@ use Kentron\Store\Variable\AVariable;
 
 use Kentron\Service\Assert;
 use Kentron\Service\System\Client;
+use Kentron\Template\IStore;
 
 /**
  * A collection of functions for retrieving config data
  */
-abstract class AConfig
+abstract class AConfig implements IStore
 {
     /**
      * The config path
@@ -31,7 +32,7 @@ abstract class AConfig
      *
      * @return array
      */
-    public static function getAppConfig (): array
+    public static function getAppConfig(): array
     {
         return self::$config["app"];
     }
@@ -41,7 +42,7 @@ abstract class AConfig
      *
      * @return array
      */
-    public static function getDatabaseConfig (): array
+    public static function getDatabaseConfig(): array
     {
         return self::$config["database"]["settings"];
     }
@@ -51,7 +52,7 @@ abstract class AConfig
      *
      * @return string
      */
-    public static function getDatabaseKey (): string
+    public static function getDatabaseKey(): string
     {
         return self::$config["database"]["database_key"];
     }
@@ -63,7 +64,7 @@ abstract class AConfig
      *
      * @return void
      */
-    public static function load (): void
+    public static function load(): void
     {
         if (!file_exists(static::$configPath) || !is_readable(static::$configPath)) {
             throw new \ErrorException("Config file '" . static::$configPath . "' does not exist or is not readable");
@@ -95,5 +96,11 @@ abstract class AConfig
         else {
             throw new \InvalidArgumentException("Unkown environment");
         }
+    }
+
+    public static function reset(): void
+    {
+        unset(self::$configPath);
+        unset(self::$config);
     }
 }

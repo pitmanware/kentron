@@ -15,7 +15,7 @@ abstract class ARouter
      *
      * @param IApp $app This application
      */
-    public static function loadAllRoutes (IApp $app): void
+    public static function loadAllRoutes(IApp $app): void
     {
         self::loadApiRoutes($app);
         self::loadAjaxRoutes($app);
@@ -29,7 +29,7 @@ abstract class ARouter
      *
      * @return void
      */
-    protected static function loadApiRoutes (IApp $app): void
+    protected static function loadApiRoutes(IApp $app): void
     {
         if (is_string(static::$apiRoutePath)) {
             require_once static::$apiRoutePath;
@@ -43,7 +43,7 @@ abstract class ARouter
      *
      * @return void
      */
-    protected static function loadAjaxRoutes (IApp $app): void
+    protected static function loadAjaxRoutes(IApp $app): void
     {
         if (is_string(static::$ajaxRoutePath)) {
             require_once static::$ajaxRoutePath;
@@ -57,7 +57,7 @@ abstract class ARouter
      *
      * @return void
      */
-    protected static function loadSystemRoutes (IApp $app): void
+    protected static function loadSystemRoutes(IApp $app): void
     {
         if (is_string(static::$systemRoutePath)) {
             require_once static::$systemRoutePath;

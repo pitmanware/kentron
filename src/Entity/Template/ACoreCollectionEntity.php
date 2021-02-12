@@ -25,7 +25,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @throws \InvalidArgumentException If the core class path is invalid
      */
-    protected function __construct (ACollectionEntity $collectionEntity, ?string $coreEntityClass = null)
+    protected function __construct(ACollectionEntity $collectionEntity, ?string $coreEntityClass = null)
     {
         parent::__construct($collectionEntity);
 
@@ -41,7 +41,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return ACollectionEntity
      */
-    final public function getRootEntity (): ACollectionEntity
+    final public function getRootEntity(): ACollectionEntity
     {
         return parent::getRootEntity();
     }
@@ -53,7 +53,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return void
      */
-    final public function buildCollection ($entityData): void
+    final public function buildCollection($entityData): void
     {
         if (!Type::isIterable($entityData)) {
             return;
@@ -88,7 +88,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return ACoreEntity|null
      */
-    final public function getNewCoreEntity (): ?ACoreEntity
+    final public function getNewCoreEntity(): ?ACoreEntity
     {
         if (is_null($this->coreEntityClass)) {
             return null;
@@ -103,7 +103,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @param ACoreEntity $coreEntity
      */
-    final public function addEntity (ACoreEntity $coreEntity): void
+    final public function addEntity(ACoreEntity $coreEntity): void
     {
         $this->coreCollection[] = $coreEntity;
         $this->getRootEntity()->addEntity($coreEntity->getRootEntity());
@@ -114,7 +114,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return iterable
      */
-    final public function iterateEntities (): iterable
+    final public function iterateEntities(): iterable
     {
         yield from $this->getRootEntity()->iterateEntities();
     }
@@ -124,14 +124,14 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return iterable
      */
-    final public function iterateCoreEntities (): iterable
+    final public function iterateCoreEntities(): iterable
     {
         foreach ($this->coreCollection as $coreEntity) {
             yield $coreEntity;
         }
     }
 
-    public function normalise (): array
+    public function normalise(): array
     {
         if ($this->getRootEntity()->isValidMethod(__FUNCTION__)) {
             return $this->getRootEntity()->{__FUNCTION__}();
@@ -155,7 +155,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return array
      */
-    final public function map (array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
+    final public function map(array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
     {
         return $this->getRootEntity()->{__FUNCTION__}($methods, $flatten, $conditions, $namedIndexes);
     }
@@ -167,7 +167,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return iterable
      */
-    final public function filter (array $conditions): iterable
+    final public function filter(array $conditions): iterable
     {
         yield from $this->getRootEntity()->{__FUNCTION__}($conditions);
     }
@@ -177,7 +177,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return Entity|null
      */
-    final public function shiftCoreEntity (): ?ACoreEntity
+    final public function shiftCoreEntity(): ?ACoreEntity
     {
         $this->getRootEntity()->shiftEntity();
         return array_shift($this->coreCollection);
@@ -188,7 +188,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @return Entity|null
      */
-    final public function popCoreEntity (): ?ACoreEntity
+    final public function popCoreEntity(): ?ACoreEntity
     {
         $this->getRootEntity()->popEntity();
         return array_pop($this->coreCollection);

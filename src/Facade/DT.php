@@ -16,7 +16,7 @@ final class DT extends DateTime
      *
      * @return self
      */
-    public static function now (): self
+    public static function now(): self
     {
         return new self();
     }
@@ -28,7 +28,7 @@ final class DT extends DateTime
      *
      * @return self
      */
-    public static function then (string $timeStamp): self
+    public static function then(string $timeStamp): self
     {
         return new self($timeStamp);
     }
@@ -45,7 +45,7 @@ final class DT extends DateTime
      *
      * @return self
      */
-    public function increment (int $seconds, int $minutes = 0, int $hours = 0, int $days = 0, int $months = 0, int $years = 0): self
+    public function increment(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0, int $months = 0, int $years = 0): self
     {
         return $this->add(new \DateInterval("P${years}Y${months}M${days}DT${hours}H${minutes}M{$seconds}S"));
     }
@@ -62,7 +62,7 @@ final class DT extends DateTime
      *
      * @return self
      */
-    public function decrement (int $seconds, int $minutes = 0, int $hours = 0, int $days = 0, int $months = 0, int $years = 0): self
+    public function decrement(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0, int $months = 0, int $years = 0): self
     {
         return $this->sub(new \DateInterval("P${years}Y${months}M${days}DT${hours}H${minutes}M{$seconds}S"));
     }
@@ -75,7 +75,7 @@ final class DT extends DateTime
      *
      * @return string
      */
-    public function format ($format = ""): string
+    public function format($format = ""): string
     {
         if (!is_string($format)) {
             throw new CustomTypeError(__METHOD__, Type::TYPE_STRING, gettype($format));
@@ -89,7 +89,7 @@ final class DT extends DateTime
      *
      * @return string[]
      */
-    public function strSplit (): array
+    public function strSplit(): array
     {
         return [
             $this->format("Y"),
@@ -106,7 +106,7 @@ final class DT extends DateTime
      *
      * @return int[]
      */
-    public function intSplit (): array
+    public function intSplit(): array
     {
         return [
             $this->format("Y"),
@@ -125,7 +125,7 @@ final class DT extends DateTime
      *
      * @return integer
      */
-    public function compare (?self $date = null): int
+    public function compare(?self $date = null): int
     {
         $date = $date ?? self::now();
         return $this->format() <=> $date->format();

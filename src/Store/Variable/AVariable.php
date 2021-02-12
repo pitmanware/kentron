@@ -4,15 +4,17 @@ namespace Kentron\Store\Variable;
 
 use Kentron\Service\Assert;
 use Kentron\Entity\Template\ACoreCollectionEntity;
+use Kentron\Template\IStore;
 
-abstract class AVariable
+abstract class AVariable implements IStore
 {
     use TLocalVariables;
-    use TProviderVariables;
 
     public const ENV_DEV = 1;
     public const ENV_UAT = 2;
     public const ENV_LIVE = 3;
+
+    private const DEFAULT_CIPHER = "AES-256-OFB";
 
     /**
      * The environment
@@ -24,19 +26,19 @@ abstract class AVariable
     * The encryption cipher
     * @var string
     */
-    private static $cipher = "AES-256-OFB";
+    private static $cipher = self::DEFAULT_CIPHER;
 
     /**
      * The base64 decoded random byte string initialisation vector to be used on encryption/decryption
      * @var string
      */
-    private static $initialisationVector;
+    private static $initialisationVector = "";
 
     /**
      * The database key to be used on encryption/decryption
      * @var string
      */
-    private static $databaseKey;
+    private static $databaseKey = "";
 
     /**
      * All encrypted variables
@@ -46,7 +48,7 @@ abstract class AVariable
 
     /**
      * All decrypted variables
-     * @var [type]
+     * @var array
      */
     private static $decrypted = [];
 
@@ -57,7 +59,7 @@ abstract class AVariable
      *
      * @return void
      */
-    public static function setCipher (string $cipher): void
+    public static function setCipher(string $cipher): void
     {
         self::$cipher = $cipher;
     }
@@ -69,7 +71,7 @@ abstract class AVariable
      *
      * @return void
      */
-    public static function setEnvironment (int $environment): void
+    public static function setEnvironment(int $environment): void
     {
         self::$environment = $environment;
     }
@@ -80,7 +82,7 @@ abstract class AVariable
      * Builds the array of system variables
      * @param string $databaseKey The database key from the config
      */
-    public static function build (ACoreCollectionEntity $variableDBCollectionEntity, string $databaseKey): void
+    public static function build(ACoreCollectionEntity $variableDBCollectionEntity, string $databaseKey): void
     {
         self::$databaseKey = $databaseKey;
 
@@ -98,7 +100,7 @@ abstract class AVariable
      * @param int   $index The index of the store to change
      * @param mixed $value The value of that store item
      */
-    public static function set (int $index, $value): void
+    public static function set(int $index, $value): void
     {
         self::$decrypted[$index] = $value;
     }
@@ -110,7 +112,7 @@ abstract class AVariable
      *
      * @throws \Exception
      */
-    public static function get (int $variableID)
+    public static function get(int $variableID)
     {
         if (!isset(self::$decrypted[$variableID]))
         {
@@ -141,7 +143,7 @@ abstract class AVariable
      *
      * @return string
      */
-    public static function encrypt (string $toDecrypt): string
+    public static function encrypt(string $toDecrypt): string
     {
         return openssl_encrypt($toDecrypt, self::$cipher, self::$databaseKey, 0, self::$initialisationVector);
     }
@@ -153,7 +155,7 @@ abstract class AVariable
      *
      * @return string
      */
-    public static function decrypt (string $toDecrypt): string
+    public static function decrypt(string $toDecrypt): string
     {
         return openssl_decrypt($toDecrypt, self::$cipher, self::$databaseKey, 0, self::$initialisationVector);
     }
@@ -163,7 +165,7 @@ abstract class AVariable
      *
      * @return boolean
      */
-    public static function onDev (): bool
+    public static function onDev(): bool
     {
         return Assert::same(self::$environment, self::ENV_DEV);
     }
@@ -173,7 +175,7 @@ abstract class AVariable
      *
      * @return boolean
      */
-    public static function onUAT (): bool
+    public static function onUAT(): bool
     {
         return Assert::same(self::$environment, self::ENV_UAT);
     }
@@ -183,7 +185,7 @@ abstract class AVariable
      *
      * @return boolean
      */
-    public static function onLive (): bool
+    public static function onLive(): bool
     {
         return Assert::same(self::$environment, self::ENV_LIVE);
     }
@@ -193,7 +195,7 @@ abstract class AVariable
      *
      * @return void
      */
-    private static function getVariables (ACoreCollectionEntity $variableDBCollectionEntity): void
+    private static function getVariables(ACoreCollectionEntity $variableDBCollectionEntity): void
     {
         $variableDBEntity = $variableDBCollectionEntity->shiftCoreEntity();
 
@@ -227,7 +229,7 @@ abstract class AVariable
      * @param  string $type  The variable type to be case to
      * @return mixed
      */
-    private static function cast ($value, string $type)
+    private static function cast($value, string $type)
     {
         switch ($type)
         {
@@ -256,5 +258,17 @@ abstract class AVariable
                 return (string) $value;
                 break;
         }
+    }
+
+    public static function reset(): void
+    {
+        self::$environment = null;
+        self::$cipher = self::DEFAULT_CIPHER;
+        self::$initialisationVector = "";
+        self::$databaseKey = "";
+        self::$encrypted = [];
+        self::$decrypted = [];
+
+        self::resetLocal();
     }
 }

@@ -4,8 +4,8 @@ namespace Kentron\Entity;
 
 use Kentron\Entity\Template\AEntity;
 
-use Nyholm\Psr7\{ServerRequest,Response};
-use Psr\Http\Message\StreamInterface;
+use Nyholm\Psr7\{Response, ServerRequest, Stream};
+use Relay\Relay;
 
 class TransportEntity extends AEntity
 {
@@ -59,9 +59,9 @@ class TransportEntity extends AEntity
     protected $jsonEncode = true;
 
     /**
-     * The next function to be called by middleware
+     * The PSR15 function to be called by middleware
      *
-     * @var object
+     * @var Relay
      */
     protected $next;
 
@@ -96,7 +96,7 @@ class TransportEntity extends AEntity
     /**
      * The body of the request
      *
-     * @var StreamInterface
+     * @var Stream
      */
     protected $requestBody;
 
@@ -131,7 +131,7 @@ class TransportEntity extends AEntity
     /**
      * Sets the default content type on instanitation
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->headers["content-type"] = $this->defaultContentType;
         $this->headers["cache-control"] = "max-age=300, must-revalidate";
@@ -141,37 +141,37 @@ class TransportEntity extends AEntity
      * Getters
      */
 
-    public function getArgs (): array
+    public function getArgs(): array
     {
         return $this->args;
     }
 
-    public function getData ()
+    public function getData()
     {
         return $this->data;
     }
 
-    public function getQueryParameters (): array
+    public function getQueryParameters(): array
     {
         return $this->queryParameters;
     }
 
-    public function getStatusCode (): ?int
+    public function getStatusCode(): ?int
     {
         return $this->statusCode;
     }
 
-    public function &getRequest (): ServerRequest
+    public function &getRequest(): ServerRequest
     {
         return $this->request;
     }
 
-    public function getRequestBody (): StreamInterface
+    public function getRequestBody(): Stream
     {
         return $this->requestBody;
     }
 
-    public function getRequestBodyContent (): ?string
+    public function getRequestBodyContent(): ?string
     {
         $body = $this->requestBody->getContents() ?: null;
         $this->requestBody->rewind();
@@ -179,27 +179,27 @@ class TransportEntity extends AEntity
         return $body;
     }
 
-    public function getRequestUrl (): string
+    public function getRequestUrl(): string
     {
         return $this->requestUrl;
     }
 
-    public function &getResponse (): Response
+    public function &getResponse(): Response
     {
         return $this->response;
     }
 
-    public function getRouteName (): ?string
+    public function getRouteName(): ?string
     {
         return $this->routeName;
     }
 
-    public function hasFailed (): bool
+    public function hasFailed(): bool
     {
         return $this->failed ?? count($this->getErrors()) > 0;
     }
 
-    public function iterateHeaders (): iterable
+    public function iterateHeaders(): iterable
     {
         foreach ($this->headers as $header => $value) {
             yield $header => $value;
@@ -211,7 +211,7 @@ class TransportEntity extends AEntity
      *
      * @return string
      */
-    public function getBody (): ?string
+    public function getBody(): ?string
     {
         if ($this->quiet) {
             return null;
@@ -235,17 +235,17 @@ class TransportEntity extends AEntity
      * Setters
      */
 
-    public function setArgs (array $args): void
+    public function setArgs(array $args): void
     {
         $this->args = $args;
     }
 
-    public function setBody (?string $body = null): void
+    public function setBody(?string $body = null): void
     {
         $this->body = $body;
     }
 
-    public function setContentType (string $contentType): void
+    public function setContentType(string $contentType): void
     {
         switch ($contentType) {
             case $this->defaultContentType:
@@ -256,22 +256,22 @@ class TransportEntity extends AEntity
         $this->headers["content-type"] = $contentType;
     }
 
-    public function setHtml (): void
+    public function setHtml(): void
     {
         $this->setContentType("text/html");
     }
 
-    public function setData ($data): void
+    public function setData($data): void
     {
         $this->data = $data;
     }
 
-    public function setFailed (bool $failed = true): void
+    public function setFailed(bool $failed = true): void
     {
         $this->failed = $failed;
     }
 
-    public function setNext (object $next): void
+    public function setNext(Relay $next): void
     {
         $this->next = $next;
     }
@@ -283,22 +283,22 @@ class TransportEntity extends AEntity
      *
      * @return void
      */
-    public function setQuiet (bool $quiet = true): void
+    public function setQuiet(bool $quiet = true): void
     {
         $this->quiet = $quiet;
     }
 
-    public function setStatusCode (int $statusCode): void
+    public function setStatusCode(int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
 
-    public function setRedirect (string $redirect): void
+    public function setRedirect(string $redirect): void
     {
         $this->redirect = $redirect;
     }
 
-    public function setRequest (ServerRequest &$request): void
+    public function setRequest(ServerRequest &$request): void
     {
         $this->request = $request;
 
@@ -308,12 +308,17 @@ class TransportEntity extends AEntity
         $this->queryParameters = $this->request->getQueryParams();
     }
 
-    public function setResponse (Response &$response): void
+    public function setResponse(Response &$response): void
     {
         $this->response = $response;
     }
 
-    public function setUnauthorised (): void
+    public function setRouteName(?string $name = null): void
+    {
+        $this->routeName = $name;
+    }
+
+    public function setUnauthorised(): void
     {
         $this->setStatusCode(401);
     }
@@ -327,7 +332,7 @@ class TransportEntity extends AEntity
      *
      * @return void
      */
-    final public function respond (): void
+    final public function respond(): void
     {
         $this->response = $this->response->withStatus($this->statusCode);
 
@@ -343,19 +348,18 @@ class TransportEntity extends AEntity
      *
      * @return void
      */
-    final public function next (): void
+    final public function next(): void
     {
-        $next = $this->next;
-        $next($this->request, $this->response);
+        $this->response = $this->next->handle($this->request);
     }
 
-    final public function redirect (string $url): void
+    final public function redirect(string $url): void
     {
         $this->statusCode = 302;
         $this->headers["Location"] = $url;
     }
 
-    final public function hasParameters (): bool
+    final public function hasParameters(): bool
     {
         return !empty($this->queryParameters);
     }

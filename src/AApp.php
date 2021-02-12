@@ -7,7 +7,8 @@ use Kentron\Entity\TransportEntity;
 use Kentron\Template\Http\AController;
 use Kentron\Template\Http\AMiddleware;
 
-use Nyholm\Psr7\{ServerRequest,Response};
+use Nyholm\Psr7\{Response, ServerRequest};
+use Relay\Relay;
 
 /**
  * The inital application class, injected into the controllers
@@ -26,13 +27,19 @@ abstract class AApp
      *
      * @return void
      */
-    public function reset (): void
+    public function reset(): void
     {
+        $this->resetStores();
+        $this->resetTransportEntity();
         $this->loadConfig();
+        $this->loadVariables();
+    }
+
+    abstract public function resetStores(): void;
+
+    final public function resetTransportEntity(): void
+    {
         $this->transportEntity = new TransportEntity();
-        $this->setVariables();
-        $this->bootOrm();
-        $this->bootRouter();
     }
 
     /**
@@ -40,28 +47,28 @@ abstract class AApp
      *
      * @return void
      */
-    abstract protected function loadConfig (): void;
-
-    /**
-     * Set up the database connection
-     *
-     * @return void
-     */
-    abstract protected function bootOrm (): void;
+    abstract protected function loadConfig(): void;
 
     /**
      * Sets the variables in the Variable Store
      *
      * @return void
      */
-    abstract protected function setVariables (): void;
+    abstract protected function loadVariables(): void;
+
+    /**
+     * Set up the database connection
+     *
+     * @return void
+     */
+    abstract protected function bootOrm(): void;
 
     /**
      * Load in all the routes
      *
      * @return void
      */
-    abstract protected function bootRouter (): void;
+    abstract protected function bootRouter(): void;
 
     /**
      * Protected Methods
@@ -75,12 +82,13 @@ abstract class AApp
      *
      * @return callable The closure
      */
-    final protected function getController (string $controllerClass, string $method): callable
+    final protected function getController(string $controllerClass, string $method, ?string $name = null): callable
     {
         $transportEntity = $this->transportEntity;
 
-        return function (ServerRequest $request, Response $response, array $args) use ($transportEntity, $controllerClass, $method)
+        return function (ServerRequest $request, Response $response, array $args) use ($transportEntity, $controllerClass, $method, $name)
         {
+            $transportEntity->setRouteName($name);
             $transportEntity->setRequest($request);
             $transportEntity->setResponse($response);
             $transportEntity->setArgs($args);
@@ -88,11 +96,11 @@ abstract class AApp
             $controller = new $controllerClass($transportEntity);
 
             if (!is_subclass_of($controller, AController::class)) {
-                throw new \InvalidArgumentException("$controllerClass must be an instance of " . AController::class);
+                throw new \RuntimeException("$controllerClass must be an instance of " . AController::class);
             }
 
             if (!method_exists($controller, $method) || !is_callable([$controller, $method])) {
-                throw new \Error("Call to undefined method {$controllerClass}::{$method}");
+                throw new \RuntimeException("Call to undefined method {$controllerClass}::{$method}");
             }
 
             if ($transportEntity->getStatusCode() === 200) {
@@ -110,20 +118,20 @@ abstract class AApp
      *
      * @return callable The closure
      */
-    final protected function getMiddleware (string $middlewareClass): callable
+    final protected function getMiddleware(string $middlewareClass): callable
     {
         $transportEntity = $this->transportEntity;
-        $middleware = new $middlewareClass();
 
-        if (!is_subclass_of($middleware, AMiddleware::class)) {
-            throw new \InvalidArgumentException("$middlewareClass must be an instance of " . AMiddleware::class);
-        }
-
-        return function (ServerRequest $request, Response $response, object $next) use ($transportEntity, $middleware)
+        return function (ServerRequest $request, Relay $requestHandler) use ($transportEntity, $middlewareClass)
         {
+            $middleware = new $middlewareClass();
+
+            if (!is_subclass_of($middleware, AMiddleware::class)) {
+                throw new \RuntimeException("$middlewareClass must be an instance of " . AMiddleware::class);
+            }
+
             $transportEntity->setRequest($request);
-            $transportEntity->setResponse($response);
-            $transportEntity->setNext($next);
+            $transportEntity->setNext($requestHandler);
 
             $middleware->run($transportEntity);
 

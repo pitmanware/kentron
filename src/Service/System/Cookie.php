@@ -14,7 +14,7 @@ class Cookie
      *
      * @return string|null
      */
-    public static function get (string $name): ?string
+    public static function get(string $name): ?string
     {
         return $_COOKIE[$name] ?? null;
     }
@@ -28,7 +28,7 @@ class Cookie
      *
      * @return void
      */
-    public static function set (string $name, $value, DT $dateExpires): void
+    public static function set(string $name, $value, DT $dateExpires): void
     {
         setcookie(
             $name,
@@ -45,12 +45,12 @@ class Cookie
         $_COOKIE[$name] = $value;
     }
 
-    public static function unset (string $name): void
+    public static function unset(string $name): void
     {
         self::set($name, null, DT::now());
     }
 
-    public static function logout (): void
+    public static function logout(): void
     {
         self::unset(session_name());
     }

@@ -50,42 +50,42 @@ final class HttpEntity extends Entity
      * Getters
      */
 
-    public function getRawResponse (): ?string
+    public function getRawResponse(): ?string
     {
         return $this->rawResponse;
     }
 
-    public function getExtracted ()
+    public function getExtracted()
     {
         return $this->extracted ?? null;
     }
 
-    public function getUrl (): string
+    public function getUrl(): string
     {
         return rtrim("{$this->baseUrl}/{$this->uri}{$this->getString}", "/");
     }
 
-    public function getPostData ()
+    public function getPostData()
     {
         return $this->postData ?? null;
     }
 
-    public function getHeaders (): array
+    public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    public function getData ()
+    public function getData()
     {
         return $this->data ?? null;
     }
 
-    public function getStatusCode (): int
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
 
-    public function getSuccess (): bool
+    public function getSuccess(): bool
     {
         return $this->success;
     }
@@ -97,7 +97,7 @@ final class HttpEntity extends Entity
      *
      * @throws \UnexpectedValueException If the method is not allowed
      */
-    public function getHttpMethod (): string
+    public function getHttpMethod(): string
     {
         switch ($this->httpMethod) {
             case self::METHOD_GET:
@@ -128,22 +128,22 @@ final class HttpEntity extends Entity
      * Setters
      */
 
-    public function setBaseUrl (string $baseUrl): void
+    public function setBaseUrl(string $baseUrl): void
     {
         $this->baseUrl = rtrim($baseUrl, "/");
     }
 
-    public function setDecodeToArray (bool $decodeAsArray = true): void
+    public function setDecodeToArray(bool $decodeAsArray = true): void
     {
         $this->decodeAsArray = $decodeAsArray;
     }
 
-    public function setDecoding (int $decoding): void
+    public function setDecoding(int $decoding): void
     {
         $this->decoding = $decoding;
     }
 
-    public function setEncoding (int $encoding): void
+    public function setEncoding(int $encoding): void
     {
         $this->encoding = $encoding;
     }
@@ -158,7 +158,7 @@ final class HttpEntity extends Entity
      *
      * @throws \InvalidArgumentException If the get data is a resource
      */
-    public function setGetData ($getData, ?bool $usePrefix = true): void
+    public function setGetData($getData, ?bool $usePrefix = true): void
     {
         if (is_resource($getData)) {
             throw new \InvalidArgumentException("Get data cannot be a resource");
@@ -183,7 +183,7 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    public function addHeader (string $headerKey, string $headerValue): void
+    public function addHeader(string $headerKey, string $headerValue): void
     {
         $this->headers[] = "$headerKey: $headerValue";
     }
@@ -195,7 +195,7 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    public function setHttpMethod (int $httpMethod): void
+    public function setHttpMethod(int $httpMethod): void
     {
         $this->httpMethod = $httpMethod;
     }
@@ -212,7 +212,7 @@ final class HttpEntity extends Entity
      * @throws \ErrorException           If the post data expects a file but it does not exist or is unreadable
      * @throws \UnexpectedValueException If the encoding method provided is not available
      */
-    public function setPostData ($postData): void
+    public function setPostData($postData): void
     {
         if (is_resource($postData)) {
             throw new \InvalidArgumentException("Post data cannot be a resource"); // TODO: Yet (7.4)
@@ -292,7 +292,7 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    public function setStatusCode (int $statusCode): void
+    public function setStatusCode(int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
@@ -304,7 +304,7 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    public function setUri (string $uri): void
+    public function setUri(string $uri): void
     {
         $this->uri = trim($uri, "/");
     }
@@ -316,7 +316,7 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    public function setParameterisePostData (bool $parameterise = true): void
+    public function setParameterisePostData(bool $parameterise = true): void
     {
         $this->parameterise = $parameterise;
     }
@@ -328,12 +328,12 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    public function setBearerToken (string $token): void
+    public function setBearerToken(string $token): void
     {
         $this->setAuthorisation("Bearer $token");
     }
 
-    public function setContentLength (int $contentLength): void
+    public function setContentLength(int $contentLength): void
     {
         $this->addHeader("Content-Length", $contentLength);
     }
@@ -342,12 +342,12 @@ final class HttpEntity extends Entity
      * Helpers
      */
 
-    public function isPost (): bool
+    public function isPost(): bool
     {
         return !is_null($this->postData);
     }
 
-    public function isCurl (): bool
+    public function isCurl(): bool
     {
         return $this->httpMethod !== self::METHOD_SOAP;
     }
@@ -361,7 +361,7 @@ final class HttpEntity extends Entity
      *
      * @throws \UnexpectedValueException If the decoding method provided is not available
      */
-    public function parseResponse ($response): void
+    public function parseResponse($response): void
     {
         if (is_string($response)) {
             $this->rawResponse = $response;
@@ -445,19 +445,19 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    private function setExtractedData ($extracted): void
+    private function setExtractedData($extracted): void
     {
         $this->setSuccess(Type::getProperty($extracted, "success") ?? true);
         $this->setData(Type::getProperty($extracted, "data") ?? null);
         $this->addError(Type::getProperty($extracted, "errors") ?? []);
     }
 
-    private function setSuccess (bool $success): void
+    private function setSuccess(bool $success): void
     {
         $this->success = $success;
     }
 
-    private function setData ($data): void
+    private function setData($data): void
     {
         $this->data = $data;
     }
@@ -469,7 +469,7 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    private function setAuthorisation (string $authorisation): void
+    private function setAuthorisation(string $authorisation): void
     {
         $this->addHeader("Authorization", $authorisation);
     }
@@ -481,7 +481,7 @@ final class HttpEntity extends Entity
      *
      * @return void
      */
-    private function setContentType (string $contentType): void
+    private function setContentType(string $contentType): void
     {
         $this->addHeader("Content-Type", $contentType);
     }

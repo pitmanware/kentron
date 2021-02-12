@@ -8,17 +8,17 @@ final class Files
 {
     use TError;
 
-    public function getOne (string $key): ?array
+    public function getOne(string $key): ?array
     {
         return $_FILES[$key] ?? null;
     }
 
-    public function getAll (): array
+    public function getAll(): array
     {
         return $_FILES ?? [];
     }
 
-    public function isValid (): bool
+    public function isValid(): bool
     {
         if (
             !isset($_FILES["upfile"]["error"]) ||

@@ -21,7 +21,7 @@ final class MailTargetEntity extends AEntity
      */
     private $name;
 
-    public function __construct (?string $email = null, ?string $name = null)
+    public function __construct(?string $email = null, ?string $name = null)
     {
         $this->email = $email ?? $this->email;
         $this->name = $name ?? $this->name;
@@ -31,12 +31,12 @@ final class MailTargetEntity extends AEntity
      * Getters
      */
 
-    public function getEmail (): string
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getName (): ?string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -45,12 +45,12 @@ final class MailTargetEntity extends AEntity
      * Setters
      */
 
-    final public function setEmail (string $email): void
+    final public function setEmail(string $email): void
     {
         $this->email = $email;
     }
 
-    final public function setName (?string $name = null): void
+    final public function setName(?string $name = null): void
     {
         $this->name = $name;
     }

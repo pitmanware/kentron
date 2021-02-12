@@ -11,7 +11,7 @@ final class Schema
      * @param  string $schemaName The name of the route relevant schema
      * @return string
      */
-    public static function get (string $schemaDir, string $actionPath, string $schemaName): string
+    public static function get(string $schemaDir, string $actionPath, string $schemaName): string
     {
         $baseDefinitionsPath = "$schemaDir/Definitions.schema.json";
         $actionDefinitionsPath = "$schemaDir/$actionPath/Definitions.schema.json";
@@ -35,7 +35,7 @@ final class Schema
      * @throws \ErrorException If the file does not exist or is not readable
      * @throws \ErrorException If the file content is not valid JSON
      */
-    private static function validateFiles (string &...$files): void
+    private static function validateFiles(string &...$files): void
     {
         foreach ($files as &$file) {
             if (!$filePath = realpath($file)) {
@@ -55,7 +55,7 @@ final class Schema
      * @param string $filePath The path to the JSON file
      * @return array|null Null if the JSON is invalid
      */
-    private static function getFileContent (string $filePath): ?array
+    private static function getFileContent(string $filePath): ?array
     {
         return json_decode(File::get($filePath), true);
     }

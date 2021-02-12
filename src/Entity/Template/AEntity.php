@@ -13,7 +13,7 @@ abstract class AEntity extends AAlert
      *
      * @return bool
      */
-    final public function isValidMethod (?string $method = null): bool
+    final public function isValidMethod(?string $method = null): bool
     {
         if (
             isset($method) &&

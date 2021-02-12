@@ -25,7 +25,7 @@ abstract class AProviderService
      */
     private $providerResponseService;
 
-    protected function __construct (AProviderEntity $providerEntity)
+    protected function __construct(AProviderEntity $providerEntity)
     {
         $this->providerEntity = $providerEntity;
     }
@@ -35,7 +35,7 @@ abstract class AProviderService
      * @param  ProviderTransportEntity $providerTransportEntity The transport entity for the request and response data from the controller
      * @return bool                                             The success of the request
      */
-    final public function makeRequest (ProviderTransportEntity $providerTransportEntity): bool
+    final public function makeRequest(ProviderTransportEntity $providerTransportEntity): bool
     {
         $httpEntity = $this->providerEntity->getHttpEntity();
 
@@ -82,16 +82,16 @@ abstract class AProviderService
         return true;
     }
 
-    final public function setProviderRequestService (IProviderRequest $requestService): void
+    final public function setProviderRequestService(IProviderRequest $requestService): void
     {
         $this->providerRequestService = $requestService;
     }
 
-    final public function setProviderResponseService (IProviderResponse $responseService): void
+    final public function setProviderResponseService(IProviderResponse $responseService): void
     {
         $this->providerResponseService = $responseService;
     }
 
-    abstract protected function auditRequest (string $url, ?string $body): void;
-    abstract protected function auditResponse (int $statusCode, ?string $body): void;
+    abstract protected function auditRequest(string $url, ?string $body): void;
+    abstract protected function auditResponse(int $statusCode, ?string $body): void;
 }

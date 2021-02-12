@@ -44,7 +44,7 @@ final class Code
      * Creates an array of unique codes based off the given parameters
      * @return array
      */
-    public function get (): array
+    public function get(): array
     {
         $codes = [];
         $count = $this->count;
@@ -67,7 +67,7 @@ final class Code
      * Get codes containing only alpha characters
      * @return array
      */
-    public function getAlpha (): array
+    public function getAlpha(): array
     {
         $this->regex = $this->safeMode ? "/[^BCDFGHJKLMNPQRSTVWXYZ]/" : "/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/";
 
@@ -78,7 +78,7 @@ final class Code
      * Get codes containing only digits
      * @return array
      */
-    public function getDigit (): array
+    public function getDigit(): array
     {
         $this->regex = $this->safeMode ? "/[^23456789]/" : "/[^0123456789]/";
 
@@ -89,7 +89,7 @@ final class Code
      * Get codes containing only alphanumeric characters
      * @return array
      */
-    public function getAlphaNumeric (): array
+    public function getAlphaNumeric(): array
     {
         $this->regex = $this->safeMode ? "/[^BCDFGHJKLMNPQRSTVWXYZ23456789]/" : "/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]/";
 
@@ -105,7 +105,7 @@ final class Code
      * @param int $length
      * @return void
      */
-    public function setLength (int $length): void
+    public function setLength(int $length): void
     {
         if ($length > 0)
         {
@@ -118,7 +118,7 @@ final class Code
      * @param int $count
      * @return void
      */
-    public function setCount (int $count): void
+    public function setCount(int $count): void
     {
         if ($count > 0)
         {
@@ -132,7 +132,7 @@ final class Code
      * @return void
      * @throws InvalidRegexException
      */
-    public function setRegex (string $regex): void
+    public function setRegex(string $regex): void
     {
         if (@preg_match($regex, null) === false)
         {
@@ -147,7 +147,7 @@ final class Code
      * @param array $exclude Any code generated in this list will be ignored
      * @return void
      */
-    public function setExclude (array $exclude): void
+    public function setExclude(array $exclude): void
     {
         $this->exclude = $exclude;
     }
@@ -157,7 +157,7 @@ final class Code
      * @param bool $safeMode
      * @return void
      */
-    public function setSafeMode (bool $safeMode): void
+    public function setSafeMode(bool $safeMode): void
     {
         $this->safeMode = $safeMode;
     }
@@ -166,7 +166,7 @@ final class Code
      * Generates one code based off the regex
      * @return string
      */
-    private function generate (): string
+    private function generate(): string
     {
         return substr(
             str_shuffle(

@@ -16,7 +16,7 @@ final class HttpService
      *
      * @return bool The success of the request
      */
-    public static function run (HttpEntity $httpEntity): bool
+    public static function run(HttpEntity $httpEntity): bool
     {
         if ($httpEntity->isCurl()) {
             return self::runCurl($httpEntity);
@@ -33,7 +33,7 @@ final class HttpService
      *
      * @return bool
      */
-    private static function runCurl (HttpEntity $httpEntity): bool
+    private static function runCurl(HttpEntity $httpEntity): bool
     {
         $curl = new Curl();
 
@@ -68,7 +68,7 @@ final class HttpService
      *
      * @return bool
      */
-    private static function runSoap (HttpEntity $httpEntity): bool
+    private static function runSoap(HttpEntity $httpEntity): bool
     {
         try {
             $soap = new \SoapClient(

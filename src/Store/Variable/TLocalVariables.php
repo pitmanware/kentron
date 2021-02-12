@@ -6,9 +6,9 @@ trait TLocalVariables
 {
     /**
      * The auth ID of the application
-     * @var int
+     * @var int|null
      */
-    private static $authID;
+    private static $authID = null;
 
     /**
      * The audit ID from the requet
@@ -20,12 +20,12 @@ trait TLocalVariables
      * Getters
      */
 
-    public static function getAuthID (): ?int
+    public static function getAuthID(): ?int
     {
         return self::$authID;
     }
 
-    public static function getAuditID (): int
+    public static function getAuditID(): int
     {
         return self::$auditID;
     }
@@ -34,13 +34,23 @@ trait TLocalVariables
      * Setters
      */
 
-    public static function setAuthID (int $authID): void
+    public static function setAuthID(int $authID): void
     {
         self::$authID = $authID;
     }
 
-    public static function setAuditID (int $auditID): void
+    public static function setAuditID(int $auditID): void
     {
         self::$auditID = $auditID;
+    }
+
+    /**
+     * Helpers
+     */
+
+    public static function resetLocal(): void
+    {
+        self::$authID = null;
+        self::$auditID = null;
     }
 }

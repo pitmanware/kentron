@@ -33,7 +33,7 @@ abstract class AProviderEntity extends AEntity
     /**
      * Used for setting all the relevant configuration data for the provider API
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->httpEntity = new HttpEntity();
 
@@ -51,17 +51,17 @@ abstract class AProviderEntity extends AEntity
      * Getters
      */
 
-    final public function getHttpEntity (): HttpEntity
+    final public function getHttpEntity(): HttpEntity
     {
         return $this->httpEntity;
     }
 
-    final public function getProviderDetails (): ?object
+    final public function getProviderDetails(): ?object
     {
         return $this->providerDetails;
     }
 
-    final public function getRequestData ()
+    final public function getRequestData()
     {
         return $this->requestData;
     }
@@ -70,7 +70,7 @@ abstract class AProviderEntity extends AEntity
      * Returns a stringified version of the post data for the audit
      * @return string|null
      */
-    final public function getPostDataAsString (): ?string
+    final public function getPostDataAsString(): ?string
     {
         $postData = $this->httpEntity->getPostData();
 
@@ -85,7 +85,7 @@ abstract class AProviderEntity extends AEntity
      * Setters
      */
 
-    final public function setRequestData ($data): void
+    final public function setRequestData($data): void
     {
         $this->requestData = $data;
     }

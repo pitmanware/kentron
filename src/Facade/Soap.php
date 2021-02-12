@@ -42,7 +42,7 @@ final class Soap extends \SoapClient
      */
     private $version = SOAP_1_2;
 
-    public function __construct (string $wsdl, ?int $version = null)
+    public function __construct(string $wsdl, ?int $version = null)
     {
         $this->wsdl = $wsdl;
 
@@ -56,12 +56,12 @@ final class Soap extends \SoapClient
         );
     }
 
-    public function setAction (string $action): void
+    public function setAction(string $action): void
     {
         $this->action = $action;
     }
 
-    public function requestRaw (string $xml, string $action, int $one_way = 0): bool
+    public function requestRaw(string $xml, string $action, int $one_way = 0): bool
     {
         try {
             $this->rawXml = parent::__doRequest(
@@ -91,12 +91,12 @@ final class Soap extends \SoapClient
         return true;
     }
 
-    public function request (): bool
+    public function request(): bool
     {
         //TODO use SoapClient call method
     }
 
-    public function extract (): ?object
+    public function extract(): ?object
     {
         try {
             $this->extractedXml = XmlService::extractSoap($this->rawXml);
