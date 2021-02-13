@@ -2,12 +2,12 @@
 
 namespace Kentron\Store;
 
-abstract class AToken
+abstract class AToken implements IStore
 {
     /**
      * The bearer token
      *
-     * @var string|null
+     * @var string
      */
     private static $token;
 
@@ -50,8 +50,11 @@ abstract class AToken
         throw new \Exception(__METHOD__ . " expects to be overridden");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public static function reset(): void
     {
-        unset(self::$token);
+        self::$token = null;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Template;
+namespace Kentron\Store;
 
 interface IStore
 {

@@ -2,8 +2,6 @@
 
 namespace Kentron\Service\Validation;
 
-use Kentron\Template\IValidation;
-
 final class Date implements IValidation
 {
     private $date;

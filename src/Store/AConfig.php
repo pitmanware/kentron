@@ -6,7 +6,6 @@ use Kentron\Store\Variable\AVariable;
 
 use Kentron\Service\Assert;
 use Kentron\Service\System\Client;
-use Kentron\Template\IStore;
 
 /**
  * A collection of functions for retrieving config data
@@ -98,6 +97,9 @@ abstract class AConfig implements IStore
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public static function reset(): void
     {
         unset(self::$configPath);

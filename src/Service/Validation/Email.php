@@ -2,8 +2,6 @@
 
 namespace Kentron\Service\Validation;
 
-use Kentron\Template\IValidation;
-
 final class Email implements IValidation
 {
     private $email = "";

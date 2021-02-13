@@ -2,9 +2,10 @@
 
 namespace Kentron\Store\Variable;
 
+use Kentron\Store\IStore;
+
 use Kentron\Service\Assert;
 use Kentron\Entity\Template\ACoreCollectionEntity;
-use Kentron\Template\IStore;
 
 abstract class AVariable implements IStore
 {
@@ -260,6 +261,9 @@ abstract class AVariable implements IStore
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public static function reset(): void
     {
         self::$environment = null;

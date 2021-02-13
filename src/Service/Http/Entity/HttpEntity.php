@@ -215,7 +215,7 @@ final class HttpEntity extends Entity
     public function setPostData($postData): void
     {
         if (is_resource($postData)) {
-            throw new \InvalidArgumentException("Post data cannot be a resource"); // TODO: Yet (7.4)
+            throw new \InvalidArgumentException("Post data cannot be a resource"); // TODO: Yet
         }
 
         switch ($this->encoding) {

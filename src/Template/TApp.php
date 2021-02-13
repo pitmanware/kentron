@@ -13,7 +13,7 @@ use Relay\Relay;
 /**
  * The inital application class, injected into the controllers
  */
-abstract class AApp
+trait TApp
 {
     /**
      * Pseudo container for request and response
