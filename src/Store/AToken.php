@@ -53,8 +53,10 @@ abstract class AToken implements IStore
     /**
      * {@inheritDoc}
      */
-    public static function reset(): void
+    public static function reset(bool $hard = false): void
     {
-        self::$token = null;
+        if ($hard) {
+            self::$token = null;
+        }
     }
 }

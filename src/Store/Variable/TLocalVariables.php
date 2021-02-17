@@ -2,6 +2,8 @@
 
 namespace Kentron\Store\Variable;
 
+use Kentron\Entity\TransportEntity;
+
 trait TLocalVariables
 {
     /**
@@ -17,6 +19,12 @@ trait TLocalVariables
     private static $auditID;
 
     /**
+     * Hold an instance of the Transport Entity statically
+     * @var TransportEntity
+     */
+    private static $transportEntity;
+
+    /**
      * Getters
      */
 
@@ -28,6 +36,11 @@ trait TLocalVariables
     public static function getAuditID(): int
     {
         return self::$auditID;
+    }
+
+    public static function getTransportEntity(): TransportEntity
+    {
+        return self::$transportEntity;
     }
 
     /**
@@ -44,13 +57,22 @@ trait TLocalVariables
         self::$auditID = $auditID;
     }
 
+    public static function setTransportEntity(TransportEntity $transportEntity): void
+    {
+        self::$transportEntity = $transportEntity;
+    }
+
     /**
      * Helpers
      */
 
-    public static function resetLocal(): void
+    public static function resetLocal(bool $hard = false): void
     {
         self::$authID = null;
         self::$auditID = null;
+
+        if ($hard) {
+            self::$transportEntity = null;
+        }
     }
 }

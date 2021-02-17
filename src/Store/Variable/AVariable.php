@@ -264,15 +264,8 @@ abstract class AVariable implements IStore
     /**
      * {@inheritDoc}
      */
-    public static function reset(): void
+    public static function reset(bool $hard = false): void
     {
-        self::$environment = null;
-        self::$cipher = self::DEFAULT_CIPHER;
-        self::$initialisationVector = "";
-        self::$databaseKey = "";
-        self::$encrypted = [];
-        self::$decrypted = [];
-
-        self::resetLocal();
+        self::resetLocal($hard);
     }
 }

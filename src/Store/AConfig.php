@@ -100,9 +100,11 @@ abstract class AConfig implements IStore
     /**
      * {@inheritDoc}
      */
-    public static function reset(): void
+    public static function reset(bool $hard = false): void
     {
-        unset(self::$configPath);
-        unset(self::$config);
+        if ($hard) {
+            self::$configPath = null;
+            self::$config = [];
+        }
     }
 }

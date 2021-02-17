@@ -156,15 +156,17 @@ trait TProviderVariables
      * Helpers
      */
 
-    public static function resetProvider(): void
+    public static function resetProvider(bool $hard = false): void
     {
-        self::$providerVariableID = 3;
-        self::$providerID = null;
-        self::$providerClass = null;
-        self::$providerName = null;
-        self::$providerUrl = null;
-        self::$providerUsername = null;
-        self::$providerPassword = null;
-        self::$providerExtraDetails = null;
+        if ($hard) {
+            self::$providerVariableID = 3;
+            self::$providerID = null;
+            self::$providerClass = null;
+            self::$providerName = null;
+            self::$providerUrl = null;
+            self::$providerUsername = null;
+            self::$providerPassword = null;
+            self::$providerExtraDetails = null;
+        }
     }
 }

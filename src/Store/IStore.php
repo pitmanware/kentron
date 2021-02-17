@@ -9,5 +9,5 @@ interface IStore
      *
      * @return void
      */
-    public static function reset(): void;
+    public static function reset(bool $hard = false): void;
 }
