@@ -44,7 +44,7 @@ abstract class AAlert
      *
      * @return array
      */
-    final public function getErrors (): array
+    final public function getErrors(): array
     {
         return $this->errors;
     }
@@ -54,7 +54,7 @@ abstract class AAlert
      *
      * @return array
      */
-    final public function getNotices (): array
+    final public function getNotices(): array
     {
         return $this->notices;
     }
@@ -64,7 +64,7 @@ abstract class AAlert
      *
      * @return array
      */
-    final public function getWarnings (): array
+    final public function getWarnings(): array
     {
         return $this->warnings;
     }
@@ -74,7 +74,7 @@ abstract class AAlert
      *
      * @param string|array $errors
      */
-    final public function addError ($errors): void
+    final public function addError($errors): void
     {
         if (is_string($errors)) {
             $this->errors[] = $errors;
@@ -89,7 +89,7 @@ abstract class AAlert
      *
      * @param string|array $notices
      */
-    final public function addNotice ($notices): void
+    final public function addNotice($notices): void
     {
         if (is_string($notices)) {
             $this->notices[] = $notices;
@@ -104,7 +104,7 @@ abstract class AAlert
      *
      * @param string|array $warnings
      */
-    final public function addWarning ($warnings): void
+    final public function addWarning($warnings): void
     {
         if (is_string($warnings)) {
             $this->warnings[] = $warnings;
@@ -119,7 +119,7 @@ abstract class AAlert
      *
      * @return boolean
      */
-    final public function hasErrors (): bool
+    final public function hasErrors(): bool
     {
         return (count($this->errors) > 0);
     }
@@ -129,7 +129,7 @@ abstract class AAlert
      *
      * @return boolean
      */
-    final public function hasNotices (): bool
+    final public function hasNotices(): bool
     {
         return (count($this->notices) > 0);
     }
@@ -139,7 +139,7 @@ abstract class AAlert
      *
      * @return boolean
      */
-    final public function hasWarnings (): bool
+    final public function hasWarnings(): bool
     {
         return (count($this->warnings) > 0);
     }
@@ -149,7 +149,7 @@ abstract class AAlert
      *
      * @return void
      */
-    final public function resetErrors (): void
+    final public function resetErrors(): void
     {
         $this->errors = [];
     }
@@ -159,7 +159,7 @@ abstract class AAlert
      *
      * @return void
      */
-    final public function resetNotices (): void
+    final public function resetNotices(): void
     {
         $this->notices = [];
     }
@@ -169,27 +169,27 @@ abstract class AAlert
      *
      * @return void
      */
-    final public function resetWarnings (): void
+    final public function resetWarnings(): void
     {
         $this->warnings = [];
     }
 
-    final public function addErrorCode (int $errorCode): void
+    final public function addErrorCode(int $errorCode): void
     {
         $this->errorCodes |= $errorCode;
     }
 
-    final public function hasErrorCode (int $errorCode): bool
+    final public function hasErrorCode(int $errorCode): bool
     {
         return $this->errorCodes & $errorCode;
     }
 
-    final public function hasErrorCodes (): bool
+    final public function hasErrorCodes(): bool
     {
         return $this->errorCodes !== 0;
     }
 
-    final public function getErrorCodes (): int
+    final public function getErrorCodes(): int
     {
         return $this->errorCodes;
     }
@@ -201,14 +201,14 @@ abstract class AAlert
      *
      * @return void
      */
-    final public function mergeAlerts (AEntity $entity): void
+    final public function mergeAlerts(AEntity $entity): void
     {
         $this->addError($entity->getErrors());
         $this->addNotice($entity->getNotices());
         $this->addWarning($entity->getWarnings());
     }
 
-    final public function normaliseAlerts (): ?array
+    final public function normaliseAlerts(): ?array
     {
         $normalised = [];
 

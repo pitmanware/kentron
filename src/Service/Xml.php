@@ -17,7 +17,7 @@ final class Xml
      *
      * @return string|null Null if the data is not in the correct format
      */
-    public static function build (string $viewPath, string $action, $data): ?string
+    public static function build(string $viewPath, string $action, $data): ?string
     {
         if (!is_array($data) && !is_object($data)) {
             return null;
@@ -44,7 +44,7 @@ final class Xml
      *
      * @throws XmlFormatException If the XML could not be decoded
      */
-    public static function extract (string $xml, bool $allowNull = false): ?array
+    public static function extract(string $xml, bool $allowNull = false): ?array
     {
         libxml_use_internal_errors(true);
         $loadedXml = simplexml_load_string($xml);
@@ -67,7 +67,7 @@ final class Xml
      *
      * @return array
      */
-    public static function extractSoap (string $soap): array
+    public static function extractSoap(string $soap): array
     {
         $xml = preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $soap);
 
@@ -81,7 +81,7 @@ final class Xml
      *
      * @return array The formatted extracted XML array
      */
-    public static function format (\SimpleXMLElement $xml): array
+    public static function format(\SimpleXMLElement $xml): array
     {
         $collection = [];
         $nodes = $xml->children();
@@ -116,7 +116,7 @@ final class Xml
      *
      * @return XmlFormatException
      */
-    private static function buildException (): XmlFormatException
+    private static function buildException(): XmlFormatException
     {
         $errors = (array) libxml_get_errors();
 

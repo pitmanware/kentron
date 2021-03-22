@@ -23,7 +23,7 @@ class JsonSchema
      * @param  string      $json The JSON data to be extracted
      * @return object|null
      */
-    public function extract (string $json): ?object
+    public function extract(string $json): ?object
     {
         return json_decode($json, false);
     }
@@ -34,7 +34,7 @@ class JsonSchema
      * @param  object $jsonSchema JSON schema.
      * @return bool               The success of the validation.
      */
-    public function isValid (object $jsonData, object $jsonSchema): bool
+    public function isValid(object $jsonData, object $jsonSchema): bool
     {
         $schemaStorage = new SchemaStorage();
 
@@ -59,7 +59,7 @@ class JsonSchema
      *
      * @return array
      */
-    public function getErrors (): array
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -69,7 +69,7 @@ class JsonSchema
      * @param  array  $jsonErrors The error array from the json validator.
      * @return void
      */
-    private function formatErrors (array $jsonErrors): void
+    private function formatErrors(array $jsonErrors): void
     {
         foreach ($jsonErrors as $jsonError) {
             $this->errors[] = "{$jsonError["pointer"]} - {$jsonError["message"]}";

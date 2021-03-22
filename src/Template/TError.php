@@ -19,7 +19,7 @@ trait TError
      *
      * @return array
      */
-    final public function getErrors (): array
+    final public function getErrors(): array
     {
         return $this->errors;
     }
@@ -29,7 +29,7 @@ trait TError
      *
      * @param string|array $errors
      */
-    final public function addError ($errors): void
+    final public function addError($errors): void
     {
         if (is_string($errors)){
             $this->errors[] = $errors;
@@ -44,7 +44,7 @@ trait TError
      *
      * @return boolean
      */
-    final public function hasErrors (): bool
+    final public function hasErrors(): bool
     {
         return (count($this->errors) > 0);
     }
@@ -54,7 +54,7 @@ trait TError
      *
      * @return void
      */
-    final public function resetErrors (): void
+    final public function resetErrors(): void
     {
         $this->errors = [];
     }

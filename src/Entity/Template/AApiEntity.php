@@ -22,7 +22,7 @@ abstract class AApiEntity extends ACoreEntity
      *
      * @return object|null The extracted JSON or null if failed
      */
-    public function validate (string $json): ?object
+    public function validate(string $json): ?object
     {
         if (!isset($this->schema)) {
             $this->addError("JSON schema not set");
@@ -46,7 +46,7 @@ abstract class AApiEntity extends ACoreEntity
      *
      * @param string $schema The content of the JSON schema
      */
-    final public function setSchema (string $schema): void
+    final public function setSchema(string $schema): void
     {
         $this->schema = $schema;
     }

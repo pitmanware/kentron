@@ -13,12 +13,12 @@ abstract class AMailEntity extends AEntity
      * Getters
      */
 
-    public function getPath (): string
+    public function getPath(): string
     {
         return $this->path;
     }
 
-    public function getName (): string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -27,12 +27,12 @@ abstract class AMailEntity extends AEntity
      * Setters
      */
 
-    public function setPath (string $path): void
+    public function setPath(string $path): void
     {
         $this->path = $path;
     }
 
-    public function setName (string $name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

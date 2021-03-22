@@ -125,7 +125,7 @@ final class MailTransportEntity extends AEntity
      */
     private $embedCollectionEntity;
 
-    public function __construct (?string $username = null, ?string $password = null)
+    public function __construct(?string $username = null, ?string $password = null)
     {
         $this->username = $username ?? $this->username;
         $this->password = $password ?? $this->password;
@@ -141,7 +141,7 @@ final class MailTransportEntity extends AEntity
      *
      * @return boolean
      */
-    public function attachFile (string $filePath, ?string $fileName = null): bool
+    public function attachFile(string $filePath, ?string $fileName = null): bool
     {
         if (!$this->validateFile($filePath)) {
             return false;
@@ -167,7 +167,7 @@ final class MailTransportEntity extends AEntity
      *
      * @return boolean
      */
-    public function embedFile (string $filePath, ?string $fileName = null, ?string $cid = null): bool
+    public function embedFile(string $filePath, ?string $fileName = null, ?string $cid = null): bool
     {
         if (!$this->validateFile($filePath)) {
             return false;
@@ -196,7 +196,7 @@ final class MailTransportEntity extends AEntity
      *
      * @return void
      */
-    public function addRecipient (string $email, ?string $name = null): void
+    public function addRecipient(string $email, ?string $name = null): void
     {
         /** @var MailTargetEntity $targetEntity */
         $targetEntity = $this->targetCollectionEntity->getNewEntity();
@@ -211,72 +211,72 @@ final class MailTransportEntity extends AEntity
      * Getters
      */
 
-    public function getSentCount (): int
+    public function getSentCount(): int
     {
         return $this->sentCount;
     }
 
-    public function getUsername (): string
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function getPassword (): string
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function getHost (): string
+    public function getHost(): string
     {
         return $this->host;
     }
 
-    public function getPort (): int
+    public function getPort(): int
     {
         return $this->port;
     }
 
-    public function getMethod (): string
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    public function getFromEmail (): string
+    public function getFromEmail(): string
     {
         return $this->fromEmail;
     }
 
-    public function getFromName (): string
+    public function getFromName(): string
     {
         return $this->fromName ?? "";
     }
 
-    public function getSubject (): string
+    public function getSubject(): string
     {
         return $this->subject ?? "";
     }
 
-    public function getBody (): string
+    public function getBody(): string
     {
         return $this->body ?? "";
     }
 
-    public function getAltBody (): string
+    public function getAltBody(): string
     {
         return $this->altBody ?? "";
     }
 
-    public function getIsHtml (): bool
+    public function getIsHtml(): bool
     {
         return $this->isHtml;
     }
 
-    public function getTargetCollectionEntity (): MailTargetCollectionEntity
+    public function getTargetCollectionEntity(): MailTargetCollectionEntity
     {
         return $this->targetCollectionEntity;
     }
 
-    public function getAttachmentCollectionEntity (): MailAttachmentCollectionEntity
+    public function getAttachmentCollectionEntity(): MailAttachmentCollectionEntity
     {
         if (is_null($this->attachmentCollectionEntity)) {
             $this->attachmentCollectionEntity = new MailAttachmentCollectionEntity();
@@ -285,7 +285,7 @@ final class MailTransportEntity extends AEntity
         return $this->attachmentCollectionEntity;
     }
 
-    public function getEmbedCollectionEntity (): MailEmbedCollectionEntity
+    public function getEmbedCollectionEntity(): MailEmbedCollectionEntity
     {
         if (is_null($this->embedCollectionEntity)) {
             $this->embedCollectionEntity = new MailEmbedCollectionEntity();
@@ -294,7 +294,7 @@ final class MailTransportEntity extends AEntity
         return $this->embedCollectionEntity;
     }
 
-    public function getLastEmbeddedCid (): ?string
+    public function getLastEmbeddedCid(): ?string
     {
         /** @var MailEmbedEntity $embedEntity */
         $embedEntity = $this->embedCollectionEntity->getLastEntity();
@@ -305,37 +305,37 @@ final class MailTransportEntity extends AEntity
      * Setters
      */
 
-    public function setUsername (string $username): void
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }
 
-    public function setPassword (string $password): void
+    public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
-    public function setHost (string $host): void
+    public function setHost(string $host): void
     {
         $this->host = $host;
     }
 
-    public function setPort (int $port): void
+    public function setPort(int $port): void
     {
         $this->port = $port;
     }
 
-    public function setMethod (string $method): void
+    public function setMethod(string $method): void
     {
         $this->method = $method;
     }
 
-    public function setFromEmail (string $fromEmail): void
+    public function setFromEmail(string $fromEmail): void
     {
         $this->fromEmail = $fromEmail;
     }
 
-    public function setFromName (string $fromName): void
+    public function setFromName(string $fromName): void
     {
         $this->fromName = $fromName;
     }
@@ -344,7 +344,7 @@ final class MailTransportEntity extends AEntity
      * Helpers
      */
 
-    public function isValid (): bool
+    public function isValid(): bool
     {
         if (is_null($this->username)) {
             $this->addError("Username is not set");
@@ -368,12 +368,12 @@ final class MailTransportEntity extends AEntity
         }
     }
 
-    public function incrementSentCount (): void
+    public function incrementSentCount(): void
     {
         $this->sentCount++;
     }
 
-    private function validateFile (string &$filePath): bool
+    private function validateFile(string &$filePath): bool
     {
         if (!File::isValidFile($filePath)) {
             $this->addError("'{$filePath}' is not a valid file");

@@ -40,12 +40,12 @@ final class Curl extends AAlert
     /**
      * Creates a new instance of curl on instantiation
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->init();
     }
 
-    public function __destruct ()
+    public function __destruct()
     {
         curl_close($this->curl);
     }
@@ -59,7 +59,7 @@ final class Curl extends AAlert
      *
      * @return array
      */
-    public function getInfo (): array
+    public function getInfo(): array
     {
         return $this->curlInfo;
     }
@@ -69,12 +69,12 @@ final class Curl extends AAlert
      *
      * @return string
      */
-    public function getResponse (): string
+    public function getResponse(): string
     {
         return $this->response;
     }
 
-    public function getStatusCode (): int
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -100,12 +100,12 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setHeaders (array $headers = []): void
+    public function setHeaders(array $headers = []): void
     {
         $this->setOpt(CURLOPT_HTTPHEADER, $headers);
     }
 
-    public function setMethod (string $method): void
+    public function setMethod(string $method): void
     {
         $this->setOpt(CURLOPT_CUSTOMREQUEST, $method);
     }
@@ -118,7 +118,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setOpt (int $optName, $value): void
+    public function setOpt(int $optName, $value): void
     {
         curl_setopt($this->curl, $optName, $value);
     }
@@ -130,7 +130,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setOptArray (array $optArray): void
+    public function setOptArray(array $optArray): void
     {
         curl_setopt_array($this->curl, $optArray);
     }
@@ -142,7 +142,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setPort (int $portNumber): void
+    public function setPort(int $portNumber): void
     {
         $this->setOpt(CURLOPT_PORT, $portNumber);
     }
@@ -155,7 +155,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setPost ($postData): void
+    public function setPost($postData): void
     {
         if (is_array($postData)) {
             $this->setPostArray($postData);
@@ -172,7 +172,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setPostArray (array $postData): void
+    public function setPostArray(array $postData): void
     {
         $this->setOpt(CURLOPT_POST, true);
         $this->setOpt(CURLOPT_POSTFIELDS, $postData);
@@ -185,7 +185,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setPostField (string $postData): void
+    public function setPostField(string $postData): void
     {
         $this->setOpt(CURLOPT_POST, true);
         $this->setOpt(CURLOPT_POSTFIELDS, $postData);
@@ -199,7 +199,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setSSL (string $sslPath = "/", string $sslPass = ""): void
+    public function setSSL(string $sslPath = "/", string $sslPass = ""): void
     {
         $this->setOpt(CURLOPT_SSLCERT, $sslPath);
         $this->setOpt(CURLOPT_SSLCERTPASSWD, $sslPass);
@@ -212,7 +212,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setTimeOut (int $seconds): void
+    public function setTimeOut(int $seconds): void
     {
         $this->setOpt(CURLOPT_TIMEOUT, $seconds);
     }
@@ -224,7 +224,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setUrl (string $url): void
+    public function setUrl(string $url): void
     {
         $this->setOpt(CURLOPT_URL, $url);
     }
@@ -236,7 +236,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function setRequestMethod (string $customRequest): void
+    public function setRequestMethod(string $customRequest): void
     {
         $this->setOpt(CURLOPT_CUSTOMREQUEST, $customRequest);
     }
@@ -252,7 +252,7 @@ final class Curl extends AAlert
      *
      * @return bool True if request was successful
      */
-    public function execute (): bool
+    public function execute(): bool
     {
         $response = curl_exec($this->curl);
         $this->curlInfo = curl_getinfo($this->curl);
@@ -276,7 +276,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    public function reset (): void
+    public function reset(): void
     {
         $this->init();
     }
@@ -292,7 +292,7 @@ final class Curl extends AAlert
      *
      * @return void
      */
-    private function init (): void
+    private function init(): void
     {
         $this->curl = curl_init();
 

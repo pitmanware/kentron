@@ -9,12 +9,12 @@ final class FileEntity extends AEntity
 {
     private $file;
 
-    public function getFile (): File
+    public function getFile(): File
     {
         return $this->file;
     }
 
-    public function setFile (File $file): void
+    public function setFile(File $file): void
     {
         $this->file = $file;
     }

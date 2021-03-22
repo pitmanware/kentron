@@ -11,7 +11,7 @@ final class IGBinary
      *
      * @return string|null The encoded binary string
      */
-    public static function serialise ($decoded): ?string
+    public static function serialise($decoded): ?string
     {
         if (is_null($decoded) || is_resource($decoded))
         {
@@ -28,7 +28,7 @@ final class IGBinary
      *
      * @return mixed The decoded data
      */
-    public static function unserialise (string $encoded)
+    public static function unserialise(string $encoded)
     {
         return @\igbinary_unserialize($encoded);
     }

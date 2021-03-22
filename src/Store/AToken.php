@@ -2,12 +2,12 @@
 
 namespace Kentron\Store;
 
-abstract class AToken
+abstract class AToken implements IStore
 {
     /**
      * The bearer token
      *
-     * @var string|null
+     * @var string
      */
     private static $token;
 
@@ -16,7 +16,7 @@ abstract class AToken
      *
      * @return boolean
      */
-    final public static function get (): string
+    final public static function get(): string
     {
         if (is_string(self::$token)) {
             return self::$token;
@@ -34,7 +34,7 @@ abstract class AToken
      *
      * @return void
      */
-    final public static function set (string $token): void
+    final public static function set(string $token): void
     {
         self::$token = $token;
     }
@@ -45,8 +45,18 @@ abstract class AToken
      *
      * @return string
      */
-    public static function getToken (): string
+    public static function getToken(): string
     {
         throw new \Exception(__METHOD__ . " expects to be overridden");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function reset(bool $hard = false): void
+    {
+        if ($hard) {
+            self::$token = null;
+        }
     }
 }

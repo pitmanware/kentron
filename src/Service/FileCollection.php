@@ -13,7 +13,7 @@ final class FileCollection
     /**
      * Build the array of File Entities
      */
-    final public function build (): FileCollectionEntity
+    final public function build(): FileCollectionEntity
     {
         $fileColletionEntity = new FileCollectionEntity();
         $files = Files::getAll();

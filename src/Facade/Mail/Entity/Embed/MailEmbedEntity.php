@@ -12,7 +12,7 @@ final class MailEmbedEntity extends AMailEntity
      * Getters
      */
 
-    public function getCid (): ?string
+    public function getCid(): ?string
     {
         return $this->cid;
     }
@@ -21,7 +21,7 @@ final class MailEmbedEntity extends AMailEntity
      * Setters
      */
 
-    public function setCid (string $cid): void
+    public function setCid(string $cid): void
     {
         $this->cid = $cid;
     }

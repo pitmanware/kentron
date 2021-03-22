@@ -20,7 +20,7 @@ final class Type
      *
      * @return bool True is the array is associative
      */
-    public static function isAssoc (array $array): bool
+    public static function isAssoc(array $array): bool
     {
         return !!array_filter(array_keys($array), 'is_string');
     }
@@ -33,7 +33,7 @@ final class Type
      *
      * @return bool True if the variable can be traversed
      */
-    public static function isIterable ($data): bool
+    public static function isIterable($data): bool
     {
         return is_array($data) || is_object($data);
     }
@@ -46,7 +46,7 @@ final class Type
      *
      * @return mixed Null if no key exists
      */
-    public static function getProperty ($data, string $property)
+    public static function getProperty($data, string $property)
     {
         if (is_object($data) && property_exists($data, $property)) {
             return $data->{$property};
@@ -67,7 +67,7 @@ final class Type
      *
      * @throws \UnexpectedValueException If the given type is unknown
      */
-    public static function castTo (string $type): string
+    public static function castTo(string $type): string
     {
         switch (strtolower($type)) {
             case static::TYPE_ARRAY:
@@ -108,7 +108,7 @@ final class Type
      *
      * @return array
      */
-    public static function castToArray ($value): array
+    public static function castToArray($value): array
     {
         return (array) $value;
     }
@@ -120,7 +120,7 @@ final class Type
      *
      * @return bool
      */
-    public static function castToBool ($value): bool
+    public static function castToBool($value): bool
     {
         return (bool) $value;
     }
@@ -134,7 +134,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function castToFloat ($value): float
+    public static function castToFloat($value): float
     {
         if (is_object($value)) {
             throw new \InvalidArgumentException("Non object expected");
@@ -152,7 +152,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function castToInt ($value): int
+    public static function castToInt($value): int
     {
         if (is_object($value)) {
             throw new \InvalidArgumentException("Non object expected");
@@ -168,7 +168,7 @@ final class Type
      *
      * @return object
      */
-    public static function castToObject ($value): object
+    public static function castToObject($value): object
     {
         return (object) $value;
     }
@@ -182,7 +182,7 @@ final class Type
      *
      * @throws InvalidArgumentException
      */
-    public static function castToString ($value): string
+    public static function castToString($value): string
     {
         if (is_iterable($value) || is_object($value)) {
             throw new \InvalidArgumentException("Non iterable/object expected");

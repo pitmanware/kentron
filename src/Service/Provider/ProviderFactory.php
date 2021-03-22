@@ -15,7 +15,7 @@ final class ProviderFactory
      * @return AProviderFactory
      * @throws UnexpectedProviderException
      */
-    public static function getProvider (): AProviderFactory
+    public static function getProvider(): AProviderFactory
     {
         $providerClass = AVariable::getProviderClass();
 

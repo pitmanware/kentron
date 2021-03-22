@@ -62,7 +62,7 @@ trait TProviderVariables
      * @param int $providerID
      * @throws \ErrorException If the given ID does not match any providers
      */
-    public static function setProvider (int $providerID): void
+    public static function setProvider(int $providerID): void
     {
         $provider = self::get(self::$providerVariableID)->{$providerID} ?? null;
 
@@ -83,7 +83,7 @@ trait TProviderVariables
         }
     }
 
-    public static function setDefaultProvider (): void
+    public static function setDefaultProvider(): void
     {
         self::setProvider(self::get(4));
     }
@@ -92,37 +92,37 @@ trait TProviderVariables
      * Getters
      */
 
-    public static function getProviderID (): int
+    public static function getProviderID(): int
     {
         return self::$providerID;
     }
 
-    public static function getProviderClass (): string
+    public static function getProviderClass(): string
     {
         return self::$providerClass;
     }
 
-    public static function getProviderName (): string
+    public static function getProviderName(): string
     {
         return self::$providerName;
     }
 
-    public static function getProviderUsername (): string
+    public static function getProviderUsername(): string
     {
         return self::$providerUsername;
     }
 
-    public static function getProviderPassword (): string
+    public static function getProviderPassword(): string
     {
         return self::$providerPassword;
     }
 
-    public static function getProviderUrl (): string
+    public static function getProviderUrl(): string
     {
         return self::$providerUrl;
     }
 
-    public static function getProviderExtraDetails (): ?object
+    public static function getProviderExtraDetails(): ?object
     {
         return self::$providerExtraDetails;
     }
@@ -136,7 +136,7 @@ trait TProviderVariables
      * @param  object $extraDetails
      * @return object
      */
-    private static function extractExtraDetails (object $extraDetails): object
+    private static function extractExtraDetails(object $extraDetails): object
     {
         $details = [];
 
@@ -150,5 +150,23 @@ trait TProviderVariables
         }
 
         return (object) $details;
+    }
+
+    /**
+     * Helpers
+     */
+
+    public static function resetProvider(bool $hard = false): void
+    {
+        if ($hard) {
+            self::$providerVariableID = 3;
+            self::$providerID = null;
+            self::$providerClass = null;
+            self::$providerName = null;
+            self::$providerUrl = null;
+            self::$providerUsername = null;
+            self::$providerPassword = null;
+            self::$providerExtraDetails = null;
+        }
     }
 }

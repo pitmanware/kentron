@@ -17,7 +17,7 @@ final class Get
      *
      * @return mixed Can return any type
      */
-    public static function getOne (string $key, ?string $type = null)
+    public static function getOne(string $key, ?string $type = null)
     {
         $value = $_GET[$key] ?? null;
 
@@ -40,7 +40,7 @@ final class Get
      *
      * @return array
      */
-    public static function getAll (): array
+    public static function getAll(): array
     {
         return $_GET ?? [];
     }

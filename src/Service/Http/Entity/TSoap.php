@@ -26,7 +26,7 @@ trait TSoap
      * Getters
      */
 
-    public function getConfig (): array
+    public function getConfig(): array
     {
         return [
             "trace"      => $this->trace,
@@ -38,27 +38,27 @@ trait TSoap
         ];
     }
 
-    public function getExtracted (): ?object
+    public function getExtracted(): ?object
     {
         return $this->extracted;
     }
 
-    public function getMethod (): string
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    public function getParameters (): array
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function getSoapVersion (): int
+    public function getSoapVersion(): int
     {
         return $this->soapVersion;
     }
 
-    public function getWsdlUrl (): string
+    public function getWsdlUrl(): string
     {
         return $this->getUrl();
     }
@@ -67,37 +67,37 @@ trait TSoap
      * Setters
      */
 
-    public function setTextEncoding (string $textEncoding): void
+    public function setTextEncoding(string $textEncoding): void
     {
         $this->textEncoding = $textEncoding;
     }
 
-    public function setExceptions (bool $exceptions): void
+    public function setExceptions(bool $exceptions): void
     {
         $this->exceptions = $exceptions;
     }
 
-    public function setFeatures (int $features): void
+    public function setFeatures(int $features): void
     {
         $this->features = $features;
     }
 
-    public function setMethod (string $method): void
+    public function setMethod(string $method): void
     {
         $this->method = $method;
     }
 
-    public function setParameters (array $parameters): void
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
 
-    public function setPassword (string $password): void
+    public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
-    public function setRawRequest (string $rawRequest): void
+    public function setRawRequest(string $rawRequest): void
     {
         $this->rawRequest = $rawRequest;
     }
@@ -107,7 +107,7 @@ trait TSoap
      *
      * @return void
      */
-    public function setSecurityHeader (): void
+    public function setSecurityHeader(): void
     {
         $this->headers[] = new SoapHeader(
             $this->wsseUrl,
@@ -131,17 +131,17 @@ trait TSoap
         );
     }
 
-    public function setSoapVersion (int $soapVersion): void
+    public function setSoapVersion(int $soapVersion): void
     {
         $this->soapVersion = $soapVersion;
     }
 
-    public function setTrace (bool $trace): void
+    public function setTrace(bool $trace): void
     {
         $this->trace = $trace;
     }
 
-    public function setUsername (string $username): void
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }
@@ -155,7 +155,7 @@ trait TSoap
      *
      * @throws \ErrorException If the path does not exist or is unreadable
      */
-    public function setViewPath (string $viewPath): void
+    public function setViewPath(string $viewPath): void
     {
         $realPath = realpath($viewPath);
 
@@ -166,12 +166,12 @@ trait TSoap
         $this->viewPath = $realPath;
     }
 
-    public function setWsdlUrl (string $url): void
+    public function setWsdlUrl(string $url): void
     {
         $this->setBaseUrl($url);
     }
 
-    public function setWsseUrl (string $url): void
+    public function setWsseUrl(string $url): void
     {
         $this->wsseUrl = $url;
     }
@@ -180,12 +180,12 @@ trait TSoap
      * Helpers
      */
 
-    public function addFeature (int $feature): void
+    public function addFeature(int $feature): void
     {
         $this->features |= $feature;
     }
 
-    public function hasParameters (): bool
+    public function hasParameters(): bool
     {
         return count($this->parameters) > 0;
     }
@@ -194,7 +194,7 @@ trait TSoap
      * Private methods
      */
 
-    private function newSoapVar ($data, ?string $tag = null, ?string $url = null): SoapVar
+    private function newSoapVar($data, ?string $tag = null, ?string $url = null): SoapVar
     {
         $url = $url ?? $this->wsseUrl;
 
