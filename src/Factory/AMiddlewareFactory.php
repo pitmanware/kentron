@@ -3,8 +3,9 @@
 namespace Kentron\Factory;
 
 use Kentron\Store\Variable\AVariable;
+use Kentron\Template\Http\AMiddleware;
 use Nyholm\Psr7\ServerRequest;
-use Relay\Relay;
+use Psr\Http\Server\RequestHandlerInterface;
 
 abstract class AMiddlewareFactory
 {
@@ -15,9 +16,9 @@ abstract class AMiddlewareFactory
      *
      * @return callable The closure
      */
-    final protected function getMiddleware(string $middlewareClass): callable
+    final protected static function getMiddleware(string $middlewareClass): callable
     {
-        return function (ServerRequest $request, Relay $requestHandler) use ($middlewareClass)
+        return function (ServerRequest $request, RequestHandlerInterface $requestHandler) use ($middlewareClass)
         {
             $transportEntity = AVariable::getTransportEntity();
             $middleware = new $middlewareClass();

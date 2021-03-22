@@ -19,7 +19,7 @@ final class Device
     public static function getDevice(): object
     {
         if (!isset(self::$device)) {
-            $device = get_browser(null, false);
+            $device = get_browser($_SERVER["HTTP_USER_AGENT"], false);
 
             if ($device === false) {
                 throw new \UnexpectedValueException("browscap.ini is not installed");

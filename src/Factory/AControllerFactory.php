@@ -3,6 +3,7 @@
 namespace Kentron\Factory;
 
 use Kentron\Store\Variable\AVariable;
+use Kentron\Template\Http\AController;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 
@@ -16,13 +17,12 @@ abstract class AControllerFactory
      *
      * @return callable The closure
      */
-    final protected function getController(string $controllerClass, string $method, ?string $name = null): callable
+    final protected static function getController(string $controllerClass, string $method): callable
     {
-        return function (ServerRequest $request, Response $response, array $args) use ($controllerClass, $method, $name)
+        return function (ServerRequest $request, Response $response, array $args) use ($controllerClass, $method)
         {
             $transportEntity = AVariable::getTransportEntity();
 
-            $transportEntity->setRouteName($name);
             $transportEntity->setRequest($request);
             $transportEntity->setResponse($response);
             $transportEntity->setArgs($args);
@@ -40,8 +40,7 @@ abstract class AControllerFactory
             if ($transportEntity->getStatusCode() === 200) {
                 $controller->$method();
             }
-
-            return $transportEntity->getResponse();
+            return $transportEntity->respond();
         };
     }
 }

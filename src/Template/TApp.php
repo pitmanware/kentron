@@ -10,6 +10,8 @@ use Kentron\Store\Variable\AVariable;
  */
 trait TApp
 {
+    protected $transportEntityClass = TransportEntity::class;
+
     /**
      * Set all things that allow for an app reset
      *
@@ -23,9 +25,17 @@ trait TApp
 
     abstract public function resetStores(): void;
 
+    final public function setTransportEntityClass(string $transportEntityClass): void
+    {
+        if (!is_a($transportEntityClass, TransportEntity::class)) {
+            throw new \Error("{$transportEntityClass} does not extend from {$this->transportEntityClass}");
+        }
+    }
+
     final public function resetTransportEntity(): void
     {
-        AVariable::setTransportEntity(new TransportEntity());
+        $transportEntityClass = $this->transportEntityClass;
+        AVariable::setTransportEntity(new $transportEntityClass());
     }
 
     /**

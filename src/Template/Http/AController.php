@@ -29,12 +29,4 @@ abstract class AController
     {
         $this->transportEntity = $transportEntity;
     }
-
-    /**
-     * On controller destruct, render any response
-     */
-    public function __destruct()
-    {
-        $this->transportEntity->respond();
-    }
 }

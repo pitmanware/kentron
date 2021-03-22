@@ -5,7 +5,7 @@ namespace Kentron\Entity;
 use Kentron\Entity\Template\AEntity;
 
 use Nyholm\Psr7\{Response, ServerRequest, Stream};
-use Relay\Relay;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class TransportEntity extends AEntity
 {
@@ -61,7 +61,7 @@ class TransportEntity extends AEntity
     /**
      * The PSR15 function to be called by middleware
      *
-     * @var Relay
+     * @var RequestHandlerInterface
      */
     protected $next;
 
@@ -127,6 +127,13 @@ class TransportEntity extends AEntity
      * @var int
      */
     protected $statusCode = 200;
+
+    /**
+     * Cookie list to be added to the response
+     *
+     * @var string[]
+     */
+    protected $cookies = [];
 
     /**
      * Sets the default content type on instanitation
@@ -271,7 +278,7 @@ class TransportEntity extends AEntity
         $this->failed = $failed;
     }
 
-    public function setNext(Relay $next): void
+    public function setNext(RequestHandlerInterface $next): void
     {
         $this->next = $next;
     }
@@ -300,12 +307,19 @@ class TransportEntity extends AEntity
 
     public function setRequest(ServerRequest &$request): void
     {
+        global $_POST, $_COOKIE;
+
         $this->request = $request;
 
         $this->requestUrl = $this->request->getUri()->getPath();
         $this->requestBody = $this->request->getBody();
         $this->request->getBody()->rewind();
         $this->queryParameters = $this->request->getQueryParams();
+
+        if ($this->request->getMethod() === "POST") {
+            $_POST = (array)$request->getParsedBody();
+        }
+        $_COOKIE = (array)$request->getCookieParams();
     }
 
     public function setResponse(Response &$response): void
@@ -323,6 +337,11 @@ class TransportEntity extends AEntity
         $this->setStatusCode(401);
     }
 
+    public function addCookies(array $cookies): void
+    {
+        $this->cookies += $cookies;
+    }
+
     /**
      * Helpers
      */
@@ -332,15 +351,11 @@ class TransportEntity extends AEntity
      *
      * @return void
      */
-    final public function respond(): void
+    final public function &respond(): Response
     {
-        $this->response = $this->response->withStatus($this->statusCode);
-
-        foreach ($this->iterateHeaders() as $header => $value) {
-            $this->response = $this->response->withHeader($header, $value);
-        }
-
-        $this->response->getBody()->write($this->getBody());
+        $this->mergeRespond();
+        $this->response->getBody()->write($this->getBody() ?? "");
+        return $this->response;
     }
 
     /**
@@ -362,5 +377,18 @@ class TransportEntity extends AEntity
     final public function hasParameters(): bool
     {
         return !empty($this->queryParameters);
+    }
+
+    private function mergeRespond(): void
+    {
+        $this->response = $this->response->withStatus($this->statusCode);
+
+        foreach ($this->iterateHeaders() as $header => $value) {
+            $this->response = $this->response->withHeader($header, $value);
+        }
+
+        foreach ($this->cookies as $cookie) {
+            $this->response = $this->response->withHeader("Set-Cookie", $cookie);
+        }
     }
 }

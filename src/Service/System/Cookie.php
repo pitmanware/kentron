@@ -7,6 +7,8 @@ use Kentron\Store\Variable\AVariable;
 
 class Cookie
 {
+    public static $headers = [];
+
     /**
      * Gets a stored cookie by name
      *
@@ -28,21 +30,37 @@ class Cookie
      *
      * @return void
      */
-    public static function set(string $name, $value, DT $dateExpires): void
+    public static function set(string $name, $value, DT $dateExpires, bool $httpOnly = true): void
     {
+        $domain = Client::getDomain();
+        $secure = !AVariable::onDev();
+        $expires = $dateExpires->format("U");
+
         setcookie(
             $name,
             $value,
             [
-                "expires" => $dateExpires->format("U"),
+                "expires" => $expires,
                 "path" => "/",
-                "domain" => Client::getDomain(),
-                "secure" => !AVariable::onDev(),
-                "httpOnly" => true,
+                "domain" => $domain,
+                "secure" => $secure,
+                "httpOnly" => $httpOnly,
                 "samesite" => "Strict"
             ]
         );
         $_COOKIE[$name] = $value;
+
+        $header = sprintf(
+            '%s=%s; expires=%s; path=/; domain=%s; samesite=Strict',
+            $name,
+            urlencode($value),
+            $expires,
+            $domain
+        );
+        $header .= $httpOnly ? '; httponly' : '';
+        $header .= $secure ? '; secure' : '';
+
+        self::$headers[] = $header;
     }
 
     public static function unset(string $name): void
@@ -53,5 +71,10 @@ class Cookie
     public static function logout(): void
     {
         self::unset(session_name());
+    }
+
+    public static function getHeaders(): array
+    {
+        return self::$headers;
     }
 }
