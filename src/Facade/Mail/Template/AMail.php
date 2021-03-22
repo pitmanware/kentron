@@ -9,6 +9,11 @@ use Kentron\Facade\Mail\Entity\MailTransportEntity;
 
 abstract class AMail
 {
+    /**
+     * Mail service
+     */
+    protected static $mailer;
+
     abstract public static function send(MailTransportEntity $mailTransportEntity): bool;
 
     abstract protected static function addRecipient(MailTargetEntity $mailTargetEntity): bool;
@@ -22,5 +27,10 @@ abstract class AMail
         }
 
         return self::send($mailTransportEntity);
+    }
+
+    public static function reset(): void
+    {
+        static::$mailer = null;
     }
 }

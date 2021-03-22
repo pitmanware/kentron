@@ -340,6 +340,26 @@ final class MailTransportEntity extends AEntity
         $this->fromName = $fromName;
     }
 
+    public function setSubject(string $subject): void
+    {
+        $this->subject = $subject;
+    }
+
+    public function setBody(string $body): void
+    {
+        $this->body = $body;
+    }
+
+    public function setAltBody(string $altBody): void
+    {
+        $this->altBody = $altBody;
+    }
+
+    public function setIsHtml(bool $isHtml = true): void
+    {
+        $this->isHtml = $isHtml;
+    }
+
     /**
      * Helpers
      */
