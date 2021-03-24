@@ -27,7 +27,7 @@ trait TApp
 
     final public function setTransportEntityClass(string $transportEntityClass): void
     {
-        if (!is_a($transportEntityClass, TransportEntity::class)) {
+        if (!is_a($transportEntityClass, TransportEntity::class, true)) {
             throw new \Error("{$transportEntityClass} does not extend from {$this->transportEntityClass}");
         }
     }
