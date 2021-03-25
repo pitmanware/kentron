@@ -20,31 +20,16 @@ abstract class AProviderEntity extends AEntity
 
     /**
      * The request data from the controller
-     * @var mixed|null
-     */
-    protected $requestData;
-
-    /**
-     * Any extra details required for the provider
      * @var object|null
      */
-    private $providerDetails;
+    protected $requestData;
 
     /**
      * Used for setting all the relevant configuration data for the provider API
      */
     public function __construct()
     {
-        $this->httpEntity = new HttpEntity();
-
-        $this->httpEntity->setBaseUrl(AVariable::getProviderUrl());
-
-        if (!$this->httpEntity->isCurl()) {
-            $this->httpEntity->setUsername(AVariable::getProviderUsername());
-            $this->httpEntity->setPassword(AVariable::getProviderPassword());
-        }
-
-        $this->providerDetails = AVariable::getProviderExtraDetails();
+        $this->resetHttpEntity();
     }
 
     /**
@@ -56,12 +41,7 @@ abstract class AProviderEntity extends AEntity
         return $this->httpEntity;
     }
 
-    final public function getProviderDetails(): ?object
-    {
-        return $this->providerDetails;
-    }
-
-    final public function getRequestData()
+    final public function getRequestData(): ?object
     {
         return $this->requestData;
     }
@@ -85,8 +65,20 @@ abstract class AProviderEntity extends AEntity
      * Setters
      */
 
-    final public function setRequestData($data): void
+    final public function setRequestData(?object $data): void
     {
         $this->requestData = $data;
+    }
+
+    public function resetHttpEntity(): void
+    {
+        $this->httpEntity = new HttpEntity();
+
+        $this->httpEntity->setBaseUrl(AVariable::getProviderUrl());
+
+        if(!$this->httpEntity->isCurl()) {
+            $this->httpEntity->setUsername(AVariable::getProviderUsername());
+            $this->httpEntity->setPassword(AVariable::getProviderPassword());
+        }
     }
 }

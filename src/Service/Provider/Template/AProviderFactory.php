@@ -4,20 +4,19 @@ namespace Kentron\Service\Provider\Template;
 
 abstract class AProviderFactory
 {
-    /** @var AProviderService $service */
+    /**
+     * @var AProviderService
+     */
     protected static $service;
 
-    protected function __construct(AProviderService $providerService)
-    {
-        self::$service = $providerService;
-    }
+    abstract public static function init(): void;
 
-    final protected function setProviderRequestService(IProviderRequest $requestClass): void
+    final protected static function setProviderRequestService(IProviderRequestService $requestClass): void
     {
         self::$service->setProviderRequestService($requestClass);
     }
 
-    final protected function setProviderResponseService(IProviderResponse $responseClass): void
+    final protected static function setProviderResponseService(IProviderResponseService $responseClass): void
     {
         self::$service->setProviderResponseService($responseClass);
     }

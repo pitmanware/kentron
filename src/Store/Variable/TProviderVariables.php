@@ -5,11 +5,11 @@ namespace Kentron\Store\Variable;
 trait TProviderVariables
 {
     /**
-     * The system_var ID for provder details; defaults to 3.
+     * The system_var ID for provder details; defaults to 5.
      * Expected to be overridden
      * @var integer
      */
-    protected static $providerVariableID = 3;
+    protected static $providerVariableID = 5;
 
     /**
      * The chosen provider ID
@@ -159,7 +159,7 @@ trait TProviderVariables
     public static function resetProvider(bool $hard = false): void
     {
         if ($hard) {
-            self::$providerVariableID = 3;
+            self::$providerVariableID = 5;
             self::$providerID = null;
             self::$providerClass = null;
             self::$providerName = null;

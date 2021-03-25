@@ -82,12 +82,12 @@ abstract class AProviderService
         return true;
     }
 
-    final public function setProviderRequestService(IProviderRequest $requestService): void
+    final public function setProviderRequestService(IProviderRequestService $requestService): void
     {
         $this->providerRequestService = $requestService;
     }
 
-    final public function setProviderResponseService(IProviderResponse $responseService): void
+    final public function setProviderResponseService(IProviderResponseService $responseService): void
     {
         $this->providerResponseService = $responseService;
     }

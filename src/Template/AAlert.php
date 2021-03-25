@@ -2,8 +2,6 @@
 
 namespace Kentron\Template;
 
-use Kentron\Entity\Template\AEntity;
-
 /**
  * Error handling methods
  */
@@ -197,15 +195,15 @@ abstract class AAlert
     /**
      * Merge the errors, notices and warnings with another entity
      *
-     * @param AEntity $entity
+     * @param self $alert
      *
      * @return void
      */
-    final public function mergeAlerts(AEntity $entity): void
+    final public function mergeAlerts(self $alert): void
     {
-        $this->addError($entity->getErrors());
-        $this->addNotice($entity->getNotices());
-        $this->addWarning($entity->getWarnings());
+        $this->addError($alert->getErrors());
+        $this->addNotice($alert->getNotices());
+        $this->addWarning($alert->getWarnings());
     }
 
     final public function normaliseAlerts(): ?array

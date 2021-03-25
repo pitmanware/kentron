@@ -2,7 +2,7 @@
 
 namespace Kentron\Service\Provider\Template;
 
-interface IProviderRequest
+interface IProviderRequestService
 {
     public function buildRequest(AProviderEntity $providerEntity): void;
 }

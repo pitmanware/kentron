@@ -65,6 +65,11 @@ final class HttpEntity extends Entity
         return rtrim("{$this->baseUrl}/{$this->uri}{$this->getString}", "/");
     }
 
+    public function getUri(): ?string
+    {
+        return $this->uri;
+    }
+
     public function getPostData()
     {
         return $this->postData ?? null;

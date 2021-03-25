@@ -10,6 +10,7 @@ use Kentron\Entity\Template\ACoreCollectionEntity;
 abstract class AVariable implements IStore
 {
     use TLocalVariables;
+    use TProviderVariables;
 
     public const ENV_DEV = 1;
     public const ENV_UAT = 2;
@@ -267,5 +268,6 @@ abstract class AVariable implements IStore
     public static function reset(bool $hard = false): void
     {
         self::resetLocal($hard);
+        self::resetProvider($hard);
     }
 }
