@@ -2,6 +2,8 @@
 
 namespace Kentron\Service;
 
+use Kentron\Facade\DT;
+
 final class Type
 {
     public const TYPE_ARRAY = "array";
@@ -12,6 +14,10 @@ final class Type
     public const TYPE_OBJECT = "object";
     public const TYPE_RESOURCE = "resource";
     public const TYPE_STRING = "string";
+    public const TYPE_DT = "dt";
+
+    private static $value;
+    private static $quiet = false;
 
     /**
      * Checks if an array is associative or numeric indexed
@@ -59,6 +65,30 @@ final class Type
     }
 
     /**
+    * Sets value param and allows chaining
+    *
+    * @param mixed $value
+    *
+    * @return self
+    */
+    public static function cast($value)
+    {
+        self::$value = $value;
+        return self::class;
+    }
+
+    /**
+     * Disables throwing an exception on failure to cast
+     *
+     * @return mixed
+     */
+    public static function quietly()
+    {
+        self::$quiet = true;
+        return self::class;
+    }
+
+    /**
      * Gets one of the casting methods
      *
      * @param string $type The type to cast to
@@ -102,6 +132,47 @@ final class Type
     }
 
     /**
+    * Gets one of the casting methods
+    *
+    * @param string $type The type to cast to
+    *
+    * @return mixed The result of the method call
+    *
+    * @throws \UnexpectedValueException If the given type is unknown
+    */
+    public static function to(string $type)
+    {
+        switch (strtolower($type)) {
+            case static::TYPE_ARRAY:
+                return self::castToArray(self::$value);
+
+            case static::TYPE_BOOLEAN:
+                return self::castToBool(self::$value);
+
+            case static::TYPE_FLOAT:
+            case static::TYPE_DOUBLE:
+                return self::castToFloat(self::$value);
+
+            case static::TYPE_INTEGER:
+                return self::castToInt(self::$value);
+
+            case static::TYPE_OBJECT:
+                return self::castToObject(self::$value);
+
+            case static::TYPE_STRING:
+                return self::castToString(self::$value);
+
+            case static::TYPE_DT:
+                return self::castToDT(self::$value);
+
+            default:
+                if (!self::$quiet) {
+                    throw new \UnexpectedValueException("$type is not a valid type");
+                }
+        }
+    }
+
+    /**
      * Casts to an array
      *
      * @param mixed $value Accepts any type
@@ -130,13 +201,17 @@ final class Type
      *
      * @param mixed $value Accepts anything but an object
      *
-     * @return float
+     * @return mixed Float or original value on quiet exception
      *
      * @throws InvalidArgumentException
      */
-    public static function castToFloat($value): float
+    public static function castToFloat($value)
     {
         if (is_object($value)) {
+            if (self::$quiet) {
+                return $value;
+            }
+
             throw new \InvalidArgumentException("Non object expected");
         }
 
@@ -148,13 +223,17 @@ final class Type
      *
      * @param mixed $value Accepts anything but an object
      *
-     * @return int
+     * @return mixed Int or original value on quiet exception
      *
      * @throws InvalidArgumentException
      */
-    public static function castToInt($value): int
+    public static function castToInt($value)
     {
         if (is_object($value)) {
+            if (self::$quiet) {
+                return $value;
+            }
+
             throw new \InvalidArgumentException("Non object expected");
         }
 
@@ -178,16 +257,40 @@ final class Type
      *
      * @param mixed $value Accepts anything except iterable or object
      *
-     * @return string
+     * @return mixed String or original value on quiet exception
      *
      * @throws InvalidArgumentException
      */
-    public static function castToString($value): string
+    public static function castToString($value)
     {
         if (is_iterable($value) || is_object($value)) {
+            if (self::$quiet) {
+                return $value;
+            }
+
             throw new \InvalidArgumentException("Non iterable/object expected");
         }
 
         return (string) $value;
+    }
+
+    /**
+     * Casts to DT
+     *
+     * @param mixed $value Expects string or null
+     *
+     * @return mixed DT or original value on quiet exception
+     */
+    public static function castToDT($value)
+    {
+        if (is_string($value)) {
+            return new DT($value);
+        }
+
+        if (self::$quiet) {
+            return $value;
+        }
+
+        throw new \InvalidArgumentException("Could not create DT with type " . gettype($value));
     }
 }

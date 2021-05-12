@@ -130,4 +130,14 @@ final class DT extends DateTime
         $date = $date ?? self::now();
         return $this->format() <=> $date->format();
     }
+
+    /**
+     * Allows casting
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->format();
+    }
 }

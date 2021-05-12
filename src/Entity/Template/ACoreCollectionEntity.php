@@ -157,7 +157,7 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      */
     final public function map(array $methods, bool $flatten = false, ?array $conditions = null, bool $namedIndexes = false): array
     {
-        return $this->getRootEntity()->{__FUNCTION__}($methods, $flatten, $conditions, $namedIndexes);
+        return $this->getRootEntity()->map($methods, $flatten, $conditions, $namedIndexes);
     }
 
     /**
@@ -165,11 +165,36 @@ abstract class ACoreCollectionEntity extends ACoreEntity
      *
      * @param array $conditions
      *
-     * @return iterable
+     * @return AEntity[]
      */
     final public function filter(array $conditions): iterable
     {
-        yield from $this->getRootEntity()->{__FUNCTION__}($conditions);
+        yield from $this->getRootEntity()->filter($conditions);
+    }
+
+    /**
+     * Returns first entity that passes the condition
+     *
+     * @param array $conditions
+     * @param bool  $and        Do OR or AND operations for filters
+     *
+     * @return AEntity|null
+     */
+    final public function filterFirst (array $conditions, bool $and = true): ?AEntity
+    {
+        return $this->getRootEntity()->filterFirst($conditions, $and);
+    }
+
+    /**
+     * Group the entities together by the return of a given function and iterate them
+     *
+     * @param string $method
+     *
+     * @return AEntity[]
+     */
+    final public function groupBy(string $method): iterable
+    {
+        yield from $this->getRootEntity()->groupBy($method);
     }
 
     /**

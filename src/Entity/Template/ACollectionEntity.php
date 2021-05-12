@@ -222,4 +222,44 @@ abstract class ACollectionEntity extends AEntity
             yield $entity;
         }
     }
+
+    /**
+     * Returns first entity that passes the condition
+     *
+     * @param array $conditions
+     * @param bool  $and        Do OR or AND operations for filters
+     *
+     * @return AEntity|null
+     */
+    final public function filterFirst (array $conditions, bool $and = true): ?AEntity
+    {
+        foreach ($this->filter($conditions, $and) as $entity) {
+            return $entity;
+        }
+
+        return null;
+    }
+
+    /**
+     * Group the entities together by the return of a given function and iterate them
+     *
+     * @param string $method
+     *
+     * @return iterable
+     */
+    final public function groupBy (string $method): iterable
+    {
+        $grouped = [];
+        foreach ($this->iterateEntities() as $coreEntity) {
+            if (!$coreEntity->isValidMethod($method)) {
+                continue;
+            }
+
+            $grouped[$coreEntity->$method()][] = $coreEntity;
+        }
+
+        foreach ($grouped as $key => $coreEntity) {
+            yield $key => $coreEntity;
+        }
+    }
 }
