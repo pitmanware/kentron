@@ -43,6 +43,10 @@ abstract class AConfig implements IStore
      */
     public static function getDatabaseConfig(): array
     {
+        self::$config["database"]["settings"]["options"] = extension_loaded('pdo_mysql') ? array_filter([
+            \PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+        ]) : [];
+
         return self::$config["database"]["settings"];
     }
 

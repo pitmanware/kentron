@@ -42,16 +42,18 @@ abstract class ACollectionEntity extends AEntity
     /**
      * Gets a new instance of the core AEntity
      *
+     * @param mixed $data To be passed to the constructor
+     *
      * @return AEntity|null
      */
-    final public function getNewEntity(): ?AEntity
+    final public function getNewEntity(...$data): ?AEntity
     {
         if (is_null($this->entityClass)) {
             return null;
         }
 
         $entityClass = $this->entityClass;
-        return new $entityClass();
+        return new $entityClass(...$data);
     }
 
     /**
@@ -96,6 +98,16 @@ abstract class ACollectionEntity extends AEntity
     final public function countEntities(): int
     {
         return count($this->collection);
+    }
+
+    /**
+     * Returns true if the count of entities is greater than zero
+     *
+     * @return boolean
+     */
+    final public function hasEntities(): bool
+    {
+        return $this->countEntities() > 0;
     }
 
     /**

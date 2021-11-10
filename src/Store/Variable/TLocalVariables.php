@@ -14,9 +14,9 @@ trait TLocalVariables
 
     /**
      * The audit ID from the requet
-     * @var int
+     * @var int|null
      */
-    private static $auditID;
+    private static $auditID = null;
 
     /**
      * Hold an instance of the Transport Entity statically
@@ -33,7 +33,7 @@ trait TLocalVariables
         return self::$authID;
     }
 
-    public static function getAuditID(): int
+    public static function getAuditID(): ?int
     {
         return self::$auditID;
     }

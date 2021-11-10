@@ -21,18 +21,15 @@ final class Get
     {
         $value = $_GET[$key] ?? null;
 
-        if (is_null($value))
-        {
+        if (is_null($value)) {
             return null;
         }
 
-        if (is_null($type))
-        {
+        if (is_null($type)) {
             return $value;
         }
 
-        $typeMethod = Type::getTypeMethod($type);
-        return Type::$typeMethod($value);
+        return Type::cast($value)::to($type);
     }
 
     /**

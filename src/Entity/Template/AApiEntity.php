@@ -34,11 +34,11 @@ abstract class AApiEntity extends ACoreEntity
         $json = $jsonService->extract($json);
         $schema = $jsonService->extract($this->schema);
 
-        $jsonService->isValid($json, $schema);
+        $isValid = $jsonService->isValid($json, $schema);
 
         $this->addError($jsonService->getErrors());
 
-        return $json;
+        return $isValid ? $json : null;
     }
 
     /**

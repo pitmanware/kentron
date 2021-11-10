@@ -86,16 +86,18 @@ abstract class ACoreCollectionEntity extends ACoreEntity
     /**
      * Return a new core entity if the class path is set
      *
+     * @param mixed $data To be passed to the constructor
+     *
      * @return ACoreEntity|null
      */
-    final public function getNewCoreEntity(): ?ACoreEntity
+    final public function getNewCoreEntity(...$data): ?ACoreEntity
     {
         if (is_null($this->coreEntityClass)) {
             return null;
         }
 
         $coreEntityClass = $this->coreEntityClass;
-        return new $coreEntityClass();
+        return new $coreEntityClass(...$data);
     }
 
     /**

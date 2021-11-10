@@ -18,6 +18,7 @@ final class Type
 
     private static $value;
     private static $quiet = false;
+    private static $deep = false;
 
     /**
      * Checks if an array is associative or numeric indexed
@@ -69,7 +70,7 @@ final class Type
     *
     * @param mixed $value
     *
-    * @return self
+    * @return static
     */
     public static function cast($value)
     {
@@ -80,11 +81,22 @@ final class Type
     /**
      * Disables throwing an exception on failure to cast
      *
-     * @return mixed
+     * @return static
      */
     public static function quietly()
     {
         self::$quiet = true;
+        return self::class;
+    }
+
+    /**
+     * If casting to an array or object, use json_encode and json_decode to do it
+     *
+     * @return static
+     */
+    public static function deeply()
+    {
+        self::$deep = true;
         return self::class;
     }
 
@@ -181,7 +193,7 @@ final class Type
      */
     public static function castToArray($value): array
     {
-        return (array) $value;
+        return self::$deep ? json_decode(json_encode($value), true) : (array) $value;
     }
 
     /**
@@ -249,7 +261,7 @@ final class Type
      */
     public static function castToObject($value): object
     {
-        return (object) $value;
+        return self::$deep ? json_decode(json_encode($value), false) : (array) $value;
     }
 
     /**

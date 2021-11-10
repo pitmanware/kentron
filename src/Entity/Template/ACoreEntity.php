@@ -104,7 +104,7 @@ abstract class ACoreEntity extends AEntity
             return;
         }
 
-        /** @var array<string,(string|callable|bool)> $binding */
+        /** @var array<string, (string|callable|bool)> $binding */
         foreach ($this->propertyMap as $property => $binding) {
 
             $dataProperty = Type::getProperty($data, $property);
@@ -214,7 +214,7 @@ abstract class ACoreEntity extends AEntity
     /**
      * Gets a class using the getter and builds it is the propery is iterable
      *
-     * @param array<string,(string|callable)> $binding      The binding from $propertyMap
+     * @param array<string, (string|callable)> $binding      The binding from $propertyMap
      * @param mixed $dataProperty The property to build with
      *
      * @return mixed Either the built entity or the original property
@@ -223,7 +223,6 @@ abstract class ACoreEntity extends AEntity
     {
         // If the property is an object or array,
         // check to see if there is a getter for the class
-        /** @var string|callable|null */
         $classGetter = $binding["get_class"] ?? null;
 
         if (is_null($classGetter)) {
@@ -251,7 +250,6 @@ abstract class ACoreEntity extends AEntity
             $entity->build($dataProperty);
         }
 
-        /** @var string|callable|null */
         $classSetter = $binding["set_class"] ?? null;
         $this->callBinding($classSetter, $entity);
 
@@ -274,11 +272,11 @@ abstract class ACoreEntity extends AEntity
     /**
      * Checks if a method can be run on the root entity
      *
-     * @param mixed $method
+     * @param string|null $method
      *
      * @return boolean
      */
-    private function isValidRootEntityMethod($method = null): bool
+    private function isValidRootEntityMethod(?string $method = null): bool
     {
         if (!is_string($method)) {
             return false;
@@ -290,7 +288,7 @@ abstract class ACoreEntity extends AEntity
     /**
      * Call a method on the root entity or closure
      *
-     * @param mixed $method
+     * @param string|callable|null $method
      * @param mixed $value
      *
      * @return mixed
@@ -310,14 +308,14 @@ abstract class ACoreEntity extends AEntity
     /**
      * Call a method on this or closure
      *
-     * @param mixed $method
+     * @param string|callable|null $method
      * @param mixed $value
      *
      * @return mixed
      */
     private function callBinding($method, $value = null)
     {
-        if ($this->isValidMethod($method)) {
+        if (is_string($method) && $this->isValidMethod($method)) {
             return $this->{$method}($value);
         }
         else if (is_callable($method)){

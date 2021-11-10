@@ -40,14 +40,12 @@ final class DT extends DateTime
      * @param integer $minutes
      * @param integer $hours
      * @param integer $days
-     * @param integer $months
-     * @param integer $years
      *
      * @return self
      */
-    public function increment(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0, int $months = 0, int $years = 0): self
+    public function increment(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0): self
     {
-        return $this->add(new \DateInterval("P${years}Y${months}M${days}DT${hours}H${minutes}M{$seconds}S"));
+        return $this->add(new \DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
     }
 
     /**
@@ -57,14 +55,37 @@ final class DT extends DateTime
      * @param integer $minutes
      * @param integer $hours
      * @param integer $days
-     * @param integer $months
-     * @param integer $years
      *
      * @return self
      */
-    public function decrement(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0, int $months = 0, int $years = 0): self
+    public function decrement(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0): self
     {
-        return $this->sub(new \DateInterval("P${years}Y${months}M${days}DT${hours}H${minutes}M{$seconds}S"));
+        return $this->sub(new \DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
+    }
+    
+    /**
+     * Increment or decrement the date by a given number of months
+     *
+     * @param integer $months
+     * 
+     * @return self
+     */
+    public function modifyMonths(int $months): self
+    {
+        $dateString = $this->format("Y-m-d");
+        $dateEndString = $this->format("Y-m-t");
+
+        $this->modify("{$months} Month");
+
+        // Check whether reversing the month addition gives us the original day back
+        if ($dateString !== (clone($this))->modify(($months * -1) . " Month")->format("Y-m-d")) {
+            $this->modify("last day of last month");
+        }
+        else if ($dateString === $dateEndString) {
+            $this->modify("last day of this month");
+        }
+
+        return $this;
     }
 
     /**

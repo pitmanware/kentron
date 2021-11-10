@@ -18,4 +18,19 @@ final class Assert
     {
         return $func($operand);
     }
+
+    public static function notEquals($operand, $comparand): bool
+    {
+        return !self::equals($operand, $comparand);
+    }
+
+    public static function notSame($operand, $comparand): bool
+    {
+        return !self::same($operand, $comparand);
+    }
+
+    public static function notIs($operand, callable $func): bool
+    {
+        return !self::is($operand, $func);
+    }
 }

@@ -12,7 +12,7 @@ final class Curl extends AAlert
     /**
      * Curl instance
      *
-     * @var resource
+     * @var \CurlHandle
      */
     private $curl;
 
