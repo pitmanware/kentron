@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kentron\Facade;
 
@@ -7,34 +8,24 @@ use JsonSchema\Validator;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\Constraint;
 
+use Kentron\Template\Alert\TError;
+
 /**
  * Used to validate json against a schema.
  */
 class JsonSchema
 {
-    /**
-     * Any errors from the validation.
-     * @var array
-     */
-    public $errors = [];
-
-    /**
-     * Extract a JSON string
-     * @param  string      $json The JSON data to be extracted
-     * @return object|null
-     */
-    public function extract(string $json): ?object
-    {
-        return json_decode($json, false);
-    }
+    use TError;
 
     /**
      * The validation function.
-     * @param  object $jsonData   JSON data to be validated.
-     * @param  object $jsonSchema JSON schema.
-     * @return bool               The success of the validation.
+     *
+     * @param array|object $jsonData JSON data to be validated.
+     * @param object $jsonSchema JSON schema.
+     *
+     * @return bool The success of the validation.
      */
-    public function isValid(object $jsonData, object $jsonSchema): bool
+    public function isValid(array|object $jsonData, object $jsonSchema): bool
     {
         $schemaStorage = new SchemaStorage();
 
@@ -55,18 +46,10 @@ class JsonSchema
     }
 
     /**
-     * Gets any errors
-     *
-     * @return array
-     */
-    public function getErrors(): array
-    {
-        return $this->errors;
-    }
-
-    /**
      * Formats all errors from the json validator.
-     * @param  array  $jsonErrors The error array from the json validator.
+     *
+     * @param string[] $jsonErrors The error array from the json validator.
+     *
      * @return void
      */
     private function formatErrors(array $jsonErrors): void

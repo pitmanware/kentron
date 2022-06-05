@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kentron\Template\Http;
 
@@ -6,9 +7,9 @@ use Kentron\Template\IApp;
 
 abstract class ARouter
 {
-    protected static $apiRoutePath;
-    protected static $ajaxRoutePath;
-    protected static $systemRoutePath;
+    protected static string $apiRoutePath;
+    protected static string $ajaxRoutePath;
+    protected static string $systemRoutePath;
 
     /**
      * Loads all routes

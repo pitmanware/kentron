@@ -1,145 +1,85 @@
 <?php
+declare(strict_types=1);
 
 namespace Kentron\Entity;
 
-use Kentron\Entity\Template\AEntity;
+use Kentron\Support\Json;
+use Kentron\Template\Entity\AEntity;
 
-use Nyholm\Psr7\{Response, ServerRequest, Stream};
+use Nyholm\Psr7\Response;
+
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 
 class TransportEntity extends AEntity
 {
-    /**
-     * The arguments for the controller
-     *
-     * @var array
-     */
-    protected $args = [];
+    /** The arguments for the controller */
+    protected array $args = [];
 
-    /**
-     * The body to be rendered on response
-     *
-     * @var string
-     */
-    protected $body;
+    /** The body to be rendered on response */
+    protected string|null $body = null;
 
-    /**
-     * The data to be put in the body
-     *
-     * @var mixed
-     */
-    protected $data;
+    /** The data to be put in the body */
+    protected mixed $data = null;
 
-    /**
-     * The default content type for the response header
-     *
-     * @var string
-     */
-    protected $defaultContentType = "application/json";
+    /** The default content type for the response header */
+    protected string $defaultContentType = "application/json";
 
-    /**
-     * The status of the response
-     *
-     * @var bool
-     */
-    protected $failed;
+    /** The status of the response */
+    protected bool $failed;
 
     /**
      * The headers of the response
      *
-     * @var array
+     * @var array<string,string>
      */
-    protected $headers = [];
+    protected array $headers = [];
 
-    /**
-     * Flag to determine if the response should be json encoded
-     *
-     * @var bool
-     */
-    protected $jsonEncode = true;
+    /** Flag to determine if the response should be json encoded */
+    protected bool $jsonEncode = true;
 
-    /**
-     * The PSR15 function to be called by middleware
-     *
-     * @var RequestHandlerInterface
-     */
-    protected $next;
+    /** The next function to be called by middleware */
+    protected RequestHandlerInterface $next;
 
-    /**
-     * Any GET or POST parameters
-     *
-     * @var array
-     */
-    protected $queryParameters = [];
+    /** Any GET or POST parameters */
+    protected array $queryParameters = [];
 
-    /**
-     * Whether the response should be sent or not
-     *
-     * @var bool
-     */
-    protected $quiet = false;
+    /** Whether the response should be sent or not */
+    protected bool $quiet = false;
 
-    /**
-     * Used for front end routing
-     *
-     * @var string|null
-     */
-    protected $redirect = null;
+    /** Used for front end routing */
+    protected string|null $redirect = null;
 
-    /**
-     * The PSR7 Request class
-     *
-     * @var ServerRequest
-     */
-    protected $request;
+    /** The Slim Request class */
+    protected ServerRequestInterface $request;
 
-    /**
-     * The body of the request
-     *
-     * @var Stream
-     */
-    protected $requestBody;
+    /** The body of the request */
+    protected StreamInterface $requestBody;
 
-    /**
-     * The URL of the request
-     *
-     * @var string
-     */
-    protected $requestUrl;
+    /** The URL of the request */
+    protected string $requestUrl;
 
-    /**
-     * The PSR7 Response class
-     *
-     * @var Response
-     */
-    protected $response;
+    /** The Slim ResponseInterface class */
+    protected ResponseInterface $response;
 
-    /**
-     * The name of the route
-     *
-     * @var string|null
-     */
-    protected $routeName;
-
-    /**
-     * The HTTP status code of the response
-     *
-     * @var int
-     */
-    protected $statusCode = 200;
+    /** The HTTP status code of the response */
+    protected int $statusCode = 200;
 
     /**
      * Cookie list to be added to the response
      *
      * @var string[]
      */
-    protected $cookies = [];
+    protected array $cookies = [];
 
     /**
      * Sets the default content type on instanitation
      */
     public function __construct()
     {
+        $this->response = new Response();
         $this->headers["content-type"] = $this->defaultContentType;
         $this->headers["cache-control"] = "max-age=300, must-revalidate";
     }
@@ -168,12 +108,12 @@ class TransportEntity extends AEntity
         return $this->statusCode;
     }
 
-    public function &getRequest(): ServerRequest
+    public function &getRequest(): ServerRequestInterface
     {
         return $this->request;
     }
 
-    public function getRequestBody(): Stream
+    public function getRequestBody(): StreamInterface
     {
         return $this->requestBody;
     }
@@ -191,19 +131,14 @@ class TransportEntity extends AEntity
         return $this->requestUrl;
     }
 
-    public function &getResponse(): Response
+    public function &getResponse(): ResponseInterface
     {
         return $this->response;
     }
 
-    public function getRouteName(): ?string
-    {
-        return $this->routeName;
-    }
-
     public function hasFailed(): bool
     {
-        return $this->failed ?? count($this->getErrors()) > 0;
+        return $this->failed ?? $this->hasErrors();
     }
 
     public function iterateHeaders(): iterable
@@ -218,24 +153,28 @@ class TransportEntity extends AEntity
      *
      * @return string
      */
-    public function getBody(): ?string
+    public function getBody(): string
     {
         if ($this->quiet) {
-            return null;
+            return "";
         }
 
         if (empty($this->body)) {
             if ($this->jsonEncode) {
-                $this->body = json_encode([
-                    "failed" => $this->hasFailed(),
-                    "data" => $this->getData(),
-                    "alerts" => $this->normaliseAlerts(),
-                    "redirect" => $this->redirect
-                ]);
+                $this->body = Json::toString(
+                    array_merge(
+                        [
+                            "failed" => $this->hasFailed(),
+                            "data" => $this->getData(),
+                            "redirect" => $this->redirect
+                        ],
+                        $this->normaliseAlerts()
+                    )
+                );
             }
         }
 
-        return $this->body;
+        return $this->body ?: "";
     }
 
     /**
@@ -305,16 +244,17 @@ class TransportEntity extends AEntity
         $this->redirect = $redirect;
     }
 
-    public function setRequest(ServerRequest &$request): void
+    public function setRequest(ServerRequestInterface &$request): void
     {
         global $_POST, $_COOKIE;
 
         $this->request = $request;
+        $paramString = http_build_query($this->request->getQueryParams());
 
-        $this->requestUrl = $this->request->getUri()->getPath();
+        $this->requestUrl = $this->request->getUri()->getPath() . (!$paramString ? "" : "?{$paramString}");
         $this->requestBody = $this->request->getBody();
-        $this->request->getBody()->rewind();
         $this->queryParameters = $this->request->getQueryParams();
+        $this->request->getBody()->rewind();
 
         if ($this->request->getMethod() === "POST") {
             $_POST = (array)$request->getParsedBody();
@@ -322,19 +262,24 @@ class TransportEntity extends AEntity
         $_COOKIE = (array)$request->getCookieParams();
     }
 
-    public function setResponse(Response &$response): void
+    public function setResponse(ResponseInterface &$response): void
     {
         $this->response = $response;
     }
 
-    public function setRouteName(?string $name = null): void
+    public function setBadRequest(): void
     {
-        $this->routeName = $name;
+        $this->setStatusCode(400);
     }
 
     public function setUnauthorised(): void
     {
         $this->setStatusCode(401);
+    }
+
+    public function setInternalServerError(): void
+    {
+        $this->setStatusCode(500);
     }
 
     public function addCookies(array $cookies): void
@@ -351,10 +296,9 @@ class TransportEntity extends AEntity
      *
      * @return void
      */
-    final public function &respond(): Response
+    final public function &respond(): ResponseInterface
     {
         $this->mergeRespond();
-        $this->response->getBody()->write($this->getBody() ?? "");
         return $this->response;
     }
 
@@ -390,5 +334,9 @@ class TransportEntity extends AEntity
         foreach ($this->cookies as $cookie) {
             $this->response = $this->response->withHeader("Set-Cookie", $cookie);
         }
+
+        $body = $this->response->getBody();
+        $body->write($this->getBody() ?? "");
+        $this->response = $this->response->withBody($body);
     }
 }
