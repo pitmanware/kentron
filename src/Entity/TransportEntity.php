@@ -47,9 +47,9 @@ class TransportEntity extends AEntity
     /**
      * The headers of the response
      *
-     * @var array
+     * @var HeadersEntity
      */
-    protected $headers = [];
+    protected $headers;
 
     /**
      * Flag to determine if the response should be json encoded
@@ -140,8 +140,10 @@ class TransportEntity extends AEntity
      */
     public function __construct()
     {
-        $this->headers["content-type"] = $this->defaultContentType;
-        $this->headers["cache-control"] = "max-age=300, must-revalidate";
+        $this->headers = new HeadersEntity();
+
+        $this->headers->setContentType($this->defaultContentType);
+        $this->headers->setCacheControl("max-age=300, must-revalidate");
     }
 
     /**
@@ -208,9 +210,7 @@ class TransportEntity extends AEntity
 
     public function iterateHeaders(): iterable
     {
-        foreach ($this->headers as $header => $value) {
-            yield $header => $value;
-        }
+        yield from $this->headers->iterateProperties(false);
     }
 
     /**
@@ -260,12 +260,12 @@ class TransportEntity extends AEntity
                 break;
         }
 
-        $this->headers["content-type"] = $contentType;
+        $this->headers->setContentType($contentType);
     }
 
     public function setHtml(): void
     {
-        $this->setContentType("text/html");
+        $this->headers->setContentType("text/html");
     }
 
     public function setData($data): void
@@ -371,7 +371,7 @@ class TransportEntity extends AEntity
     final public function redirect(string $url): void
     {
         $this->statusCode = 302;
-        $this->headers["Location"] = $url;
+        $this->headers->setLocation($url);
     }
 
     final public function hasParameters(): bool
