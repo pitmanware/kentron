@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Kentron\Entity;
 
+use \Error;
+
+use Kentron\Struct\SContentType;
+use Kentron\Struct\SStatusCode;
 use Kentron\Support\Json;
 use Kentron\Template\Entity\AEntity;
 
@@ -24,18 +28,11 @@ class TransportEntity extends AEntity
     /** The data to be put in the body */
     protected mixed $data = null;
 
-    /** The default content type for the response header */
-    protected string $defaultContentType = "application/json";
-
     /** The status of the response */
     protected bool $failed;
 
-    /**
-     * The headers of the response
-     *
-     * @var array<string,string>
-     */
-    protected array $headers = [];
+    /** The headers of the response */
+    protected HeadersEntity $headers;
 
     /** Flag to determine if the response should be json encoded */
     protected bool $jsonEncode = true;
@@ -65,7 +62,7 @@ class TransportEntity extends AEntity
     protected ResponseInterface $response;
 
     /** The HTTP status code of the response */
-    protected int $statusCode = 200;
+    protected int $statusCode = SStatusCode::CODE_200;
 
     /**
      * Cookie list to be added to the response
@@ -80,8 +77,7 @@ class TransportEntity extends AEntity
     public function __construct()
     {
         $this->response = new Response();
-        $this->headers["content-type"] = $this->defaultContentType;
-        $this->headers["cache-control"] = "max-age=300, must-revalidate";
+        $this->headers = new HeadersEntity();
     }
 
     /**
@@ -143,9 +139,7 @@ class TransportEntity extends AEntity
 
     public function iterateHeaders(): iterable
     {
-        foreach ($this->headers as $header => $value) {
-            yield $header => $value;
-        }
+        yield from $this->headers->iterateProperties(false);
     }
 
     /**
@@ -194,17 +188,17 @@ class TransportEntity extends AEntity
     public function setContentType(string $contentType): void
     {
         switch ($contentType) {
-            case $this->defaultContentType:
+            case SContentType::TYPE_JSON:
                 $this->jsonEncode = true;
                 break;
         }
 
-        $this->headers["content-type"] = $contentType;
+        $this->headers->contentType = $contentType;
     }
 
-    public function setHtml(): void
+    final public function setLocation(string $url): void
     {
-        $this->setContentType("text/html");
+        $this->headers->location = $url;
     }
 
     public function setData($data): void
@@ -267,21 +261,6 @@ class TransportEntity extends AEntity
         $this->response = $response;
     }
 
-    public function setBadRequest(): void
-    {
-        $this->setStatusCode(400);
-    }
-
-    public function setUnauthorised(): void
-    {
-        $this->setStatusCode(401);
-    }
-
-    public function setInternalServerError(): void
-    {
-        $this->setStatusCode(500);
-    }
-
     public function addCookies(array $cookies): void
     {
         $this->cookies += $cookies;
@@ -312,12 +291,6 @@ class TransportEntity extends AEntity
         $this->response = $this->next->handle($this->request);
     }
 
-    final public function redirect(string $url): void
-    {
-        $this->statusCode = 302;
-        $this->headers["Location"] = $url;
-    }
-
     final public function hasParameters(): bool
     {
         return !empty($this->queryParameters);
@@ -327,7 +300,11 @@ class TransportEntity extends AEntity
     {
         $this->response = $this->response->withStatus($this->statusCode);
 
-        foreach ($this->iterateHeaders() as $header => $value) {
+        if (SStatusCode::codeRequiresLocation($this->statusCode) && is_null($this->headers->location)) {
+            throw new Error("Could not respond, missing location header");
+        }
+
+        foreach ($this->headers->iterateProperties() as $header => $value) {
             $this->response = $this->response->withHeader($header, $value);
         }
 
