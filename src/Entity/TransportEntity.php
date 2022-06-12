@@ -1,147 +1,83 @@
 <?php
+declare(strict_types=1);
 
 namespace Kentron\Entity;
 
-use Kentron\Entity\Template\AEntity;
+use \Error;
 
-use Nyholm\Psr7\{Response, ServerRequest, Stream};
+use Kentron\Struct\SContentType;
+use Kentron\Struct\SStatusCode;
+use Kentron\Support\Json;
+use Kentron\Template\Entity\AEntity;
+
+use Nyholm\Psr7\Response;
+
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 
 class TransportEntity extends AEntity
 {
-    /**
-     * The arguments for the controller
-     *
-     * @var array
-     */
-    protected $args = [];
+    /** The arguments for the controller */
+    protected array $args = [];
 
-    /**
-     * The body to be rendered on response
-     *
-     * @var string
-     */
-    protected $body;
+    /** The body to be rendered on response */
+    protected string|null $body = null;
 
-    /**
-     * The data to be put in the body
-     *
-     * @var mixed
-     */
-    protected $data;
+    /** The data to be put in the body */
+    protected mixed $data = null;
 
-    /**
-     * The default content type for the response header
-     *
-     * @var string
-     */
-    protected $defaultContentType = "application/json";
+    /** The status of the response */
+    protected bool $failed;
 
-    /**
-     * The status of the response
-     *
-     * @var bool
-     */
-    protected $failed;
+    /** The headers of the response */
+    protected HeadersEntity $headers;
 
-    /**
-     * The headers of the response
-     *
-     * @var array
-     */
-    protected $headers = [];
+    /** Flag to determine if the response should be json encoded */
+    protected bool $jsonEncode = true;
 
-    /**
-     * Flag to determine if the response should be json encoded
-     *
-     * @var bool
-     */
-    protected $jsonEncode = true;
+    /** The next function to be called by middleware */
+    protected RequestHandlerInterface $next;
 
-    /**
-     * The PSR15 function to be called by middleware
-     *
-     * @var RequestHandlerInterface
-     */
-    protected $next;
+    /** Any GET or POST parameters */
+    protected array $queryParameters = [];
 
-    /**
-     * Any GET or POST parameters
-     *
-     * @var array
-     */
-    protected $queryParameters = [];
+    /** Whether the response should be sent or not */
+    protected bool $quiet = false;
 
-    /**
-     * Whether the response should be sent or not
-     *
-     * @var bool
-     */
-    protected $quiet = false;
+    /** Used for front end routing */
+    protected string|null $redirect = null;
 
-    /**
-     * Used for front end routing
-     *
-     * @var string|null
-     */
-    protected $redirect = null;
+    /** The Slim Request class */
+    protected ServerRequestInterface $request;
 
-    /**
-     * The PSR7 Request class
-     *
-     * @var ServerRequest
-     */
-    protected $request;
+    /** The body of the request */
+    protected StreamInterface $requestBody;
 
-    /**
-     * The body of the request
-     *
-     * @var Stream
-     */
-    protected $requestBody;
+    /** The URL of the request */
+    protected string $requestUrl;
 
-    /**
-     * The URL of the request
-     *
-     * @var string
-     */
-    protected $requestUrl;
+    /** The Slim ResponseInterface class */
+    protected ResponseInterface $response;
 
-    /**
-     * The PSR7 Response class
-     *
-     * @var Response
-     */
-    protected $response;
-
-    /**
-     * The name of the route
-     *
-     * @var string|null
-     */
-    protected $routeName;
-
-    /**
-     * The HTTP status code of the response
-     *
-     * @var int
-     */
-    protected $statusCode = 200;
+    /** The HTTP status code of the response */
+    protected int $statusCode = SStatusCode::CODE_200;
 
     /**
      * Cookie list to be added to the response
      *
      * @var string[]
      */
-    protected $cookies = [];
+    protected array $cookies = [];
 
     /**
      * Sets the default content type on instanitation
      */
     public function __construct()
     {
-        $this->headers["content-type"] = $this->defaultContentType;
-        $this->headers["cache-control"] = "max-age=300, must-revalidate";
+        $this->response = new Response();
+        $this->headers = new HeadersEntity();
     }
 
     /**
@@ -168,12 +104,12 @@ class TransportEntity extends AEntity
         return $this->statusCode;
     }
 
-    public function &getRequest(): ServerRequest
+    public function &getRequest(): ServerRequestInterface
     {
         return $this->request;
     }
 
-    public function getRequestBody(): Stream
+    public function getRequestBody(): StreamInterface
     {
         return $this->requestBody;
     }
@@ -191,26 +127,19 @@ class TransportEntity extends AEntity
         return $this->requestUrl;
     }
 
-    public function &getResponse(): Response
+    public function &getResponse(): ResponseInterface
     {
         return $this->response;
     }
 
-    public function getRouteName(): ?string
-    {
-        return $this->routeName;
-    }
-
     public function hasFailed(): bool
     {
-        return $this->failed ?? count($this->getErrors()) > 0;
+        return $this->failed ?? $this->hasErrors();
     }
 
     public function iterateHeaders(): iterable
     {
-        foreach ($this->headers as $header => $value) {
-            yield $header => $value;
-        }
+        yield from $this->headers->iterateProperties(false);
     }
 
     /**
@@ -218,24 +147,28 @@ class TransportEntity extends AEntity
      *
      * @return string
      */
-    public function getBody(): ?string
+    public function getBody(): string
     {
         if ($this->quiet) {
-            return null;
+            return "";
         }
 
         if (empty($this->body)) {
             if ($this->jsonEncode) {
-                $this->body = json_encode([
-                    "failed" => $this->hasFailed(),
-                    "data" => $this->getData(),
-                    "alerts" => $this->normaliseAlerts(),
-                    "redirect" => $this->redirect
-                ]);
+                $this->body = Json::toString(
+                    array_merge(
+                        [
+                            "failed" => $this->hasFailed(),
+                            "data" => $this->getData(),
+                            "redirect" => $this->redirect
+                        ],
+                        $this->normaliseAlerts()
+                    )
+                );
             }
         }
 
-        return $this->body;
+        return $this->body ?: "";
     }
 
     /**
@@ -255,17 +188,17 @@ class TransportEntity extends AEntity
     public function setContentType(string $contentType): void
     {
         switch ($contentType) {
-            case $this->defaultContentType:
+            case SContentType::TYPE_JSON:
                 $this->jsonEncode = true;
                 break;
         }
 
-        $this->headers["content-type"] = $contentType;
+        $this->headers->contentType = $contentType;
     }
 
-    public function setHtml(): void
+    final public function setLocation(string $url): void
     {
-        $this->setContentType("text/html");
+        $this->headers->location = $url;
     }
 
     public function setData($data): void
@@ -305,16 +238,17 @@ class TransportEntity extends AEntity
         $this->redirect = $redirect;
     }
 
-    public function setRequest(ServerRequest &$request): void
+    public function setRequest(ServerRequestInterface &$request): void
     {
         global $_POST, $_COOKIE;
 
         $this->request = $request;
+        $paramString = http_build_query($this->request->getQueryParams());
 
-        $this->requestUrl = $this->request->getUri()->getPath();
+        $this->requestUrl = $this->request->getUri()->getPath() . (!$paramString ? "" : "?{$paramString}");
         $this->requestBody = $this->request->getBody();
-        $this->request->getBody()->rewind();
         $this->queryParameters = $this->request->getQueryParams();
+        $this->request->getBody()->rewind();
 
         if ($this->request->getMethod() === "POST") {
             $_POST = (array)$request->getParsedBody();
@@ -322,19 +256,9 @@ class TransportEntity extends AEntity
         $_COOKIE = (array)$request->getCookieParams();
     }
 
-    public function setResponse(Response &$response): void
+    public function setResponse(ResponseInterface &$response): void
     {
         $this->response = $response;
-    }
-
-    public function setRouteName(?string $name = null): void
-    {
-        $this->routeName = $name;
-    }
-
-    public function setUnauthorised(): void
-    {
-        $this->setStatusCode(401);
     }
 
     public function addCookies(array $cookies): void
@@ -351,10 +275,9 @@ class TransportEntity extends AEntity
      *
      * @return void
      */
-    final public function &respond(): Response
+    final public function &respond(): ResponseInterface
     {
         $this->mergeRespond();
-        $this->response->getBody()->write($this->getBody() ?? "");
         return $this->response;
     }
 
@@ -368,12 +291,6 @@ class TransportEntity extends AEntity
         $this->response = $this->next->handle($this->request);
     }
 
-    final public function redirect(string $url): void
-    {
-        $this->statusCode = 302;
-        $this->headers["Location"] = $url;
-    }
-
     final public function hasParameters(): bool
     {
         return !empty($this->queryParameters);
@@ -383,12 +300,20 @@ class TransportEntity extends AEntity
     {
         $this->response = $this->response->withStatus($this->statusCode);
 
-        foreach ($this->iterateHeaders() as $header => $value) {
+        if (SStatusCode::codeRequiresLocation($this->statusCode) && is_null($this->headers->location)) {
+            throw new Error("Could not respond, missing location header");
+        }
+
+        foreach ($this->headers->iterateProperties() as $header => $value) {
             $this->response = $this->response->withHeader($header, $value);
         }
 
         foreach ($this->cookies as $cookie) {
             $this->response = $this->response->withHeader("Set-Cookie", $cookie);
         }
+
+        $body = $this->response->getBody();
+        $body->write($this->getBody() ?? "");
+        $this->response = $this->response->withBody($body);
     }
 }

@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Kentron\Facade;
 
 use \DateTime;
+use \DateInterval;
+
 use Kentron\Exception\CustomTypeError;
 use Kentron\Service\Type;
 
@@ -24,13 +27,13 @@ final class DT extends DateTime
     /**
      * Gets new self at a specified timestamp
      *
-     * @param string $timeStamp
+     * @param string|int|null $timeStamp
      *
      * @return self
      */
-    public static function then(string $timeStamp): self
+    public static function then(string|int|null $timeStamp = null): self
     {
-        return new self($timeStamp);
+        return new self((string)$timeStamp);
     }
 
     /**
@@ -45,7 +48,7 @@ final class DT extends DateTime
      */
     public function increment(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0): self
     {
-        return $this->add(new \DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
+        return $this->add(new DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
     }
 
     /**
@@ -60,14 +63,14 @@ final class DT extends DateTime
      */
     public function decrement(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0): self
     {
-        return $this->sub(new \DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
+        return $this->sub(new DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
     }
-    
+
     /**
      * Increment or decrement the date by a given number of months
      *
      * @param integer $months
-     * 
+     *
      * @return self
      */
     public function modifyMonths(int $months): self

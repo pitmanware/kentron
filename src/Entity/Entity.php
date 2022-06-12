@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Kentron\Entity;
 
-use Kentron\Entity\Template\AEntity;
+use Kentron\Template\Entity\AEntity;
 
 /**
  * An empty entity for storing data and error handling;
