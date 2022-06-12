@@ -7,7 +7,7 @@ This is just a simple collection of PHP classes I made that I use in all my pers
 
 ## Installation
 
-PHP version 7.4 or higher is required.
+PHP version 8.0 or higher is required.
 
 [Composer](https://getcomposer.org) is the recommended method of installation.
 
