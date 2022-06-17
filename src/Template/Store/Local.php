@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Store;
 
-use Kentron\Entity\TransportEntity;
-
 class Local implements IStore
 {
     /** The auth ID of the application */
@@ -25,8 +23,6 @@ class Local implements IStore
     /** The unique token associated to the session */
     public static string|null $sessionToken = null;
 
-    public static TransportEntity $transportEntity;
-
     /**
      * Helpers
      */
@@ -39,9 +35,5 @@ class Local implements IStore
         self::$sessionId = null;
         self::$sessionAuditId = null;
         self::$sessionToken = null;
-
-        if ($hard) {
-            self::$transportEntity = null;
-        }
     }
 }

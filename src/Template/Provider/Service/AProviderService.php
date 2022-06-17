@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Template\Provider;
+namespace Kentron\Template\Provider\Service;
 
 // Entities
 use Kentron\Template\Provider\Entity\AProviderEntity;
@@ -25,8 +25,10 @@ abstract class AProviderService
 
     /**
      * Makes the request to the provider
-     * @param  ProviderTransportEntity $providerTransportEntity The transport entity for the request and response data from the controller
-     * @return bool                                             The success of the request
+     *
+     * @param ProviderTransportEntity $providerTransportEntity The transport entity for the request and response data from the controller
+     *
+     * @return bool The success of the request
      */
     final public function run(ProviderTransportEntity $providerTransportEntity): bool
     {

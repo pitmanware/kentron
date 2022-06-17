@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Http\Factory;
 
+use \RuntimeException;
+
 use Kentron\Template\Http\AMiddleware;
-use Kentron\Template\Store\Local;
+use Kentron\Template\Store\App;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -22,11 +24,11 @@ abstract class AMiddlewareFactory
     {
         return function (ServerRequestInterface $request, RequestHandlerInterface $requestHandler) use ($middlewareClass)
         {
-            $transportEntity = Local::$transportEntity;
+            $transportEntity = App::getTransportEntity();
             $middleware = new $middlewareClass();
 
             if (!is_subclass_of($middleware, AMiddleware::class)) {
-                throw new \RuntimeException("$middlewareClass must be an instance of " . AMiddleware::class);
+                throw new RuntimeException("$middlewareClass must be an instance of " . AMiddleware::class);
             }
 
             $transportEntity->setRequest($request);

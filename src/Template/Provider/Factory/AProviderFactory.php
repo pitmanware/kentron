@@ -2,7 +2,7 @@
 
 namespace Kentron\Template\Provider\Factory;
 
-use Kentron\Template\Provider\AProviderService;
+use Kentron\Template\Provider\Service\AProviderService;
 
 abstract class AProviderFactory
 {

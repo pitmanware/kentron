@@ -3,16 +3,17 @@ declare(strict_types=1);
 
 namespace Kentron\Template;
 
+use \Error;
+
 use Kentron\Entity\TransportEntity;
-use Kentron\Store\Variable\AVariable;
-use Kentron\Template\Store\Local;
+use Kentron\Template\Store\App;
 
 /**
  * The inital application class, injected into the controllers
  */
 trait TApp
 {
-    protected $transportEntityClass = TransportEntity::class;
+    private string $transportEntityClass = TransportEntity::class;
 
     /**
      * Set all things that allow for an app reset
@@ -27,19 +28,19 @@ trait TApp
 
     abstract public function resetStores(): void;
 
-    final public function setTransportEntityClass(string $transportEntityClass): void
+    private function setTransportEntityClass(string $transportEntityClass): void
     {
         if (!is_a($transportEntityClass, TransportEntity::class, true)) {
-            throw new \Error("{$transportEntityClass} does not extend from {$this->transportEntityClass}");
+            throw new Error("{$transportEntityClass} does not extend from {$this->transportEntityClass}");
         }
 
         $this->transportEntityClass = $transportEntityClass;
     }
 
-    final public function resetTransportEntity(): void
+    private function resetTransportEntity(): void
     {
         $transportEntityClass = $this->transportEntityClass;
-        Local::$transportEntity = new $transportEntityClass();
+        App::setTransportEntity(new $transportEntityClass());
     }
 
     /**

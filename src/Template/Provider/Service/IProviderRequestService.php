@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Template\Provider;
+namespace Kentron\Template\Provider\Service;
 
 use Kentron\Template\Provider\Entity\AProviderEntity;
 

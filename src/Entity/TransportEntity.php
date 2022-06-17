@@ -99,7 +99,7 @@ class TransportEntity extends AEntity
         return $this->queryParameters;
     }
 
-    public function getStatusCode(): ?int
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -132,21 +132,6 @@ class TransportEntity extends AEntity
         return $this->response;
     }
 
-    public function hasFailed(): bool
-    {
-        return $this->failed ?? $this->hasErrors();
-    }
-
-    public function iterateHeaders(): iterable
-    {
-        yield from $this->headers->iterateProperties(false);
-    }
-
-    /**
-     * Gets the body of the response, defaults to json encoded
-     *
-     * @return string
-     */
     public function getBody(): string
     {
         if ($this->quiet) {
@@ -269,6 +254,16 @@ class TransportEntity extends AEntity
     /**
      * Helpers
      */
+
+    public function hasFailed(): bool
+    {
+        return $this->failed ?? $this->hasErrors();
+    }
+
+    public function iterateHeaders(): iterable
+    {
+        yield from $this->headers->iterateProperties(false);
+    }
 
     /**
      * Builds the response

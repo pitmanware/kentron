@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Http\Factory;
 
+use \RuntimeException;
+
+use Kentron\Struct\SStatusCode;
 use Kentron\Template\Http\Controller\AController;
-use Kentron\Template\Store\Local;
+use Kentron\Template\Store\App;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,7 +26,7 @@ abstract class AControllerFactory
     {
         return function (ServerRequestInterface $request, ResponseInterface $response, array $args) use ($controllerClass, $method)
         {
-            $transportEntity = Local::$transportEntity;
+            $transportEntity = App::getTransportEntity();
 
             $transportEntity->setRequest($request);
             $transportEntity->setResponse($response);
@@ -32,16 +35,17 @@ abstract class AControllerFactory
             $controller = new $controllerClass($transportEntity);
 
             if (!is_subclass_of($controller, AController::class)) {
-                throw new \RuntimeException("$controllerClass must be an instance of " . AController::class);
+                throw new RuntimeException("$controllerClass must be an instance of " . AController::class);
             }
 
             if (!method_exists($controller, $method) || !is_callable([$controller, $method])) {
-                throw new \RuntimeException("Call to undefined method {$controllerClass}::{$method}");
+                throw new RuntimeException("Call to undefined method {$controllerClass}::{$method}");
             }
 
-            if ($transportEntity->getStatusCode() === 200) {
+            if (SStatusCode::codeIndicatesSuccess($transportEntity->getStatusCode())) {
                 $controller->$method();
             }
+
             return $transportEntity->respond();
         };
     }

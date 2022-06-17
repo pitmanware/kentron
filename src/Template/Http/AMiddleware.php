@@ -11,9 +11,12 @@ use Kentron\Entity\TransportEntity;
 abstract class AMiddleware
 {
     /**
-     * @var TransportEntity
+     * Creates the Request and Response objects and runs access checks
+     * @param TransportEntity $transportEntity The entity containing Slim objects
      */
-    protected $transportEntity;
+    public function __construct(
+        protected TransportEntity $transportEntity
+    ) {}
 
     /**
      * All middlewares must be able to be run by the router
