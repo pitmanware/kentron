@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Store;
 
-class Local implements IStore
+class LocalStore implements IStore
 {
     /** The auth ID of the application */
     public static int|null $authId = null;

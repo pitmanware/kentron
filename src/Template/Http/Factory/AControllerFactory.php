@@ -7,13 +7,14 @@ use \RuntimeException;
 
 use Kentron\Struct\SStatusCode;
 use Kentron\Template\Http\Controller\AController;
-use Kentron\Template\Store\App;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AControllerFactory
 {
+    use TGetTransportEntity;
+
     /**
      * Returns a dynamic controller closure for Slim to use
      *
@@ -26,7 +27,7 @@ abstract class AControllerFactory
     {
         return function (ServerRequestInterface $request, ResponseInterface $response, array $args) use ($controllerClass, $method)
         {
-            $transportEntity = App::getTransportEntity();
+            $transportEntity = static::getTransportEntity();
 
             $transportEntity->setRequest($request);
             $transportEntity->setResponse($response);

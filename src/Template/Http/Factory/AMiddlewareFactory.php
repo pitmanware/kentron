@@ -6,13 +6,14 @@ namespace Kentron\Template\Http\Factory;
 use \RuntimeException;
 
 use Kentron\Template\Http\AMiddleware;
-use Kentron\Template\Store\App;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 abstract class AMiddlewareFactory
 {
+    use TGetTransportEntity;
+
     /**
      * Gets a middleware class and returns the closure for Slim to use
      *
@@ -24,7 +25,7 @@ abstract class AMiddlewareFactory
     {
         return function (ServerRequestInterface $request, RequestHandlerInterface $requestHandler) use ($middlewareClass)
         {
-            $transportEntity = App::getTransportEntity();
+            $transportEntity = static::getTransportEntity();
             $middleware = new $middlewareClass();
 
             if (!is_subclass_of($middleware, AMiddleware::class)) {

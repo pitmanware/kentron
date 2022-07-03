@@ -5,7 +5,7 @@ namespace Kentron\Template\Store;
 
 use \Error;
 
-class Temp implements IStore
+class TempStore implements IStore
 {
     private static array $store = [];
 

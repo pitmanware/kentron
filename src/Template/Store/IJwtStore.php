@@ -6,6 +6,8 @@ namespace Kentron\Template\Store;
 use Kentron\Support\Jwt\Entity\Payload;
 use Kentron\Support\Jwt\Entity\Header;
 
+use \Error;
+
 interface IJwtStore
 {
     /**
@@ -27,7 +29,7 @@ interface IJwtStore
      *
      * @return string
      *
-     * @throws \Error If the key is not set
+     * @throws Error If the key is not set
      */
     public static function getJwtAuthKey(): string;
 }

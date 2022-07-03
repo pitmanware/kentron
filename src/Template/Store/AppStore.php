@@ -5,7 +5,7 @@ namespace Kentron\Template\Store;
 
 use Kentron\Entity\TransportEntity;
 
-class App implements IStore
+class AppStore implements IStore
 {
     private static TransportEntity $transportEntity;
 

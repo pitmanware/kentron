@@ -6,7 +6,7 @@ namespace Kentron\Template;
 use \Error;
 
 use Kentron\Entity\TransportEntity;
-use Kentron\Template\Store\App;
+use Kentron\Template\Store\AppStore;
 
 /**
  * The inital application class, injected into the controllers
@@ -40,7 +40,7 @@ trait TApp
     private function resetTransportEntity(): void
     {
         $transportEntityClass = $this->transportEntityClass;
-        App::setTransportEntity(new $transportEntityClass());
+        AppStore::setTransportEntity(new $transportEntityClass());
     }
 
     /**

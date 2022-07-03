@@ -3,14 +3,14 @@
 namespace Kentron\Template\Provider\Service;
 
 // Entities
-use Kentron\Template\Provider\Entity\AProviderEntity;
+use Kentron\Template\Provider\Entity\AProviderRequestEntity;
 use Kentron\Entity\ProviderTransportEntity;
 use Kentron\Support\Http\Http;
 
 abstract class AProviderService
 {
     /** The specific provider entity */
-    protected AProviderEntity $providerEntity;
+    protected AProviderRequestEntity $providerRequestEntity;
 
     /** The specific provider request handler */
     private IProviderRequestService $providerRequestService;
@@ -18,9 +18,9 @@ abstract class AProviderService
     /** The specific provider response handler */
     private IProviderResponseService $providerResponseService;
 
-    protected function __construct(AProviderEntity $providerEntity)
+    protected function __construct(AProviderRequestEntity $providerRequestEntity)
     {
-        $this->providerEntity = $providerEntity;
+        $this->providerRequestEntity = $providerRequestEntity;
     }
 
     /**
@@ -32,17 +32,17 @@ abstract class AProviderService
      */
     final public function run(ProviderTransportEntity $providerTransportEntity): bool
     {
-        $http = $this->providerEntity->http;
+        $http = $this->providerRequestEntity->http;
 
         // Merge the transport entity into the main provider entity
-        $this->providerEntity->setRequestData($providerTransportEntity->requestEntity);
+        $this->providerRequestEntity->setRequestData($providerTransportEntity->requestEntity);
 
         // Format the request based on the request type
-        $this->providerRequestService->buildRequest($this->providerEntity);
+        $this->providerRequestService->buildRequest($this->providerRequestEntity);
 
         // TODO check if can turn provider entity into just a class
-        if ($this->providerEntity->hasErrors()) {
-            $providerTransportEntity->mergeAlerts($this->providerEntity);
+        if ($this->providerRequestEntity->hasErrors()) {
+            $providerTransportEntity->mergeAlerts($this->providerRequestEntity);
             return false;
         }
 
@@ -62,11 +62,11 @@ abstract class AProviderService
 
         // Format the response and make it readable for the caller system
         $providerTransportEntity->responseData =
-            $this->providerResponseService->formatResponse($this->providerEntity)
+            $this->providerResponseService->formatResponse($this->providerRequestEntity)
         ;
 
-        if ($this->providerEntity->hasErrors()) {
-            $providerTransportEntity->mergeAlerts($this->providerEntity);
+        if ($this->providerRequestEntity->hasErrors()) {
+            $providerTransportEntity->mergeAlerts($this->providerRequestEntity);
             return false;
         }
 

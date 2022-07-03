@@ -11,7 +11,7 @@ use Kentron\Template\Store\Variable\IVariableDbEntity;
 
 use \Exception;
 
-abstract class AVariable implements IStore
+abstract class AVariableStore implements IStore
 {
     /** All decrypted variables */
     protected static array $store = [];

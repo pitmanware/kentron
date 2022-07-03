@@ -2,9 +2,9 @@
 
 namespace Kentron\Template\Provider\Service;
 
-use Kentron\Template\Provider\Entity\AProviderEntity;
+use Kentron\Template\Provider\Entity\AProviderRequestEntity;
 
 interface IProviderRequestService
 {
-    public function buildRequest(AProviderEntity $providerEntity): void;
+    public function buildRequest(AProviderRequestEntity $providerRequestEntity): void;
 }

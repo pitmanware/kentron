@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Kentron\Template\Store\Variable\System;
 
 use Kentron\Support\System\Crypt;
-use Kentron\Template\Store\Variable\AVariable;
+use Kentron\Template\Store\Variable\AVariableStore;
 use Kentron\Template\Store\Variable\IVariableDbEntity;
 
-abstract class ASystemVar extends AVariable
+abstract class ASystemVarStore extends AVariableStore
 {
     protected const VAR_SYSTEM_ACTIVE = "SYSTEM_ACTIVE";
     protected const VAR_EMAIL_USERNAME = "EMAIL_USERNAME";

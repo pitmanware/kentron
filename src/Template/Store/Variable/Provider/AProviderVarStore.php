@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Kentron\Template\Store\Variable\Provider;
 
 use Kentron\Template\Store\IJwtStore;
-use Kentron\Template\Store\Variable\AVariable;
+use Kentron\Template\Store\Variable\AVariableStore;
 use Kentron\Template\Store\Variable\IVariableDbEntity;
 
 use \ReflectionClass;
 
-abstract class AProviderVar extends AVariable
+abstract class AProviderVarStore extends AVariableStore
 {
     /** Used for the factory */
     public const NAME = "";

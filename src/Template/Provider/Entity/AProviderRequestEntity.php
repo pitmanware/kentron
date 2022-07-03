@@ -8,7 +8,7 @@ use Kentron\Support\Http\Http;
 /**
  * Handles all data to be passed around the provider service
  */
-abstract class AProviderEntity extends AEntity
+abstract class AProviderRequestEntity extends AEntity
 {
     /** The HTTP entity for the request */
     public Http $http;
