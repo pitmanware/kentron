@@ -299,7 +299,7 @@ class TransportEntity extends AEntity
             throw new Error("Could not respond, missing location header");
         }
 
-        foreach ($this->headers->iterateProperties() as $header => $value) {
+        foreach ($this->headers->iterateProperties(false) as $header => $value) {
             $this->response = $this->response->withHeader($header, $value);
         }
 

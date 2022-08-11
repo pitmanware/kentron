@@ -345,7 +345,7 @@ trait TCast
     public static function castToJson(mixed $value, bool $quiet = false): mixed
     {
         if (is_array($value) || is_object($value)) {
-            return json_encode($value);
+            return Json::toString($value);
         }
 
         if ($quiet) {

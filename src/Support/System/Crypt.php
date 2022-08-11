@@ -12,6 +12,7 @@ final class Crypt
     public const ENV_LIVE = 3;
 
     protected const DEFAULT_CIPHER = "AES-256-OFB";
+    protected const DEFAULT_CIPHER_LENGTH = 16;
 
     /** The environment */
     public static int|null $environment = null;
@@ -81,5 +82,15 @@ final class Crypt
     public static function onLive(): bool
     {
         return Assert::same(self::$environment, self::ENV_LIVE);
+    }
+
+    /**
+     * Generates an initialisation vector for encryption
+     *
+     * @return string
+     */
+    public static function generateIV(): string
+    {
+        return base64_encode(openssl_random_pseudo_bytes(openssl_cipher_iv_length(self::DEFAULT_CIPHER) ?: self::DEFAULT_CIPHER_LENGTH));
     }
 }

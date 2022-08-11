@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Store\Provider;
 
-use Kentron\Template\Entity\Provider\IProviderEntity;
+use Kentron\Template\Provider\Entity\IProviderEntity;
 use Kentron\Template\Store\Variable\Provider\AProviderVarStore;
 
 abstract class AProviderStore

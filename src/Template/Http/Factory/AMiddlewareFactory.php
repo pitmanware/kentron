@@ -26,7 +26,7 @@ abstract class AMiddlewareFactory
         return function (ServerRequestInterface $request, RequestHandlerInterface $requestHandler) use ($middlewareClass)
         {
             $transportEntity = static::getTransportEntity();
-            $middleware = new $middlewareClass();
+            $middleware = new $middlewareClass($transportEntity);
 
             if (!is_subclass_of($middleware, AMiddleware::class)) {
                 throw new RuntimeException("$middlewareClass must be an instance of " . AMiddleware::class);

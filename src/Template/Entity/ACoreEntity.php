@@ -14,6 +14,7 @@ use Kentron\Template\Entity\AEntity;
 
 // Throwable
 use \Error;
+use Kentron\Support\Json;
 use \TypeError;
 
 abstract class ACoreEntity extends AEntity
@@ -258,6 +259,31 @@ abstract class ACoreEntity extends AEntity
         }
 
         return $normalised;
+    }
+
+    /**
+     * Json encode the normalised array
+     *
+     * @param boolean $allowNullable
+     *
+     * @return string
+     */
+    public function toJson(bool $allowNullable = true): string
+    {
+        return Json::toString($this->normalise($allowNullable));
+    }
+
+    /**
+     * Hydrate from a json encoded string
+     *
+     * @param string $json
+     * @param boolean $allowNull
+     *
+     * @return void
+     */
+    public function fromJson(string $json, bool $allowNull = false): void
+    {
+        $this->hydrate(Json::extract($json), $allowNull);
     }
 
     /**

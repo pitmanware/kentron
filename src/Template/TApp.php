@@ -15,6 +15,16 @@ trait TApp
 {
     private string $transportEntityClass = TransportEntity::class;
 
+    public function boot (): void
+    {
+        $this->loadEnvironment();
+
+        $this->reset();
+        $this->bootOrm();
+        $this->loadVariables();
+        $this->bootRouter();
+    }
+
     /**
      * Set all things that allow for an app reset
      *
