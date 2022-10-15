@@ -169,7 +169,33 @@ abstract class AEntity extends AAlert
     {
         $reProperty = $this->getReflectionProperty($property);
         if (!is_null($reProperty) && $reProperty->isInitialized($this)) {
-            return $reProperty->getValue($this);
+            $value = $reProperty->getValue($this);
+
+            if ($reProperty->hasType()) {
+
+                $type = $reProperty->getType();
+                /** @var ReflectionNamedType[] */
+                $types = [];
+
+                // If the property has one type
+                if ($type instanceof ReflectionNamedType) {
+                    $types = [$type];
+                }
+                else if ($type instanceof ReflectionUnionType) {
+                    $types = $type->getTypes();
+                }
+
+                foreach ($types as $type) {
+                    $type = $type->getName();
+
+                    if (Assert::same($type, DT::class)) {
+                        $value = Type::cast($value)->quietly()->toString();
+                        break;
+                    }
+                }
+            }
+
+            return $value;
         }
         return null;
     }
