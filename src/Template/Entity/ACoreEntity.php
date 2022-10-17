@@ -181,8 +181,15 @@ abstract class ACoreEntity extends AEntity
      */
     public function iterateProperties(bool $allowNullable = true): iterable
     {
-        /** @var string|array<string,(string|callable|bool)> $binding */
+        /**
+         * @var string|int $key
+         * @var string|array<string, (string|callable|bool)> $binding
+         */
         foreach ($this->propertyMap as $key => $binding) {
+
+            if (is_int($key)) {
+                throw new Error("Property map for " . $this::class . " cannot be a 1D array");
+            }
 
             if (is_string($binding)) {
                 $propertyValue = $this->bindGetProperty($binding);
