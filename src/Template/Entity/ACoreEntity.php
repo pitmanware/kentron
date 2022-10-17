@@ -70,8 +70,15 @@ abstract class ACoreEntity extends AEntity
             return;
         }
 
-        /** @var string|array<string, (string|callable|bool)> $binding */
+        /**
+         * @var string|int $property
+         * @var string|array<string, (string|callable|bool)> $binding
+         */
         foreach ($this->propertyMap as $property => $binding) {
+
+            if (is_int($property)) {
+                throw new Error("Property map for " . $this::class . " cannot be a 1D array");
+            }
 
             $dataProperty = Type::getProperty($data, $property);
 
