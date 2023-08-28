@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kentron\Support\Http;
 
-use Kentron\Struct\SType;
+use Kentron\Enum\EType;
 use Kentron\Support\Http\TSoap;
 use Kentron\Support\Json;
 use Kentron\Support\Type\Type;
@@ -473,7 +473,7 @@ final class Http
         $this->extracted = $extracted;
 
         $errors = Type::getProperty($extracted, "errors") ?? [];
-        if (Type::of($errors)->isArrayOf(SType::TYPE_STRING)) {
+        if (Type::of($errors)->isArrayOf(EType::TYPE_STRING)) {
             $this->addError($errors);
         }
     }

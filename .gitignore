@@ -5,5 +5,3 @@ docs
 vendor
 
 composer.lock
-
-src/Entity/Template/ACoreCollectionEntity2.php

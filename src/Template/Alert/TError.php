@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Alert;
 
+use Kentron\Enum\EType;
 use Kentron\Support\Type\Type;
-use Kentron\Struct\SType;
 
 use \ReflectionClass;
 
@@ -27,7 +27,7 @@ trait TError
             $this->errors[] = $errors;
         }
         else if (is_array($errors) && !empty($errors)) {
-            if (Type::isAssoc($errors) || !Type::of($errors)->isArrayOf(SType::TYPE_STRING)) {
+            if (Type::isAssoc($errors) || !Type::of($errors)->isArrayOf(EType::TYPE_STRING)) {
                 throw new \UnexpectedValueException("Cannot add errors of type " . Type::get($errors));
             }
             $this->errors = array_merge($this->errors, $errors);

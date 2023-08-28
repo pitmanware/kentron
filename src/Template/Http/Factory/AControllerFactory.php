@@ -5,7 +5,6 @@ namespace Kentron\Template\Http\Factory;
 
 use \RuntimeException;
 
-use Kentron\Struct\SStatusCode;
 use Kentron\Template\Http\Controller\AController;
 
 use Psr\Http\Message\ResponseInterface;
@@ -43,7 +42,7 @@ abstract class AControllerFactory
                 throw new RuntimeException("Call to undefined method {$controllerClass}::{$method}");
             }
 
-            if (SStatusCode::codeIndicatesSuccess($transportEntity->getStatusCode())) {
+            if ($transportEntity->getStatusCode()->codeIndicatesSuccess()) {
                 $controller->$method();
             }
 

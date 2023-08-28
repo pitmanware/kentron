@@ -10,6 +10,7 @@ use Kentron\Template\Store\IStore;
 use Kentron\Template\Store\Variable\IVariableDbEntity;
 
 use \Exception;
+use Kentron\Enum\EType;
 
 abstract class AVariableStore implements IStore
 {
@@ -65,7 +66,7 @@ abstract class AVariableStore implements IStore
             $value = Crypt::decrypt($variableDbEntity->getValue());
         }
 
-        self::$store[$variableDbEntity->getConstantName()] = Type::cast($value)->to($variableDbEntity->getType());
+        self::$store[$variableDbEntity->getConstantName()] = Type::cast($value)->to(EType::from($variableDbEntity->getType()));
     }
 
     protected static function load(): void {}

@@ -18,6 +18,8 @@ use \ReflectionNamedType;
 use \ReflectionObject;
 use \ReflectionProperty;
 use \ReflectionUnionType;
+use \UnitEnum;
+use \BackedEnum;
 
 abstract class AEntity extends AAlert
 {
@@ -154,9 +156,7 @@ abstract class AEntity extends AAlert
         return $entity;
     }
 
-    /**
-     * Protected methods
-     */
+    // Protected methods
 
     /**
      * Get a property using reflection
@@ -169,33 +169,7 @@ abstract class AEntity extends AAlert
     {
         $reProperty = $this->getReflectionProperty($property);
         if (!is_null($reProperty) && $reProperty->isInitialized($this)) {
-            $value = $reProperty->getValue($this);
-
-            if ($reProperty->hasType()) {
-
-                $type = $reProperty->getType();
-                /** @var ReflectionNamedType[] */
-                $types = [];
-
-                // If the property has one type
-                if ($type instanceof ReflectionNamedType) {
-                    $types = [$type];
-                }
-                else if ($type instanceof ReflectionUnionType) {
-                    $types = $type->getTypes();
-                }
-
-                foreach ($types as $type) {
-                    $type = $type->getName();
-
-                    if (Assert::same($type, DT::class)) {
-                        $value = Type::cast($value)->quietly()->toString();
-                        break;
-                    }
-                }
-            }
-
-            return $value;
+            return $reProperty->getValue($this);
         }
         return null;
     }
@@ -244,6 +218,26 @@ abstract class AEntity extends AAlert
                 // Casts integer booleans (1/0) to bool
                 else if (Type::isInt($value, true) && Assert::same($type, SType::TYPE_BOOL)) {
                     $value = Type::cast($value)->quietly()->toBool();
+                    break;
+                }
+                // If the type is an enumeration, try to convert the string to it
+                else if (enum_exists($type)) {
+                    /** @var UnitEnum|BackedEnum $type */
+                    $enumValue = null;
+
+                    // Check if the value is a backed enum
+                    if (is_a($type, BackedEnum::class, true)) {
+                        $enumValue = $type::tryFrom($value);
+                    }
+                    if (is_null($enumValue) && is_a($type, UnitEnum::class, true)) {
+                        $enumValue = constant("{$type}::{$value}");
+                    }
+
+                    if (is_null($enumValue)) {
+                        throw new Error("Enum {$type}::{$value} does not exist");
+                    }
+
+                    $value = $enumValue;
                     break;
                 }
                 // Used for JSON strings

@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Kentron\Support\Type;
 
 use Kentron\Facade\DT;
-use Kentron\Struct\SType;
 use Kentron\Support\Json;
 
 use \InvalidArgumentException;
+use Kentron\Enum\EType;
 use \UnexpectedValueException;
 
 trait TCast
@@ -55,26 +55,26 @@ trait TCast
     /**
      * Gets one of the casting methods
      *
-     * @param string $type The type to cast to
+     * @param EType $type The type to cast to
      *
      * @return mixed The result of the method call
      *
      * @throws UnexpectedValueException If the given type is unknown
      */
-    public function to(string $type): mixed
+    public function to(EType $type): mixed
     {
-        return match (strtolower($type)) {
-            SType::TYPE_ARRAY   => $this->castToArray($this->value),
-            SType::TYPE_BOOL,
-            SType::TYPE_BOOLEAN => $this->castToBool($this->value),
-            SType::TYPE_FLOAT,
-            SType::TYPE_DOUBLE  => $this->castToFloat($this->value),
-            SType::TYPE_INT,
-            SType::TYPE_INTEGER => $this->castToInt($this->value),
-            SType::TYPE_OBJECT  => $this->castToObject($this->value),
-            SType::TYPE_STRING  => $this->castToString($this->value),
-            SType::TYPE_DT      => $this->castToDT($this->value),
-            SType::TYPE_JSON    => $this->castToJson($this->value),
+        return match ($type) {
+            EType::TYPE_ARRAY   => $this->castToArray($this->value),
+            EType::TYPE_BOOL,
+            EType::TYPE_BOOLEAN => $this->castToBool($this->value),
+            EType::TYPE_FLOAT,
+            EType::TYPE_DOUBLE  => $this->castToFloat($this->value),
+            EType::TYPE_INT,
+            EType::TYPE_INTEGER => $this->castToInt($this->value),
+            EType::TYPE_OBJECT  => $this->castToObject($this->value),
+            EType::TYPE_STRING  => $this->castToString($this->value),
+            EType::TYPE_DT      => $this->castToDT($this->value),
+            EType::TYPE_JSON    => $this->castToJson($this->value),
 
             default => $this->quiet ? $this->value : throw new UnexpectedValueException("$type is not a valid type")
         };

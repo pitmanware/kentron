@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace Kentron\Support\Type;
 
+use Kentron\Enum\EType;
 use Kentron\Facade\DT;
 use Kentron\Support\Json;
-use Kentron\Struct\SType;
 use Kentron\Template\Entity\ACollectionEntity;
 use Kentron\Template\Entity\ACoreCollectionEntity;
 use Kentron\Template\Entity\TCollection;
 
 use \ReflectionClass;
+use \stdClass;
 use \UnexpectedValueException;
 
 final class Type
@@ -34,11 +35,11 @@ final class Type
      *
      * @return bool If the type is available
      *
-     * @see SType::exists();
+     * @see EType::exists();
      */
     public static function exists(string $type): bool
     {
-        return SType::exists($type);
+        return EType::exists($type);
     }
 
     /**
@@ -50,42 +51,22 @@ final class Type
      */
     public static function get(mixed $value): string
     {
-        $type = match (gettype($value)) {
-            SType::TYPE_BOOL,
-            SType::TYPE_BOOLEAN => SType::TYPE_BOOL,
-            SType::TYPE_FLOAT,
-            SType::TYPE_DOUBLE  => SType::TYPE_FLOAT,
-            SType::TYPE_INT,
-            SType::TYPE_INTEGER => SType::TYPE_INT,
-            SType::TYPE_STRING  => SType::TYPE_STRING,
-
-            default => null
-        };
-
-        if (!is_null($type)) {
-            return $type;
-        }
-
-        $type = new self($value);
-
-        if ($type->isObject($value)) {
+        if (is_object($value) && !($value instanceof stdClass)) {
             return $value::class;
         }
-
-        if ($type->isArray($value)) {
+        else if (is_array($value)) {
             if (!self::isAssoc($value)) {
 
-                $zerothType = self::get($value[0]);
-                if ($type->of($value)->isArrayOf($zerothType)) {
-                    return "{$zerothType}[]";
+                $zerothType = EType::fromType($value[0]);
+                if (self::of($value)->isArrayOf($zerothType)) {
+                    return "{$zerothType->value}[]";
                 }
 
                 return "mixed[]";
             }
-            return SType::TYPE_ARRAY;
         }
 
-        return gettype($value);
+        return EType::tryFromType($value)->value ?? gettype($value);
     }
 
     /**
@@ -204,37 +185,37 @@ final class Type
     /**
      * Checks the value is type
      *
-     * @param string $type The type to check
+     * @param EType $type The type to check
      *
      * @return bool If the type of the data matches
      *
      * @throws UnexpectedValueException If the given type is unknown
      */
-    public function is(string $type): bool
+    public function is(EType $type): bool
     {
-        return match (strtolower($type)) {
-            SType::TYPE_ARRAY   => $this->isArray($this->value),
-            SType::TYPE_BOOL,
-            SType::TYPE_BOOLEAN => $this->isBool($this->value),
-            SType::TYPE_FLOAT,
-            SType::TYPE_DOUBLE  => $this->isFloat($this->value),
-            SType::TYPE_INT,
-            SType::TYPE_INTEGER => $this->isInt($this->value),
-            SType::TYPE_OBJECT  => $this->isObject($this->value),
-            SType::TYPE_STRING  => $this->isString($this->value),
-            SType::TYPE_DT      => $this->isDT($this->value),
-            SType::TYPE_JSON    => Json::isValid($this->value),
+        return match ($type) {
+            EType::TYPE_ARRAY   => $this->isArray($this->value),
+            EType::TYPE_BOOL,
+            EType::TYPE_BOOLEAN => $this->isBool($this->value),
+            EType::TYPE_FLOAT,
+            EType::TYPE_DOUBLE  => $this->isFloat($this->value),
+            EType::TYPE_INT,
+            EType::TYPE_INTEGER => $this->isInt($this->value),
+            EType::TYPE_OBJECT  => $this->isObject($this->value),
+            EType::TYPE_STRING  => $this->isString($this->value),
+            EType::TYPE_DT      => $this->isDT($this->value),
+            EType::TYPE_JSON    => Json::isValid($this->value),
 
-            SType::TYPE_ARRAY_ARRAY     => $this->isArrayOf(SType::TYPE_ARRAY),
-            SType::TYPE_ARRAY_BOOL,
-            SType::TYPE_ARRAY_BOOLEAN   => $this->isArrayOf(SType::TYPE_BOOL),
-            SType::TYPE_ARRAY_FLOAT,
-            SType::TYPE_ARRAY_DOUBLE    => $this->isArrayOf(SType::TYPE_FLOAT),
-            SType::TYPE_ARRAY_INT,
-            SType::TYPE_ARRAY_INTEGER   => $this->isArrayOf(SType::TYPE_INT),
-            SType::TYPE_ARRAY_OBJECT    => $this->isArrayOf(SType::TYPE_OBJECT),
-            SType::TYPE_ARRAY_STRING    => $this->isArrayOf(SType::TYPE_STRING),
-            SType::TYPE_ARRAY_DT        => $this->isArrayOf(SType::TYPE_DT),
+            EType::TYPE_ARRAY_ARRAY     => $this->isArrayOf(EType::TYPE_ARRAY),
+            EType::TYPE_ARRAY_BOOL,
+            EType::TYPE_ARRAY_BOOLEAN   => $this->isArrayOf(EType::TYPE_BOOL),
+            EType::TYPE_ARRAY_FLOAT,
+            EType::TYPE_ARRAY_DOUBLE    => $this->isArrayOf(EType::TYPE_FLOAT),
+            EType::TYPE_ARRAY_INT,
+            EType::TYPE_ARRAY_INTEGER   => $this->isArrayOf(EType::TYPE_INT),
+            EType::TYPE_ARRAY_OBJECT    => $this->isArrayOf(EType::TYPE_OBJECT),
+            EType::TYPE_ARRAY_STRING    => $this->isArrayOf(EType::TYPE_STRING),
+            EType::TYPE_ARRAY_DT        => $this->isArrayOf(EType::TYPE_DT),
 
             default => throw new UnexpectedValueException("$type is not a valid type")
         };
@@ -243,25 +224,25 @@ final class Type
     /**
      * Checks the value is an array of type
      *
-     * @param string $type The type to check
+     * @param EType $type The type to check
      *
      * @return bool If the type of the data matches
      *
      * @throws UnexpectedValueException If the given type is unknown
      */
-    public function isArrayOf(string $type): bool
+    public function isArrayOf(EType $type): bool
     {
-        $callable = match (strtolower($type)) {
-            SType::TYPE_ARRAY   => fn($element) => $this->isArray($element),
-            SType::TYPE_BOOL,
-            SType::TYPE_BOOLEAN => fn($element) => $this->isBool($element),
-            SType::TYPE_FLOAT,
-            SType::TYPE_DOUBLE  => fn($element) => $this->isFloat($element),
-            SType::TYPE_INT,
-            SType::TYPE_INTEGER => fn($element) => $this->isInt($element),
-            SType::TYPE_OBJECT  => fn($element) => $this->isObject($element),
-            SType::TYPE_STRING  => fn($element) => $this->isString($element),
-            SType::TYPE_DT      => fn($element) => $this->isDT($element),
+        $callable = match ($type) {
+            EType::TYPE_ARRAY   => fn($element) => $this->isArray($element),
+            EType::TYPE_BOOL,
+            EType::TYPE_BOOLEAN => fn($element) => $this->isBool($element),
+            EType::TYPE_FLOAT,
+            EType::TYPE_DOUBLE  => fn($element) => $this->isFloat($element),
+            EType::TYPE_INT,
+            EType::TYPE_INTEGER => fn($element) => $this->isInt($element),
+            EType::TYPE_OBJECT  => fn($element) => $this->isObject($element),
+            EType::TYPE_STRING  => fn($element) => $this->isString($element),
+            EType::TYPE_DT      => fn($element) => $this->isDT($element),
 
             default => throw new UnexpectedValueException("$type is not a valid type")
         };

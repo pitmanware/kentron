@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Kentron\Facade;
+namespace Kentron\Facade\Env;
 
 use Kentron\Support\File;
+use Kentron\Support\Assert;
+use Kentron\Facade\Env\Enum\EEnvironment;
 
 use Dotenv\Dotenv;
 
@@ -13,6 +15,8 @@ class Env
 {
     protected const DEFAULT_ENV_NAME = ".env";
     protected const DEFAULT_ENV_DIR = "/env";
+
+    public static EEnvironment $environment;
 
     /** @var array<string,string|int|float|bool|null> $env */
     protected static $env = [];
@@ -39,7 +43,7 @@ class Env
             if (!defined("ROOT_DIR")) {
                 throw new Error("No env directory provided");
             }
-            $directory = ROOT_DIR . static::DEFAULT_ENV_DIR;
+            $directory = constant("ROOT_DIR") . static::DEFAULT_ENV_DIR;
         }
 
         $path = File::path($directory, $name ?? static::DEFAULT_ENV_NAME);
@@ -72,7 +76,7 @@ class Env
     /**
      * Get the env array
      *
-     * @return array<string,string|int|float|bool|null> The environment variables
+     * @return array The environment variables
      */
     public static function getEnv (): array
     {
@@ -89,5 +93,17 @@ class Env
     public static function getKey (string $key)
     {
         return self::$env[$key] ?? null;
+    }
+
+    /**
+     * Returns true if the environment is set to development
+     *
+     * @return bool
+     */
+    public static function onDev(): bool
+    {
+        return Assert::same(self::$environment, EEnvironment::Dev)
+            || Assert::same(self::$environment, EEnvironment::Docker)
+        ;
     }
 }

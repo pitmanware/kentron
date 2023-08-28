@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Alert;
 
+use Kentron\Enum\EType;
 use Kentron\Template\Alert\AAlert;
 use Kentron\Support\Type\Type;
-use Kentron\Struct\SType;
 
 use \ReflectionClass;
 
@@ -28,7 +28,7 @@ trait TWarning
             $this->warnings[] = $warnings;
         }
         else if (is_array($warnings)) {
-            if (Type::isAssoc($warnings) || !Type::of($warnings)->isArrayOf(SType::TYPE_STRING)) {
+            if (Type::isAssoc($warnings) || !Type::of($warnings)->isArrayOf(EType::TYPE_STRING)) {
                 throw new \UnexpectedValueException("Cannot add warnings of type " . Type::get($warnings));
             }
             $this->warnings = array_merge($this->warnings, $warnings);

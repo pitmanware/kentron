@@ -5,16 +5,16 @@ namespace Kentron\Template\Entity;
 
 // Services
 use Kentron\Support\Type\Type;
+use Kentron\Support\Json;
 
-// Structs
-use Kentron\Struct\SType;
+// Enums
+use Kentron\Enum\EType;
 
 // Entities
 use Kentron\Template\Entity\AEntity;
 
 // Throwable
 use \Error;
-use Kentron\Support\Json;
 use \TypeError;
 
 abstract class ACoreEntity extends AEntity
@@ -32,7 +32,7 @@ abstract class ACoreEntity extends AEntity
      * ```
      * $propertyMap = [
      *     "property_key" => [
-     *         "get" => "getClassProperty", // String of the getter method or callable
+     *         "get" => "getClassProperty", // String of the getter method, array of getters or callable
      *         "set" => "setClassProperty",
      *         "add" => "addClassProperty", // Used for setting a nested class
      *         "prop" => "classProperty", // Raw property assignment, can only be used with statically typed variables PHP 7.4+
@@ -135,13 +135,13 @@ abstract class ACoreEntity extends AEntity
                 }
 
                 // Accepts an array of methods/Type::casts to cast with
-                if (Type::of($caster)->isArrayOf(SType::TYPE_STRING)) {
+                if (Type::of($caster)->isArrayOf(EType::TYPE_STRING)) {
                     foreach ($caster as $cast) {
                         if ($this->isValidMethod($cast)) {
                             $dataProperty = $this->{$cast}($dataProperty, $property);
                         }
                         else {
-                            $dataProperty = Type::cast($dataProperty)->quietly()->to($cast);
+                            $dataProperty = Type::cast($dataProperty)->quietly()->to(EType::from($cast));
                         }
                     }
                 }
@@ -150,7 +150,7 @@ abstract class ACoreEntity extends AEntity
                         $dataProperty = $this->{$caster}($dataProperty, $property);
                     }
                     else {
-                        $dataProperty = Type::cast($dataProperty)->quietly()->to($caster);
+                        $dataProperty = Type::cast($dataProperty)->quietly()->to(EType::from($caster));
                     }
                 }
             }
@@ -216,7 +216,7 @@ abstract class ACoreEntity extends AEntity
                 else {
                     /** @var string|string[]|null */
                     $getProp = $binding["get_prop"] ?? null;
-                    if (Type::of($getProp)->isArrayOf(SType::TYPE_STRING)) {
+                    if (Type::of($getProp)->isArrayOf(EType::TYPE_STRING)) {
                         $entity = $this;
                         foreach ($getProp as $property) {
                             $propertyValue = $entity->bindGetProperty($property);
@@ -248,7 +248,7 @@ abstract class ACoreEntity extends AEntity
                         $propertyValue = $this->{$caster}($propertyValue);
                     }
                     else {
-                        $propertyValue = Type::cast($propertyValue)->quietly()->to($caster);
+                        $propertyValue = Type::cast($propertyValue)->quietly()->to(EType::from($caster));
                     }
                 }
             }

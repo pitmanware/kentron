@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Http\Controller;
 
+use Kentron\Enum\EStatusCode;
 use Kentron\Facade\JsonSchema;
-use Kentron\Struct\SStatusCode;
 use Kentron\Support\Json;
 
 /**
@@ -20,14 +20,14 @@ abstract class AApiController extends AController
 
         if (is_null($body)) {
             $this->transportEntity->addError("Request body is not valid JSON. " . Json::handleError());
-            $this->transportEntity->setStatusCode(SStatusCode::CODE_400);
+            $this->transportEntity->setStatusCode(EStatusCode::CODE_400);
 
             return null;
         }
 
         if (!$jsonSchema->isValid($body, Json::toObject($schema))) {
             $this->transportEntity->addError($jsonSchema->errors);
-            $this->transportEntity->setStatusCode(SStatusCode::CODE_422);
+            $this->transportEntity->setStatusCode(EStatusCode::CODE_422);
 
             return null;
         }

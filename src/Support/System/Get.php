@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kentron\Support\System;
 
+use Kentron\Enum\EType;
 use Kentron\Support\Type\Type;
 
 /**
@@ -14,11 +15,11 @@ final class Get
      * Get one item from the _GET array
      *
      * @param string      $key  The post index to retrieve
-     * @param string|null $type The type to cast to if necessary
+     * @param EType|null $type The type to cast to if necessary
      *
      * @return mixed Can return any type
      */
-    public static function getOne(string $key, ?string $type = null)
+    public static function getOne(string $key, ?EType $type = null)
     {
         $value = $_GET[$key] ?? null;
 

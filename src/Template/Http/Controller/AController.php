@@ -5,7 +5,7 @@ namespace Kentron\Template\Http\Controller;
 
 use Kentron\Entity\ProviderTransportEntity;
 use Kentron\Entity\TransportEntity;
-use Kentron\Struct\SStatusCode;
+use Kentron\Enum\EStatusCode;
 use Kentron\Template\Entity\AEntity;
 use Kentron\Template\Provider\Service\AProviderService;
 
@@ -28,7 +28,7 @@ abstract class AController
 
         if (!$provider->run($providerTransportEntity)) {
             $this->transportEntity->mergeAlerts($providerTransportEntity);
-            $this->transportEntity->setStatusCode(SStatusCode::CODE_500);
+            $this->transportEntity->setStatusCode(EStatusCode::CODE_500);
         }
 
         return $providerTransportEntity->responseData;

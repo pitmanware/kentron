@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Kentron\Entity;
 
 use \Error;
-
+use Kentron\Enum\EContentType;
+use Kentron\Enum\EStatusCode;
 use Kentron\Struct\SContentType;
-use Kentron\Struct\SStatusCode;
 use Kentron\Support\Json;
 use Kentron\Template\Entity\AEntity;
 
@@ -62,7 +62,7 @@ class TransportEntity extends AEntity
     protected ResponseInterface $response;
 
     /** The HTTP status code of the response */
-    protected int $statusCode = SStatusCode::CODE_200;
+    protected EStatusCode $statusCode = EStatusCode::CODE_200;
 
     /**
      * Cookie list to be added to the response
@@ -99,7 +99,7 @@ class TransportEntity extends AEntity
         return $this->queryParameters;
     }
 
-    public function getStatusCode(): int
+    public function getStatusCode(): EStatusCode
     {
         return $this->statusCode;
     }
@@ -170,10 +170,10 @@ class TransportEntity extends AEntity
         $this->body = $body;
     }
 
-    public function setContentType(string $contentType): void
+    public function setContentType(EContentType $contentType): void
     {
         switch ($contentType) {
-            case SContentType::TYPE_JSON:
+            case EContentType::TYPE_JSON:
                 $this->jsonEncode = true;
                 break;
         }
@@ -213,7 +213,7 @@ class TransportEntity extends AEntity
         $this->quiet = $quiet;
     }
 
-    public function setStatusCode(int $statusCode): void
+    public function setStatusCode(EStatusCode $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
@@ -293,9 +293,9 @@ class TransportEntity extends AEntity
 
     private function mergeRespond(): void
     {
-        $this->response = $this->response->withStatus($this->statusCode);
+        $this->response = $this->response->withStatus($this->statusCode->value);
 
-        if (SStatusCode::codeRequiresLocation($this->statusCode) && is_null($this->headers->location)) {
+        if ($this->statusCode->codeRequiresLocation() && is_null($this->headers->location)) {
             throw new Error("Could not respond, missing location header");
         }
 
