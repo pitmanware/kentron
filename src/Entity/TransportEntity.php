@@ -6,7 +6,6 @@ namespace Kentron\Entity;
 use \Error;
 use Kentron\Enum\EContentType;
 use Kentron\Enum\EStatusCode;
-use Kentron\Struct\SContentType;
 use Kentron\Support\Json;
 use Kentron\Template\Entity\AEntity;
 
