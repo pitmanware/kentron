@@ -61,7 +61,7 @@ class TransportEntity extends AEntity
     protected ResponseInterface $response;
 
     /** The HTTP status code of the response */
-    protected EStatusCode $statusCode = EStatusCode::CODE_200;
+    protected EStatusCode $statusCode = EStatusCode::Code200;
 
     /**
      * Cookie list to be added to the response
@@ -169,10 +169,14 @@ class TransportEntity extends AEntity
         $this->body = $body;
     }
 
-    public function setContentType(EContentType $contentType): void
+    public function setContentType(string|EContentType $contentType): void
     {
+        if (is_string($contentType)) {
+            $contentType = EContentType::from($contentType);
+        }
+
         switch ($contentType) {
-            case EContentType::TYPE_JSON:
+            case EContentType::Json:
                 $this->jsonEncode = true;
                 break;
         }
@@ -212,8 +216,12 @@ class TransportEntity extends AEntity
         $this->quiet = $quiet;
     }
 
-    public function setStatusCode(EStatusCode $statusCode): void
+    public function setStatusCode(int|EStatusCode $statusCode): void
     {
+        if (is_int($statusCode)) {
+            $statusCode = EStatusCode::from($statusCode);
+        }
+
         $this->statusCode = $statusCode;
     }
 

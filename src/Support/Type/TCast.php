@@ -64,17 +64,17 @@ trait TCast
     public function to(EType $type): mixed
     {
         return match ($type) {
-            EType::TYPE_ARRAY   => $this->castToArray($this->value),
-            EType::TYPE_BOOL,
-            EType::TYPE_BOOLEAN => $this->castToBool($this->value),
-            EType::TYPE_FLOAT,
-            EType::TYPE_DOUBLE  => $this->castToFloat($this->value),
-            EType::TYPE_INT,
-            EType::TYPE_INTEGER => $this->castToInt($this->value),
-            EType::TYPE_OBJECT  => $this->castToObject($this->value),
-            EType::TYPE_STRING  => $this->castToString($this->value),
-            EType::TYPE_DT      => $this->castToDT($this->value),
-            EType::TYPE_JSON    => $this->castToJson($this->value),
+            EType::Array   => $this->castToArray($this->value),
+            EType::Bool,
+            EType::Boolean => $this->castToBool($this->value),
+            EType::Float,
+            EType::Double  => $this->castToFloat($this->value),
+            EType::Int,
+            EType::Integer => $this->castToInt($this->value),
+            EType::Object  => $this->castToObject($this->value),
+            EType::String  => $this->castToString($this->value),
+            EType::Dt      => $this->castToDT($this->value),
+            EType::Json    => $this->castToJson($this->value),
 
             default => $this->quiet ? $this->value : throw new UnexpectedValueException("$type is not a valid type")
         };

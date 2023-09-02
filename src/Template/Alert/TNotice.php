@@ -28,7 +28,7 @@ trait TNotice
             $this->notices[] = $notices;
         }
         else if (is_array($notices)) {
-            if (Type::isAssoc($notices) || !Type::of($notices)->isArrayOf(EType::TYPE_STRING)) {
+            if (Type::isAssoc($notices) || !Type::of($notices)->isArrayOf(EType::String)) {
                 throw new \UnexpectedValueException("Cannot add notices of type " . Type::get($notices));
             }
             $this->notices = array_merge($this->notices, $notices);

@@ -135,7 +135,7 @@ abstract class ACoreEntity extends AEntity
                 }
 
                 // Accepts an array of methods/Type::casts to cast with
-                if (Type::of($caster)->isArrayOf(EType::TYPE_STRING)) {
+                if (Type::of($caster)->isArrayOf(EType::String)) {
                     foreach ($caster as $cast) {
                         if ($this->isValidMethod($cast)) {
                             $dataProperty = $this->{$cast}($dataProperty, $property);
@@ -216,7 +216,7 @@ abstract class ACoreEntity extends AEntity
                 else {
                     /** @var string|string[]|null */
                     $getProp = $binding["get_prop"] ?? null;
-                    if (Type::of($getProp)->isArrayOf(EType::TYPE_STRING)) {
+                    if (Type::of($getProp)->isArrayOf(EType::String)) {
                         $entity = $this;
                         foreach ($getProp as $property) {
                             $propertyValue = $entity->bindGetProperty($property);

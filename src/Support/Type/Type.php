@@ -11,7 +11,9 @@ use Kentron\Template\Entity\ACoreCollectionEntity;
 use Kentron\Template\Entity\TCollection;
 
 use \ReflectionClass;
+use \BackedEnum;
 use \stdClass;
+use \Throwable;
 use \UnexpectedValueException;
 
 final class Type
@@ -66,7 +68,7 @@ final class Type
             }
         }
 
-        return EType::tryFromType($value)->value ?? gettype($value);
+        return EType::tryFromType($value)?->value ?? gettype($value);
     }
 
     /**
@@ -137,9 +139,18 @@ final class Type
                 $key = (string) $key;
             }
 
-            if (property_exists($data, $key)) {
+            if (isset($data->{$key})) {
                 return $data->{$key};
             }
+
+            if ($data instanceof BackedEnum) {
+                return $data::tryFrom($key);
+            }
+
+            try {
+                return constant("{$data}::{$key}");
+            }
+            catch (Throwable) {}
         }
         else if (is_array($data) && isset($data[$key])) {
             return $data[$key];
@@ -185,37 +196,43 @@ final class Type
     /**
      * Checks the value is type
      *
-     * @param EType $type The type to check
+     * @param string|EType $type The type to check
      *
      * @return bool If the type of the data matches
      *
      * @throws UnexpectedValueException If the given type is unknown
      */
-    public function is(EType $type): bool
+    public function is(string|EType $type): bool
     {
-        return match ($type) {
-            EType::TYPE_ARRAY   => $this->isArray($this->value),
-            EType::TYPE_BOOL,
-            EType::TYPE_BOOLEAN => $this->isBool($this->value),
-            EType::TYPE_FLOAT,
-            EType::TYPE_DOUBLE  => $this->isFloat($this->value),
-            EType::TYPE_INT,
-            EType::TYPE_INTEGER => $this->isInt($this->value),
-            EType::TYPE_OBJECT  => $this->isObject($this->value),
-            EType::TYPE_STRING  => $this->isString($this->value),
-            EType::TYPE_DT      => $this->isDT($this->value),
-            EType::TYPE_JSON    => Json::isValid($this->value),
+        if (is_string($type)) {
+            $type = EType::tryFromType($type);
+        }
 
-            EType::TYPE_ARRAY_ARRAY     => $this->isArrayOf(EType::TYPE_ARRAY),
-            EType::TYPE_ARRAY_BOOL,
-            EType::TYPE_ARRAY_BOOLEAN   => $this->isArrayOf(EType::TYPE_BOOL),
-            EType::TYPE_ARRAY_FLOAT,
-            EType::TYPE_ARRAY_DOUBLE    => $this->isArrayOf(EType::TYPE_FLOAT),
-            EType::TYPE_ARRAY_INT,
-            EType::TYPE_ARRAY_INTEGER   => $this->isArrayOf(EType::TYPE_INT),
-            EType::TYPE_ARRAY_OBJECT    => $this->isArrayOf(EType::TYPE_OBJECT),
-            EType::TYPE_ARRAY_STRING    => $this->isArrayOf(EType::TYPE_STRING),
-            EType::TYPE_ARRAY_DT        => $this->isArrayOf(EType::TYPE_DT),
+        return match ($type) {
+            EType::Null     => $this->isNull($this->value),
+            EType::Array    => $this->isArray($this->value),
+            EType::Bool,
+            EType::Boolean  => $this->isBool($this->value),
+            EType::Float,
+            EType::Double   => $this->isFloat($this->value),
+            EType::Int,
+            EType::Integer  => $this->isInt($this->value),
+            EType::Object   => $this->isObject($this->value),
+            EType::String   => $this->isString($this->value),
+            EType::Resource => $this->isResource($this->value),
+            EType::Dt       => $this->isDt($this->value),
+            EType::Json     => Json::isValid($this->value),
+
+            EType::ArrayNull     => $this->isArrayOf(EType::Null),
+            EType::ArrayArray    => $this->isArrayOf(EType::Array),
+            EType::ArrayBool     => $this->isArrayOf(EType::Bool),
+            EType::ArrayFloat    => $this->isArrayOf(EType::Float),
+            EType::ArrayInt      => $this->isArrayOf(EType::Int),
+            EType::ArrayObject   => $this->isArrayOf(EType::Object),
+            EType::ArrayString   => $this->isArrayOf(EType::String),
+            EType::ArrayResource => $this->isArrayOf(EType::Resource),
+            EType::ArrayDt       => $this->isArrayOf(EType::Dt),
+            EType::ArrayJson     => $this->isArrayOf(EType::Json),
 
             default => throw new UnexpectedValueException("$type is not a valid type")
         };
@@ -224,25 +241,32 @@ final class Type
     /**
      * Checks the value is an array of type
      *
-     * @param EType $type The type to check
+     * @param string|EType $type The type to check
      *
      * @return bool If the type of the data matches
      *
      * @throws UnexpectedValueException If the given type is unknown
      */
-    public function isArrayOf(EType $type): bool
+    public function isArrayOf(string|EType $type): bool
     {
+        if (is_string($type)) {
+            $type = EType::from($type);
+        }
+
         $callable = match ($type) {
-            EType::TYPE_ARRAY   => fn($element) => $this->isArray($element),
-            EType::TYPE_BOOL,
-            EType::TYPE_BOOLEAN => fn($element) => $this->isBool($element),
-            EType::TYPE_FLOAT,
-            EType::TYPE_DOUBLE  => fn($element) => $this->isFloat($element),
-            EType::TYPE_INT,
-            EType::TYPE_INTEGER => fn($element) => $this->isInt($element),
-            EType::TYPE_OBJECT  => fn($element) => $this->isObject($element),
-            EType::TYPE_STRING  => fn($element) => $this->isString($element),
-            EType::TYPE_DT      => fn($element) => $this->isDT($element),
+            EType::Null     => fn($element) => $this->isNull($element),
+            EType::Array    => fn($element) => $this->isArray($element),
+            EType::Bool,
+            EType::Boolean  => fn($element) => $this->isBool($element),
+            EType::Float,
+            EType::Double   => fn($element) => $this->isFloat($element),
+            EType::Int,
+            EType::Integer  => fn($element) => $this->isInt($element),
+            EType::Object   => fn($element) => $this->isObject($element),
+            EType::String   => fn($element) => $this->isString($element),
+            EType::Resource => fn($element) => $this->isResource($element),
+            EType::Dt       => fn($element) => $this->isDt($element),
+            EType::Json     => fn($element) => Json::isValid($element),
 
             default => throw new UnexpectedValueException("$type is not a valid type")
         };
@@ -252,6 +276,28 @@ final class Type
         }
 
         return count($this->value) === count(array_filter($this->value, $callable));
+    }
+
+    /**
+     * Chainable method fo is()
+     *
+     * @return bool
+     */
+    public function aNull(): bool
+    {
+        return self::isNull($this->value);
+    }
+
+    /**
+     * Is null
+     *
+     * @param mixed $value Accepts any type
+     *
+     * @return bool
+     */
+    public static function isNull(mixed $value): bool
+    {
+        return is_null($value);
     }
 
     /**
@@ -394,9 +440,31 @@ final class Type
      *
      * @return bool
      */
-    public function aDT(): bool
+    public function aResource(): bool
     {
-        return self::isDT($this->value);
+        return self::isResource($this->value);
+    }
+
+    /**
+     * Is a resource
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public static function isResource(mixed $value): bool
+    {
+        return is_resource($value);
+    }
+
+    /**
+     * Chainable method for is()
+     *
+     * @return bool
+     */
+    public function aDt(): bool
+    {
+        return self::isDt($this->value);
     }
 
     /**
@@ -406,7 +474,7 @@ final class Type
      *
      * @return bool
      */
-    public static function isDT(mixed $value): bool
+    public static function isDt(mixed $value): bool
     {
         return $value instanceof DT;
     }

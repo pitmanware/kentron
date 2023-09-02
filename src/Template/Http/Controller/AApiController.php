@@ -20,14 +20,14 @@ abstract class AApiController extends AController
 
         if (is_null($body)) {
             $this->transportEntity->addError("Request body is not valid JSON. " . Json::handleError());
-            $this->transportEntity->setStatusCode(EStatusCode::CODE_400);
+            $this->transportEntity->setStatusCode(EStatusCode::Code400);
 
             return null;
         }
 
         if (!$jsonSchema->isValid($body, Json::toObject($schema))) {
             $this->transportEntity->addError($jsonSchema->errors);
-            $this->transportEntity->setStatusCode(EStatusCode::CODE_422);
+            $this->transportEntity->setStatusCode(EStatusCode::Code422);
 
             return null;
         }

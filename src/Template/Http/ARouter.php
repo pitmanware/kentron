@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Http;
 
+use Kentron\Template\AClass;
 use Kentron\Template\IApp;
 
-abstract class ARouter
+abstract class ARouter extends AClass
 {
     protected static string $apiRoutePath;
     protected static string $ajaxRoutePath;

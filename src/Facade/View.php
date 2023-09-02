@@ -5,6 +5,7 @@ namespace Kentron\Facade;
 
 use Kentron\Support\Type\Type;
 use Kentron\Support\File;
+use Kentron\Template\AClass;
 
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
@@ -14,7 +15,7 @@ use \InvalidArgumentException;
 /**
  * FIX: This expects a package that has been removed, it needs to be abstracted
  */
-class View
+class View extends AClass
 {
     public string $title = "";
     public mixed $data = [];

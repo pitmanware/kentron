@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Kentron\Support\System;
 
 use Kentron\Facade\DT;
+use Kentron\Template\AClass;
 
-class Cookie
+class Cookie extends AClass
 {
     public static $headers = [];
 

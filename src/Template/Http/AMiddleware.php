@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Kentron\Template\Http;
 
 use Kentron\Entity\TransportEntity;
+use Kentron\Template\AClass;
 
 /**
  * The base abstract middleware
  */
-abstract class AMiddleware
+abstract class AMiddleware extends AClass
 {
     /**
      * Creates the Request and Response objects and runs access checks

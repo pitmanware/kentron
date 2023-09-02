@@ -7,13 +7,13 @@ use JsonSchema\SchemaStorage;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\Constraint;
-
+use Kentron\Template\AClass;
 use Kentron\Template\Alert\TError;
 
 /**
  * Used to validate json against a schema.
  */
-class JsonSchema
+class JsonSchema extends AClass
 {
     use TError;
 

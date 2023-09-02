@@ -5,8 +5,8 @@ namespace Kentron\Support;
 
 use Kentron\Exception\XmlFormatException;
 
-use Kentron\Facade\Twig;
 use Kentron\Facade\View;
+use \SimpleXMLElement;
 
 final class Xml
 {
@@ -39,7 +39,7 @@ final class Xml
         libxml_use_internal_errors(true);
         $loadedXml = simplexml_load_string($xml);
 
-        if (!($xml instanceof \SimpleXMLElement)) {
+        if (!($xml instanceof SimpleXMLElement)) {
             if ($allowNull) {
                 return null;
             }
@@ -71,7 +71,7 @@ final class Xml
      *
      * @return array The formatted extracted XML array
      */
-    public static function format(\SimpleXMLElement $xml): array
+    public static function format(SimpleXMLElement $xml): array
     {
         $collection = [];
         $nodes = $xml->children();
@@ -88,7 +88,7 @@ final class Xml
             return $collection;
         }
 
-        /** @var \SimpleXMLElement $nodeValue */
+        /** @var SimpleXMLElement $nodeValue */
         foreach ($nodes as $nodeName => $nodeValue) {
             if (count($nodeValue->xpath('../' . $nodeName)) < 2) {
                 $collection[$nodeName] = self::format($nodeValue);

@@ -5,9 +5,8 @@ namespace Kentron\Facade;
 
 use \DateTime;
 use \DateInterval;
-
+use Kentron\Enum\EType;
 use Kentron\Exception\CustomTypeError;
-use Kentron\Service\Type;
 
 /**
  * Singleton for the DateTime object
@@ -102,7 +101,7 @@ final class DT extends DateTime
     public function format($format = ""): string
     {
         if (!is_string($format)) {
-            throw new CustomTypeError(__METHOD__, Type::TYPE_STRING, gettype($format));
+            throw new CustomTypeError(__METHOD__, EType::String->value, gettype($format));
         }
 
         return parent::format($format ?: "c");

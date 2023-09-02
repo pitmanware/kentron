@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Kentron\Support\System;
 
-class Session
+use Kentron\Template\AClass;
+
+class Session extends AClass
 {
     public static function get(string $key)
     {

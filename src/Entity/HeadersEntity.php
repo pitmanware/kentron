@@ -9,7 +9,7 @@ use Kentron\Template\Entity\ACoreEntity;
 
 class HeadersEntity extends ACoreEntity
 {
-    public EContentType $contentType = EContentType::TYPE_JSON;
+    public EContentType $contentType = EContentType::Json;
     public string $cacheControl = "max-age=300, must-revalidate";
     public string|null $location = null;
 

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kentron\Facade;
+namespace Kentron\Support;
 
 use Kentron\Support\Http\Http;
 use Kentron\Support\System\Client;
@@ -19,7 +19,6 @@ final class Geo
 
         $http->baseUrl = self::URL;
         $http->setGetData(["ip" => Client::getIP()]);
-        $http->decoding = $http::DECODE_JSON;
         $http->decodeAsArray = true;
 
         if (!$http->run()) {

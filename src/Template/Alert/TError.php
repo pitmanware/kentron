@@ -7,6 +7,7 @@ use Kentron\Enum\EType;
 use Kentron\Support\Type\Type;
 
 use \ReflectionClass;
+use \UnexpectedValueException;
 
 /**
  * Error handling methods
@@ -27,8 +28,8 @@ trait TError
             $this->errors[] = $errors;
         }
         else if (is_array($errors) && !empty($errors)) {
-            if (Type::isAssoc($errors) || !Type::of($errors)->isArrayOf(EType::TYPE_STRING)) {
-                throw new \UnexpectedValueException("Cannot add errors of type " . Type::get($errors));
+            if (Type::isAssoc($errors) || !Type::of($errors)->isArrayOf(EType::String)) {
+                throw new UnexpectedValueException("Cannot add errors of type " . Type::get($errors));
             }
             $this->errors = array_merge($this->errors, $errors);
         }

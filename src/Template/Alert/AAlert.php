@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Alert;
 
+use Kentron\Template\AClass;
+
 /**
  * Error handling methods
  */
-abstract class AAlert
+abstract class AAlert extends AClass
 {
     use TError;
     use TErrorCode;

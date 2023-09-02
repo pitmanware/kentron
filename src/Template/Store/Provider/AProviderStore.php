@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Store\Provider;
 
+use Kentron\Template\AClass;
 use Kentron\Template\Provider\Entity\IProviderEntity;
 use Kentron\Template\Store\Variable\Provider\AProviderVarStore;
 
-abstract class AProviderStore
+abstract class AProviderStore extends AClass
 {
     public static AProviderVarStore|string $store;
 

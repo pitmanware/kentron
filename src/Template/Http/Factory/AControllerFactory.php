@@ -5,12 +5,13 @@ namespace Kentron\Template\Http\Factory;
 
 use \RuntimeException;
 
+use Kentron\Template\AClass;
 use Kentron\Template\Http\Controller\AController;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AControllerFactory
+abstract class AControllerFactory extends AClass
 {
     use TGetTransportEntity;
 

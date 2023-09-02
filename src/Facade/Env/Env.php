@@ -6,12 +6,13 @@ namespace Kentron\Facade\Env;
 use Kentron\Support\File;
 use Kentron\Support\Assert;
 use Kentron\Facade\Env\Enum\EEnvironment;
+use Kentron\Template\AClass;
 
 use Dotenv\Dotenv;
 
 use \Error;
 
-class Env
+class Env extends AClass
 {
     protected const DEFAULT_ENV_NAME = ".env";
     protected const DEFAULT_ENV_DIR = "/env";

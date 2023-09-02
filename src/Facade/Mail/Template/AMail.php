@@ -7,8 +7,9 @@ use Kentron\Facade\Mail\Entity\Attachment\MailAttachmentEntity;
 use Kentron\Facade\Mail\Entity\Embed\MailEmbedEntity;
 use Kentron\Facade\Mail\Entity\MailTargetEntity;
 use Kentron\Facade\Mail\Entity\MailTransportEntity;
+use Kentron\Template\AClass;
 
-abstract class AMail
+abstract class AMail extends AClass
 {
     /**
      * Mail service

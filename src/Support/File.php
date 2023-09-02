@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Kentron\Support;
 
-class File
+use Kentron\Template\AClass;
+
+class File extends AClass
 {
     /**
      * Static helpers

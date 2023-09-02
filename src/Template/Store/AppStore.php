@@ -5,19 +5,12 @@ namespace Kentron\Template\Store;
 
 use Kentron\Entity\TransportEntity;
 
-class AppStore implements IStore
+/**
+ * Store for the core app functionality
+ */
+class AppStore extends AStore
 {
-    private static TransportEntity $transportEntity;
-
-    public static function getTransportEntity(): TransportEntity
-    {
-        return self::$transportEntity;
-    }
-
-    final public static function setTransportEntity(TransportEntity $transportEntity): void
-    {
-        self::$transportEntity = $transportEntity;
-    }
+    public static TransportEntity $transportEntity;
 
     /**
      * Helpers

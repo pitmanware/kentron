@@ -23,7 +23,7 @@ abstract class ASystemController extends AController
     {
         $view = new View($directory, $index, $frame);
 
-        $this->transportEntity->setContentType(EContentType::TYPE_HTML);
+        $this->transportEntity->setContentType(EContentType::Html);
 
         $view->removeScripts();
         $view->setAlerts($this->transportEntity->normaliseAlerts());

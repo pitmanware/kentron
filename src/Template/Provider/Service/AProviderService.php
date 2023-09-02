@@ -6,8 +6,9 @@ namespace Kentron\Template\Provider\Service;
 use Kentron\Template\Provider\Entity\AProviderRequestEntity;
 use Kentron\Entity\ProviderTransportEntity;
 use Kentron\Support\Http\Http;
+use Kentron\Template\AClass;
 
-abstract class AProviderService
+abstract class AProviderService extends AClass
 {
     /** The specific provider entity */
     protected AProviderRequestEntity $providerRequestEntity;

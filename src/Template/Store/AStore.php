@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Store;
 
-interface IStore
+use Kentron\Template\AClass;
+
+abstract class AStore extends AClass
 {
     /**
      * Enforces that a static store can be reset to an original state
      *
      * @return void
      */
-    public static function reset(bool $hard = false): void;
+    abstract public static function reset(bool $hard = false): void;
 }

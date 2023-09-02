@@ -3,16 +3,17 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Store\Variable;
 
+use Kentron\Enum\EType;
+
 use Kentron\Support\Type\Type;
 use Kentron\Support\System\Crypt;
 
-use Kentron\Template\Store\IStore;
+use Kentron\Template\Store\AStore;
 use Kentron\Template\Store\Variable\IVariableDbEntity;
 
 use \Exception;
-use Kentron\Enum\EType;
 
-abstract class AVariableStore implements IStore
+abstract class AVariableStore extends AStore
 {
     /** All decrypted variables */
     protected static array $store = [];

@@ -5,7 +5,7 @@ namespace Kentron\Template\Entity;
 
 use Kentron\Template\Alert\AAlert;
 
-use Kentron\Struct\SType;
+use Kentron\Enum\EType;
 use Kentron\Support\Assert;
 use Kentron\Support\Json;
 use Kentron\Support\Type\Type;
@@ -216,7 +216,7 @@ abstract class AEntity extends AAlert
                     break;
                 }
                 // Casts integer booleans (1/0) to bool
-                else if (Type::isInt($value, true) && Assert::same($type, SType::TYPE_BOOL)) {
+                else if (Type::isInt($value, true) && Assert::same($type, EType::Bool)) {
                     $value = Type::cast($value)->quietly()->toBool();
                     break;
                 }
@@ -242,11 +242,11 @@ abstract class AEntity extends AAlert
                 }
                 // Used for JSON strings
                 else if (Type::isString($value)) {
-                    if (Assert::same($type, SType::TYPE_ARRAY) && is_array($jsonArray = Json::toArray($value))) {
+                    if (Assert::same($type, EType::Array) && is_array($jsonArray = Json::toArray($value))) {
                         $value = $jsonArray;
                         break;
                     }
-                    else if (Assert::same($type, SType::TYPE_OBJECT) && is_object($jsonObject = Json::toObject($value))) {
+                    else if (Assert::same($type, EType::Object) && is_object($jsonObject = Json::toObject($value))) {
                         $value = $jsonObject;
                         break;
                     }

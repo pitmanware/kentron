@@ -5,17 +5,10 @@ namespace Kentron\Support;
 
 use \Closure;
 use \Error;
+use Kentron\Enum\EOperator;
 
 final class Evaluate
 {
-    public const OP_ADD = "add";
-    public const OP_SUBTRACT = "sub";
-    public const OP_DIVIDE = "div";
-    public const OP_MULTIPLY = "mul";
-    public const OP_RAISE = "pow";
-    public const OP_AND = "and";
-    public const OP_OR = "or";
-
     /**
      * Add together all parameters
      *
@@ -105,21 +98,20 @@ final class Evaluate
         return in_array(true, [$operand, ...$operands]);
     }
 
-
     /**
      * Get a callable based on the operator
      *
-     * @param string $operator
+     * @param EOperator|string $operator
      *
      * @return Closure
      */
-    public static function parseOperator(string $operator): Closure
+    public static function parseOperator(EOperator|string $operator): Closure
     {
-        $add      = fn(int|float ...$operands) => Evaluate::add(...$operands);
-        $subtract = fn(int|float ...$operands) => Evaluate::subtract(...$operands);
-        $divide   = fn(int|float ...$operands) => Evaluate::divide(...$operands);
-        $multiply = fn(int|float ...$operands) => Evaluate::multiply(...$operands);
-        $raise    = fn(int|float ...$operands) => Evaluate::raise(...$operands);
+        $add      = fn(int|float ...$operands) => self::add(...$operands);
+        $subtract = fn(int|float ...$operands) => self::subtract(...$operands);
+        $divide   = fn(int|float ...$operands) => self::divide(...$operands);
+        $multiply = fn(int|float ...$operands) => self::multiply(...$operands);
+        $raise    = fn(int|float ...$operands) => self::raise(...$operands);
 
         $callIfNumeric = function(callable $callback, ...$operands)
         {
@@ -133,35 +125,37 @@ final class Evaluate
 
             return call_user_func($callback, ...$operands);
         };
+        $operator = is_string($operator) ? EOperator::from($operator) : $operator;
 
         return match ($operator) {
-            Evaluate::OP_ADD      => Closure::fromCallable($callIfNumeric($add, ...func_get_args())),
-            Evaluate::OP_SUBTRACT => Closure::fromCallable($callIfNumeric($subtract, ...func_get_args())),
-            Evaluate::OP_DIVIDE   => Closure::fromCallable($callIfNumeric($divide, ...func_get_args())),
-            Evaluate::OP_MULTIPLY => Closure::fromCallable($callIfNumeric($multiply, ...func_get_args())),
-            Evaluate::OP_RAISE    => Closure::fromCallable($callIfNumeric($raise, ...func_get_args())),
-            Evaluate::OP_AND      => Closure::fromCallable(fn(bool ...$operands) => Evaluate::and(...$operands)),
-            Evaluate::OP_OR       => Closure::fromCallable(fn(bool ...$operands) => Evaluate::or(...$operands))
+            EOperator::Add      => Closure::fromCallable($callIfNumeric($add, ...func_get_args())),
+            EOperator::Subtract => Closure::fromCallable($callIfNumeric($subtract, ...func_get_args())),
+            EOperator::Divide   => Closure::fromCallable($callIfNumeric($divide, ...func_get_args())),
+            EOperator::Multiply => Closure::fromCallable($callIfNumeric($multiply, ...func_get_args())),
+            EOperator::Raise    => Closure::fromCallable($callIfNumeric($raise, ...func_get_args())),
+            EOperator::And      => Closure::fromCallable(fn(bool ...$operands) => self::and(...$operands)),
+            EOperator::Or       => Closure::fromCallable(fn(bool ...$operands) => self::or(...$operands))
         };
     }
 
     /**
      * Get the readable version of the operator
      *
-     * @param string $operator
+     * @param EOperator|string $operator
      *
      * @return string
      */
-    public static function getReadableOperator(string $operator): string
+    public static function getReadableOperator(EOperator|string $operator): string
     {
+        $operator = is_string($operator) ? EOperator::from($operator) : $operator;
         return match ($operator) {
-            self::OP_ADD => "+",
-            self::OP_AND => "and",
-            self::OP_DIVIDE => "÷",
-            self::OP_MULTIPLY => "x",
-            self::OP_OR => "or",
-            self::OP_RAISE => "^",
-            self::OP_SUBTRACT => "-"
+            EOperator::Add => "+",
+            EOperator::And => "and",
+            EOperator::Divide => "÷",
+            EOperator::Multiply => "x",
+            EOperator::Or => "or",
+            EOperator::Raise => "^",
+            EOperator::Subtract => "-"
         };
     }
 }

@@ -3,68 +3,174 @@ declare(strict_types=1);
 
 namespace Kentron\Enum;
 
-use Throwable;
+use Kentron\Facade\DT;
+use Kentron\Support\Json;
+use Kentron\Support\Type\Type;
+
+use \ValueError;
 
 enum EType: string
 {
-    case TYPE_ARRAY = "array";
-    case TYPE_BOOL = "bool";
-    case TYPE_BOOLEAN = "boolean";
-    case TYPE_DOUBLE = "double";
-    case TYPE_FLOAT = "float";
-    case TYPE_INT = "int";
-    case TYPE_INTEGER = "integer";
-    case TYPE_NULL = "null";
-    case TYPE_OBJECT = "object";
-    case TYPE_RESOURCE = "resource";
-    case TYPE_STRING = "string";
-    case TYPE_DT = "dt";
-    case TYPE_JSON = "json";
+    case Null = "null";
+    case Array = "array";
+    case Bool = "bool";
+    case Boolean = "boolean";
+    case Double = "double";
+    case Float = "float";
+    case Int = "int";
+    case Integer = "integer";
+    case Object = "object";
+    case Resource = "resource";
+    case ResourceClosed = "resource (closed)";
+    case String = "string";
+    case Dt = "dt";
+    case Json = "json";
+    case Mixed = "mixed";
 
-    case TYPE_ARRAY_ARRAY = "array_array";
-    case TYPE_ARRAY_BOOL = "array_bool";
-    case TYPE_ARRAY_BOOLEAN = "array_boolean";
-    case TYPE_ARRAY_DOUBLE = "array_double";
-    case TYPE_ARRAY_FLOAT = "array_float";
-    case TYPE_ARRAY_INT = "array_int";
-    case TYPE_ARRAY_INTEGER = "array_integer";
-    case TYPE_ARRAY_OBJECT = "array_object";
-    case TYPE_ARRAY_STRING = "array_string";
-    case TYPE_ARRAY_DT = "array_dt";
+    case ArrayNull = "null[]";
+    case ArrayArray = "array[]";
+    case ArrayBool = "bool[]";
+    case ArrayFloat = "float[]";
+    case ArrayInt = "int[]";
+    case ArrayResource = "resource[]";
+    case ArrayResourceClosed = "resource_closed[]";
+    case ArrayObject = "object[]";
+    case ArrayString = "string[]";
+    case ArrayDt = "dt[]";
+    case ArrayJson = "json[]";
+    case ArrayMixed = "mixed[]";
 
     /**
-     * Checks if a type is available to be coerced
+     * Wrapper for from() but renames Boolean to Bool, Double to Float and Integer to Int
      *
-     * @param string $type The type to cast to
+     * @param string $type
+     *
+     * @return static
+     *
+     * @throws ValueError if the type is not recognised
+     */
+    public static function fromType(string $type): static
+    {
+        $eType = self::from($type);
+
+        return match ($type) {
+            self::Boolean => self::Bool,
+            self::Double => self::Float,
+            self::Integer => self::Int,
+
+            default => $eType
+        };
+    }
+
+    /**
+     * Wrapper for fromType() but returns null on exception
+     *
+     * @param string $type
+     *
+     * @return static|null
+     */
+    public static function tryFromType(string $type): ?static
+    {
+        try {
+            return self::fromType($type);
+        }
+        catch (ValueError) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets the EType based on a mixed type variable
+     *
+     * @param mixed $value
+     *
+     * @return static
+     *
+     * @throws ValueError if the type is not recognised
+     */
+    public static function fromMixed(mixed $value): static
+    {
+        $eType = self::fromType(strtolower(gettype($value)));
+
+        if ($eType === self::Array) {
+            if (!Type::isAssoc($value)) {
+                $eType = self::ArrayMixed;
+                $zerothType = self::tryFromMixed($value[0] ?? null);
+
+                if (Type::of($value)->isArrayOf($zerothType)) {
+                    $eType = match ($zerothType) {
+                        self::Null => self::ArrayNull,
+                        self::Array => self::ArrayArray,
+                        self::Bool => self::ArrayBool,
+                        self::Float => self::ArrayFloat,
+                        self::Int => self::ArrayInt,
+                        self::Object => self::ArrayObject,
+                        self::Resource => self::ArrayResource,
+                        self::ResourceClosed => self::ArrayResourceClosed,
+                        self::String => self::ArrayString,
+                        self::Dt => self::ArrayDt,
+                        self::Json => self::ArrayJson,
+                        default => $eType
+                    };
+                }
+            }
+        }
+        else if ($eType === self::Object) {
+            if ($value instanceof DT) {
+                $eType = self::Dt;
+            }
+        }
+        else if ($eType === self::String) {
+            if (Json::isValid($value)) {
+                $eType = self::Json;
+            }
+        }
+
+        return $eType;
+    }
+
+    /**
+     * Same as fromMixed() but returns null on Exception
+     *
+     * @param mixed $value
+     *
+     * @return static|null
+     */
+    public static function tryFromMixed(mixed $value): ?static
+    {
+        try {
+            return self::fromMixed($value);
+        }
+        catch (ValueError) {
+            return null;
+        }
+    }
+
+    /**
+     * Checks if a type is available
+     *
+     * @param string $type The type to check
      *
      * @return bool If the type is available
      */
     public static function exists(string $type): bool
     {
-        return !!self::tryFrom(strtolower($type));
+        return !is_null(self::tryFrom($type));
     }
 
-    public static function fromType(mixed $value): static
+    /**
+     * Check if a type is the one we want
+     *
+     * @param string|self $type
+     *
+     * @return bool
+     */
+    public function is(string|self $type): bool
     {
-        $type = self::from(gettype($value));
-
-        $type = match($type) {
-            self::TYPE_BOOLEAN => self::TYPE_BOOL,
-            self::TYPE_DOUBLE => self::TYPE_FLOAT,
-            self::TYPE_INTEGER => self::TYPE_INT,
-            default => $type
-        };
-
-        return $type;
-    }
-
-    public static function tryFromType(mixed $value): ?static
-    {
-        try {
-            return self::fromType($value);
+        if (is_string($type)) {
+            $type = self::fromType($type);
         }
-        catch (Throwable) {
-            return null;
-        }
+
+        return $this === $type;
     }
 }

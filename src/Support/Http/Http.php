@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kentron\Support\Http;
 
+use Kentron\Enum\EHttpMethod;
 use Kentron\Enum\EType;
 use Kentron\Support\Http\TSoap;
 use Kentron\Support\Json;
@@ -19,30 +20,11 @@ final class Http
     use TSoap;
     use TError;
 
-    public const ENCODE_NONE = 1;
-    public const ENCODE_JSON = 2;
-    public const ENCODE_CLASS = 3;
-    public const ENCODE_FILE = 4;
-    public const ENCODE_XML = 5;
-    public const ENCODE_SOAP = 6;
-
-    public const DECODE_NONE = 1;
-    public const DECODE_JSON = 2;
-    public const DECODE_CLASS = 3;
-    public const DECODE_XML = 4;
-    public const DECODE_SOAP = 5;
-
-    public const METHOD_GET = 1;
-    public const METHOD_POST = 2;
-    public const METHOD_PUT = 3;
-    public const METHOD_DELETE = 4;
-    public const METHOD_SOAP = 5;
-
     public bool $decodeAsArray = false;
     public bool $urlEncode = false;
-    public int $decoding = self::DECODE_JSON;
-    public int $encoding = self::ENCODE_JSON;
-    public int $httpMethod = self::METHOD_POST;
+    public EDecodeAs $decoding = EDecodeAs::Json;
+    public EEncodeAs $encoding = EEncodeAs::Json;
+    public EHttpMethod $httpMethod = EHttpMethod::Post;
     public string $baseUrl;
     public string $getString = "";
     public string $uri = "";
@@ -109,13 +91,7 @@ final class Http
      */
     public function getHttpMethod(): string
     {
-        return match ($this->httpMethod) {
-            self::METHOD_GET => "GET",
-            self::METHOD_POST => "POST",
-            self::METHOD_PUT => "PUT",
-            self::METHOD_DELETE => "DELETE",
-            default => throw new \UnexpectedValueException("CURL method given is unknown")
-        };
+        return $this->httpMethod->value;
     }
 
     /**
@@ -186,7 +162,7 @@ final class Http
         }
 
         switch ($this->encoding) {
-            case self::ENCODE_NONE:
+            case EEncodeAs::None:
                 if (!is_string($postData) && !(is_array($postData) && Type::isAssoc($postData))) {
                     throw new \InvalidArgumentException("Invalid post data type");
                 }
@@ -210,7 +186,7 @@ final class Http
 
                 break;
 
-            case self::ENCODE_JSON:
+            case EEncodeAs::Json:
                 $postData = json_encode($postData);
                 if ($postData === false) {
                     throw new \ErrorException("Post data could not be JSON encoded: " . Json::handleError());
@@ -221,11 +197,11 @@ final class Http
 
                 break;
 
-            case self::ENCODE_CLASS:
+            case EEncodeAs::Serial:
                 $postData = serialize($postData);
                 break;
 
-            case self::ENCODE_FILE:
+            case EEncodeAs::File:
                 $filePath = realpath($postData);
                 if (empty($filePath) || !@file_exists($filePath) || !@is_readable($filePath)) {
                     throw new \ErrorException("File '$filePath' does not exist or is not readable");
@@ -236,8 +212,8 @@ final class Http
 
                 break;
 
-            case self::ENCODE_XML:
-            case self::ENCODE_SOAP:
+            case EEncodeAs::Xml:
+            case EEncodeAs::Soap:
                 if (isset($this->viewPath) && isset($this->method)) {
                     $postData = Xml::build($this->viewPath, $this->method, Type::cast($postData)->toArray());
                 }
@@ -303,7 +279,7 @@ final class Http
      */
     public function run(): bool
     {
-        if ($this->httpMethod === self::METHOD_SOAP) {
+        if ($this->httpMethod === EHttpMethod::Soap) {
             self::runSoap();
         }
         else {
@@ -412,11 +388,11 @@ final class Http
         }
 
         switch ($this->decoding) {
-            case self::DECODE_NONE:
+            case EDecodeAs::None:
                 $extracted = $response;
                 break;
 
-            case self::DECODE_JSON:
+            case EDecodeAs::Json:
                 $extracted = json_decode($response, $this->decodeAsArray);
 
                 if (is_null($extracted)) {
@@ -428,7 +404,7 @@ final class Http
 
                 break;
 
-            case self::DECODE_CLASS:
+            case EDecodeAs::Serial:
                 $extracted = unserialize($response);
 
                 if (is_null($extracted)) {
@@ -437,7 +413,7 @@ final class Http
                 }
                 break;
 
-            case self::DECODE_XML:
+            case EDecodeAs::Xml:
                 $extracted = Xml::extract($response);
 
                 if (is_null($extracted)) {
@@ -446,7 +422,7 @@ final class Http
                 }
                 break;
 
-            case self::DECODE_SOAP:
+            case EDecodeAs::Soap:
                 $extracted = Xml::extract(
                     preg_replace(
                         ['/(<\/?)(\w+):([^>]*>)/', '/&lt;/', '/&gt;/'],
@@ -473,7 +449,7 @@ final class Http
         $this->extracted = $extracted;
 
         $errors = Type::getProperty($extracted, "errors") ?? [];
-        if (Type::of($errors)->isArrayOf(EType::TYPE_STRING)) {
+        if (Type::of($errors)->isArrayOf(EType::String)) {
             $this->addError($errors);
         }
     }

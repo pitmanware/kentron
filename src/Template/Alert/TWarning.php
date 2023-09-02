@@ -28,7 +28,7 @@ trait TWarning
             $this->warnings[] = $warnings;
         }
         else if (is_array($warnings)) {
-            if (Type::isAssoc($warnings) || !Type::of($warnings)->isArrayOf(EType::TYPE_STRING)) {
+            if (Type::isAssoc($warnings) || !Type::of($warnings)->isArrayOf(EType::String)) {
                 throw new \UnexpectedValueException("Cannot add warnings of type " . Type::get($warnings));
             }
             $this->warnings = array_merge($this->warnings, $warnings);
