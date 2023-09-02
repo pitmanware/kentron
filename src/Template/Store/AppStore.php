@@ -10,7 +10,12 @@ use Kentron\Entity\TransportEntity;
  */
 class AppStore extends AStore
 {
-    public static TransportEntity $transportEntity;
+    protected static TransportEntity $transportEntity;
+
+    public static function getTransportEntity(): TransportEntity
+    {
+        return self::$transportEntity;
+    }
 
     /**
      * Helpers
