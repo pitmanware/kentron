@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kentron\Facade\Mail\Entity\Embed;
 
-use Kentron\Entity\Template\ACollectionEntity;
+use Kentron\Template\Entity\ACollectionEntity;
 
 final class MailEmbedCollectionEntity extends ACollectionEntity
 {

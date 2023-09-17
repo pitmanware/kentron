@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kentron\Facade\Mail\Entity;
 
-use Kentron\Entity\Template\AEntity;
+use Kentron\Template\Entity\AEntity;
 
 final class MailTargetEntity extends AEntity
 {
