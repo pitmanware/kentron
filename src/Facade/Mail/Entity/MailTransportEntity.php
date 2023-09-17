@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kentron\Facade\Mail\Entity;
 
-use Kentron\Entity\Template\AEntity;
-use Kentron\Service\File;
+use Kentron\Template\Entity\AEntity;
+use Kentron\Support\File;
 
 use Kentron\Facade\Mail\Entity\Attachment\{
     MailAttachmentCollectionEntity,
@@ -151,7 +151,7 @@ final class MailTransportEntity extends AEntity
         $fileName = $fileName ?? basename($filePath);
 
         /** @var MailAttachmentEntity $attachmentEntity */
-        $attachmentEntity = $this->getAttachmentCollectionEntity()->getNewEntity();
+        $attachmentEntity = $this->getAttachmentCollectionEntity()->newEntity();
 
         $attachmentEntity->setPath($filePath);
         $attachmentEntity->setName($fileName);
@@ -177,7 +177,7 @@ final class MailTransportEntity extends AEntity
         $fileName = $fileName ?? basename($filePath);
 
         /** @var MailEmbedEntity $embedEntity */
-        $embedEntity = $this->getEmbedCollectionEntity()->getNewEntity();
+        $embedEntity = $this->getEmbedCollectionEntity()->newEntity();
 
         $embedEntity->setPath($filePath);
         $embedEntity->setName($fileName);
@@ -200,7 +200,7 @@ final class MailTransportEntity extends AEntity
     public function addRecipient(string $email, ?string $name = null): void
     {
         /** @var MailTargetEntity $targetEntity */
-        $targetEntity = $this->targetCollectionEntity->getNewEntity();
+        $targetEntity = $this->targetCollectionEntity->newEntity();
 
         $targetEntity->setEmail($email);
         $targetEntity->setName($name);
@@ -298,7 +298,7 @@ final class MailTransportEntity extends AEntity
     public function getLastEmbeddedCid(): ?string
     {
         /** @var MailEmbedEntity $embedEntity */
-        $embedEntity = $this->embedCollectionEntity->getLastEntity();
+        $embedEntity = $this->embedCollectionEntity->getLast();
         return $embedEntity->getCid();
     }
 
@@ -379,7 +379,7 @@ final class MailTransportEntity extends AEntity
             $this->addError("From email is not set");
             return false;
         }
-        if (is_null($this->targetEmail)) {
+        if ($this->targetCollectionEntity->countEntities() === 0) {
             $this->addError("Target email is not set");
             return false;
         }
@@ -401,7 +401,7 @@ final class MailTransportEntity extends AEntity
             return false;
         }
 
-        $filePath = File::getRealPath($filePath);
-        return true;
+        $filePath = File::real($filePath);
+        return is_string($filePath);
     }
 }
