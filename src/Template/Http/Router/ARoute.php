@@ -17,12 +17,17 @@ abstract class ARoute
 
     public function __construct(string $path = "")
     {
-        $path = rtrim("/" . trim($path, "/"), "/");
+        $path = $this->sanitisePath($path);
 
-        if (empty($path)) {
+        if ($path === "") {
             $path = "[/]";
         }
         $this->path = $path;
+    }
+
+    final protected function sanitisePath(string $path): string
+    {
+        return rtrim("/" . trim($path, "/"), "/");
     }
 
     final public function addMiddleware(callable $middleware): static

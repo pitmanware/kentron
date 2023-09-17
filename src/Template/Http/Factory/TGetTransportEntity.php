@@ -13,7 +13,7 @@ trait TGetTransportEntity
      *
      * @return TransportEntity
      */
-    protected static function getTransportEntity(): TransportEntity
+    protected function getTransportEntity(): TransportEntity
     {
         return AppStore::getTransportEntity();
     }

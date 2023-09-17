@@ -17,6 +17,11 @@ class AppStore extends AStore
         return self::$transportEntity;
     }
 
+    public static function setTransportEntity(TransportEntity $transportEntity): void
+    {
+        self::$transportEntity = $transportEntity;
+    }
+
     /**
      * Helpers
      */

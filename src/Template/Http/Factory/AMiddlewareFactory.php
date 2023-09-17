@@ -22,11 +22,11 @@ abstract class AMiddlewareFactory extends AClass
      *
      * @return callable The closure
      */
-    final protected static function getMiddleware(string $middlewareClass): callable
+    final protected function getMiddleware(string $middlewareClass): callable
     {
         return function (ServerRequestInterface $request, RequestHandlerInterface $requestHandler) use ($middlewareClass)
         {
-            $transportEntity = static::getTransportEntity();
+            $transportEntity = $this->getTransportEntity();
             $middleware = new $middlewareClass($transportEntity);
 
             if (!is_subclass_of($middleware, AMiddleware::class)) {

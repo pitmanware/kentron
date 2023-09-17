@@ -10,13 +10,13 @@ final class Group extends ARoute
     /** @var ARoute[] */
     private array $routes = [];
 
-    public function __construct(?string $path = null)
+    public function __construct(string $path = "")
     {
-        if (is_null($path)) {
-            $this->path = "";
+        if ($path === "") {
+            $this->path = $path;
         }
         else {
-            parent::__construct($path);
+            $this->path = parent::sanitisePath($path);
         }
     }
 

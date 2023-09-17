@@ -23,11 +23,11 @@ abstract class AControllerFactory extends AClass
      *
      * @return callable The closure
      */
-    final protected static function getController(string $controllerClass, string $method): callable
+    final protected function getController(string $controllerClass, string $method): callable
     {
         return function (ServerRequestInterface $request, ResponseInterface $response, array $args) use ($controllerClass, $method)
         {
-            $transportEntity = static::getTransportEntity();
+            $transportEntity = $this->getTransportEntity();
 
             $transportEntity->setRequest($request);
             $transportEntity->setResponse($response);
