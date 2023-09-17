@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kentron\Template\Entity;
 
 use Kentron\Support\Assert;
+use Kentron\Enum\EAssertion;
 
 use \Error;
 use \InvalidArgumentException;
@@ -170,7 +171,7 @@ trait TCollection
                                 continue;
                             }
 
-                            if (!Assert::$assertion($value, $result)) {
+                            if (!Assert::parseOperator($assertion)($value, $result)) {
                                 continue 3;
                             }
                         }
@@ -219,7 +220,7 @@ trait TCollection
                 else {
                     if (is_string($key)) {
                         $methodOrProperty = $key;
-                        $assertion = Assert::OP_SAME;
+                        $assertion = EAssertion::Same;
                         $result = $condition;
                     }
                     else {
@@ -240,7 +241,7 @@ trait TCollection
                         continue 2;
                     }
 
-                    if (!Assert::$assertion($value, $result)) {
+                    if (!Assert::parseOperator($assertion)($value, $result)) {
                         continue 2;
                     }
                 }
