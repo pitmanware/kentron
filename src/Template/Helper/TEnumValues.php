@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kentron\Template\Enum;
+namespace Kentron\Template\Helper;
 
 use \BackedEnum;
 use \Error;
