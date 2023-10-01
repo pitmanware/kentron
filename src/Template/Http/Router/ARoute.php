@@ -19,7 +19,7 @@ abstract class ARoute
     {
         $path = $this->sanitisePath($path);
 
-        if ($path === "") {
+        if (empty($path)) {
             $path = "[/]";
         }
         $this->path = $path;

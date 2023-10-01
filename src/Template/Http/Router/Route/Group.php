@@ -12,8 +12,8 @@ final class Group extends ARoute
 
     public function __construct(string $path = "")
     {
-        if ($path === "") {
-            $this->path = $path;
+        if (empty($path)) {
+            $this->path = "";
         }
         else {
             $this->path = parent::sanitisePath($path);
