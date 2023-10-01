@@ -47,7 +47,7 @@ final class DT extends DateTime
      */
     public function increment(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0): self
     {
-        return $this->add(new DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
+        return $this->add(new DateInterval("P{$days}DT{$hours}H{$minutes}M{$seconds}S"));
     }
 
     /**
@@ -62,7 +62,7 @@ final class DT extends DateTime
      */
     public function decrement(int $seconds, int $minutes = 0, int $hours = 0, int $days = 0): self
     {
-        return $this->sub(new DateInterval("P${days}DT${hours}H${minutes}M{$seconds}S"));
+        return $this->sub(new DateInterval("P{$days}DT{$hours}H{$minutes}M{$seconds}S"));
     }
 
     /**
@@ -92,7 +92,7 @@ final class DT extends DateTime
 
     /**
      * Format self based on a given string,
-     * if none given, use ISO 8601
+     * if none given, uses Y-m-d H:i:s
      *
      * @param string $format
      *
@@ -104,7 +104,7 @@ final class DT extends DateTime
             throw new CustomTypeError(__METHOD__, EType::String->value, gettype($format));
         }
 
-        return parent::format($format ?: "c");
+        return parent::format($format ?: "Y-m-d H:i:s");
     }
 
     /**
